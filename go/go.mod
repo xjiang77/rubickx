@@ -1,6 +1,6 @@
 module github.com/xjiang77/rubickx/go
 
-go 1.25.6
+go 1.24.7
 
 require github.com/anthropics/anthropic-sdk-go v1.26.0
 

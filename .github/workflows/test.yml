@@ -25,21 +25,36 @@ jobs:
 
   session-test:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
     strategy:
+      fail-fast: false
       matrix:
         session: [v0, v1, v2, v3, v4, v5, v6, v7, v8a, v8b, v8c, v9]
     steps:
       - uses: actions/checkout@v6
 
+      - name: Check test file exists
+        id: check
+        run: |
+          if [ -f "tests/test_${{ matrix.session }}.py" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping: tests/test_${{ matrix.session }}.py not found"
+          fi
+
       - name: Set up Python
+        if: steps.check.outputs.exists == 'true'
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: steps.check.outputs.exists == 'true'
         run: pip install anthropic python-dotenv
 
       - name: Run ${{ matrix.session }} tests
+        if: steps.check.outputs.exists == 'true'
         env:
           TEST_API_KEY: ${{ secrets.TEST_API_KEY }}
           TEST_BASE_URL: ${{ secrets.TEST_BASE_URL }}

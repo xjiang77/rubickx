@@ -1,109 +1,204 @@
-// s03 - TodoWrite
+// s08 - Background Tasks
 //
-// The model tracks its own progress via a TodoManager. A nag reminder
-// forces it to keep updating when it forgets.
+// Run commands in background goroutines. A notification queue is drained
+// before each LLM call to deliver results.
 //
-//	+----------+      +-------+      +---------+
-//	|   User   | ---> |  LLM  | ---> | Tools   |
-//	|  prompt  |      |       |      | + todo  |
-//	+----------+      +---+---+      +----+----+
-//	                      ^               |
-//	                      |   tool_result |
-//	                      +---------------+
-//	                            |
-//	                +-----------+-----------+
-//	                | TodoManager state     |
-//	                | [ ] task A            |
-//	                | [>] task B <- doing   |
-//	                | [x] task C            |
-//	                +-----------------------+
-//	                            |
-//	                if rounds_since_todo >= 3:
-//	                  inject <reminder>
+//	Main goroutine              Background goroutine
+//	+-----------------+        +-----------------+
+//	| agent loop      |        | task executes   |
+//	| ...             |        | ...             |
+//	| [LLM call] <---+------- | enqueue(result) |
+//	|  ^drain queue   |        +-----------------+
+//	+-----------------+
 //
-// Key insight: "The agent can track its own progress -- and I can see it."
+//	Timeline:
+//	Agent ----[spawn A]----[spawn B]----[other work]----
+//	               |              |
+//	               v              v
+//	            [A runs]      [B runs]        (parallel)
+//	               |              |
+//	               +-- notification queue --> [results injected]
+//
+// Key insight: "Fire and forget -- the agent doesn't block while the command runs."
 package main
 
 import (
 	"bufio"
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
 )
 
-// ========== TodoManager ==========
+// ========== BackgroundManager ==========
 
-// TodoItem represents one task the agent is tracking.
-type TodoItem struct {
-	ID     string `json:"id"`
-	Text   string `json:"text"`
-	Status string `json:"status"` // "pending", "in_progress", "completed"
+// bgTask tracks a single background command.
+type bgTask struct {
+	Status  string `json:"status"` // running | completed | timeout | error
+	Result  string `json:"result"`
+	Command string `json:"command"`
 }
 
-// TodoManager is structured state the LLM writes to.
-type TodoManager struct {
-	Items []TodoItem
+// notification is pushed to the queue when a background task finishes.
+type notification struct {
+	TaskID  string `json:"task_id"`
+	Status  string `json:"status"`
+	Command string `json:"command"`
+	Result  string `json:"result"`
 }
 
-// Update validates and replaces the entire todo list. Returns rendered text.
-func (t *TodoManager) Update(items []TodoItem) (string, error) {
-	if len(items) > 20 {
-		return "", fmt.Errorf("max 20 todos allowed")
-	}
-	inProgressCount := 0
-	for i := range items {
-		item := &items[i]
-		if item.Text == "" {
-			return "", fmt.Errorf("item %s: text required", item.ID)
-		}
-		if item.ID == "" {
-			item.ID = fmt.Sprintf("%d", i+1)
-		}
-		switch item.Status {
-		case "pending", "in_progress", "completed":
-			// valid
-		default:
-			return "", fmt.Errorf("item %s: invalid status '%s'", item.ID, item.Status)
-		}
-		if item.Status == "in_progress" {
-			inProgressCount++
-		}
-	}
-	if inProgressCount > 1 {
-		return "", fmt.Errorf("only one task can be in_progress at a time")
-	}
-	t.Items = items
-	return t.Render(), nil
+// BackgroundManager manages goroutine-based background execution with a
+// thread-safe notification queue.
+type BackgroundManager struct {
+	tasks map[string]*bgTask
+	queue []notification
+	mu    sync.Mutex
 }
 
-// Render returns a human-readable view of the todo list.
-func (t *TodoManager) Render() string {
-	if len(t.Items) == 0 {
-		return "No todos."
+// NewBackgroundManager creates an empty manager.
+func NewBackgroundManager() *BackgroundManager {
+	return &BackgroundManager{
+		tasks: make(map[string]*bgTask),
 	}
-	markers := map[string]string{
-		"pending":     "[ ]",
-		"in_progress": "[>]",
-		"completed":   "[x]",
+}
+
+// Run starts a background goroutine and returns a task ID immediately.
+func (bg *BackgroundManager) Run(command string) string {
+	taskID := randomID()
+	bg.mu.Lock()
+	bg.tasks[taskID] = &bgTask{
+		Status:  "running",
+		Command: command,
 	}
+	bg.mu.Unlock()
+
+	go bg.execute(taskID, command)
+
+	cmdPreview := command
+	if len(cmdPreview) > 80 {
+		cmdPreview = cmdPreview[:80]
+	}
+	return fmt.Sprintf("Background task %s started: %s", taskID, cmdPreview)
+}
+
+// execute is the goroutine target: runs subprocess, captures output, pushes to queue.
+func (bg *BackgroundManager) execute(taskID, command string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "sh", "-c", command)
+	cmd.Dir = workdir
+	output, err := cmd.CombinedOutput()
+
+	var status, result string
+	if ctx.Err() == context.DeadlineExceeded {
+		status = "timeout"
+		result = "Error: Timeout (300s)"
+	} else if err != nil {
+		out := strings.TrimSpace(string(output))
+		if out != "" {
+			status = "completed"
+			result = out
+		} else {
+			status = "error"
+			result = fmt.Sprintf("Error: %v", err)
+		}
+	} else {
+		status = "completed"
+		result = strings.TrimSpace(string(output))
+	}
+
+	if result == "" {
+		result = "(no output)"
+	}
+	if len(result) > 50000 {
+		result = result[:50000]
+	}
+
+	bg.mu.Lock()
+	defer bg.mu.Unlock()
+
+	bg.tasks[taskID].Status = status
+	bg.tasks[taskID].Result = result
+
+	// Truncate result for notification (keep full in tasks map)
+	notifResult := result
+	if len(notifResult) > 500 {
+		notifResult = notifResult[:500]
+	}
+	cmdPreview := command
+	if len(cmdPreview) > 80 {
+		cmdPreview = cmdPreview[:80]
+	}
+
+	bg.queue = append(bg.queue, notification{
+		TaskID:  taskID,
+		Status:  status,
+		Command: cmdPreview,
+		Result:  notifResult,
+	})
+}
+
+// Check returns the status of one task, or lists all if taskID is empty.
+func (bg *BackgroundManager) Check(taskID string) string {
+	bg.mu.Lock()
+	defer bg.mu.Unlock()
+
+	if taskID != "" {
+		t, ok := bg.tasks[taskID]
+		if !ok {
+			return fmt.Sprintf("Error: Unknown task %s", taskID)
+		}
+		r := t.Result
+		if r == "" {
+			r = "(running)"
+		}
+		cmdPreview := t.Command
+		if len(cmdPreview) > 60 {
+			cmdPreview = cmdPreview[:60]
+		}
+		return fmt.Sprintf("[%s] %s\n%s", t.Status, cmdPreview, r)
+	}
+
 	var lines []string
-	done := 0
-	for _, item := range t.Items {
-		lines = append(lines, fmt.Sprintf("%s #%s: %s", markers[item.Status], item.ID, item.Text))
-		if item.Status == "completed" {
-			done++
+	for tid, t := range bg.tasks {
+		cmdPreview := t.Command
+		if len(cmdPreview) > 60 {
+			cmdPreview = cmdPreview[:60]
 		}
+		lines = append(lines, fmt.Sprintf("%s: [%s] %s", tid, t.Status, cmdPreview))
 	}
-	lines = append(lines, fmt.Sprintf("\n(%d/%d completed)", done, len(t.Items)))
+	if len(lines) == 0 {
+		return "No background tasks."
+	}
 	return strings.Join(lines, "\n")
+}
+
+// DrainNotifications returns and clears all pending completion notifications.
+func (bg *BackgroundManager) DrainNotifications() []notification {
+	bg.mu.Lock()
+	defer bg.mu.Unlock()
+
+	notifs := make([]notification, len(bg.queue))
+	copy(notifs, bg.queue)
+	bg.queue = bg.queue[:0]
+	return notifs
+}
+
+// randomID generates an 8-char hex ID (like Python's uuid4()[:8]).
+func randomID() string {
+	b := make([]byte, 4)
+	_, _ = rand.Read(b)
+	return fmt.Sprintf("%x", b)
 }
 
 // ========== Globals ==========
@@ -112,13 +207,22 @@ var (
 	model   string
 	system  string
 	workdir string
+	bg      *BackgroundManager
 	tools   []anthropic.ToolUnionParam
-	todo    = &TodoManager{}
 )
 
 type toolHandler func(input json.RawMessage) string
 
 var dispatch map[string]toolHandler
+
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Background exec + foreground work", `Run "sleep 5 && echo done" in the background, then create a hello.go file while it runs`},
+	{"Multiple background tasks", `Start 3 background tasks: "sleep 2 && echo task1", "sleep 4 && echo task2", "sleep 6 && echo task3". Check their status.`},
+	{"Real-world background usage", `Run "go vet ./..." in the background and keep working on other things`},
+}
 
 func init() {
 	model = os.Getenv("MODEL_ID")
@@ -127,15 +231,16 @@ func init() {
 	}
 
 	workdir, _ = os.Getwd()
-	system = fmt.Sprintf(`You are a coding agent at %s.
-Use the todo tool to plan multi-step tasks. Mark in_progress before starting, completed when done.
-Prefer tools over prose.`, workdir)
+
+	bg = NewBackgroundManager()
+
+	system = fmt.Sprintf("You are a coding agent at %s. Use background_run for long-running commands.", workdir)
 
 	// -- Tool definitions --
 	tools = []anthropic.ToolUnionParam{
 		{OfTool: &anthropic.ToolParam{
 			Name:        "bash",
-			Description: anthropic.String("Run a shell command."),
+			Description: anthropic.String("Run a shell command (blocking)."),
 			InputSchema: anthropic.ToolInputSchemaParam{
 				Properties: map[string]interface{}{
 					"command": map[string]interface{}{"type": "string"},
@@ -178,35 +283,34 @@ Prefer tools over prose.`, workdir)
 			},
 		}},
 		{OfTool: &anthropic.ToolParam{
-			Name:        "todo",
-			Description: anthropic.String("Update task list. Track progress on multi-step tasks."),
+			Name:        "background_run",
+			Description: anthropic.String("Run command in background goroutine. Returns task_id immediately."),
 			InputSchema: anthropic.ToolInputSchemaParam{
 				Properties: map[string]interface{}{
-					"items": map[string]interface{}{
-						"type": "array",
-						"items": map[string]interface{}{
-							"type": "object",
-							"properties": map[string]interface{}{
-								"id":     map[string]interface{}{"type": "string"},
-								"text":   map[string]interface{}{"type": "string"},
-								"status": map[string]interface{}{"type": "string", "enum": []string{"pending", "in_progress", "completed"}},
-							},
-							"required": []string{"id", "text", "status"},
-						},
-					},
+					"command": map[string]interface{}{"type": "string"},
 				},
-				Required: []string{"items"},
+				Required: []string{"command"},
+			},
+		}},
+		{OfTool: &anthropic.ToolParam{
+			Name:        "check_background",
+			Description: anthropic.String("Check background task status. Omit task_id to list all."),
+			InputSchema: anthropic.ToolInputSchemaParam{
+				Properties: map[string]interface{}{
+					"task_id": map[string]interface{}{"type": "string"},
+				},
 			},
 		}},
 	}
 
 	// -- Dispatch map --
 	dispatch = map[string]toolHandler{
-		"bash":       handleBash,
-		"read_file":  handleReadFile,
-		"write_file": handleWriteFile,
-		"edit_file":  handleEditFile,
-		"todo":       handleTodo,
+		"bash":             handleBash,
+		"read_file":        handleReadFile,
+		"write_file":       handleWriteFile,
+		"edit_file":        handleEditFile,
+		"background_run":   handleBackgroundRun,
+		"check_background": handleCheckBackground,
 	}
 }
 
@@ -218,7 +322,7 @@ func safePath(p string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
-	if !strings.HasPrefix(abs, workdir) {
+	if abs != workdir && !strings.HasPrefix(abs, workdir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -262,18 +366,20 @@ func handleEditFile(raw json.RawMessage) string {
 	return runEdit(input.Path, input.OldText, input.NewText)
 }
 
-func handleTodo(raw json.RawMessage) string {
+func handleBackgroundRun(raw json.RawMessage) string {
 	var input struct {
-		Items []TodoItem `json:"items"`
+		Command string `json:"command"`
 	}
-	if err := json.Unmarshal(raw, &input); err != nil {
-		return fmt.Sprintf("Error: %v", err)
+	_ = json.Unmarshal(raw, &input)
+	return bg.Run(input.Command)
+}
+
+func handleCheckBackground(raw json.RawMessage) string {
+	var input struct {
+		TaskID string `json:"task_id"`
 	}
-	result, err := todo.Update(input.Items)
-	if err != nil {
-		return fmt.Sprintf("Error: %v", err)
-	}
-	return result
+	_ = json.Unmarshal(raw, &input)
+	return bg.Check(input.TaskID)
 }
 
 // ========== Tool implementations ==========
@@ -360,19 +466,25 @@ func runEdit(path string, oldText string, newText string) string {
 	return fmt.Sprintf("Edited %s", path)
 }
 
-// ========== Agent Loop (with nag reminder) ==========
+// ========== Agent Loop ==========
 
 func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []anthropic.MessageParam {
-	roundsSinceTodo := 0
-
 	for {
-		// Nag reminder: if 3+ rounds without a todo update, inject reminder
-		if roundsSinceTodo >= 3 && len(messages) > 0 {
-			last := &messages[len(messages)-1]
-			// Prepend a text reminder into the last user message
-			last.Content = append(
-				[]anthropic.ContentBlockParamUnion{anthropic.NewTextBlock("<reminder>Update your todos.</reminder>")},
-				last.Content...,
+		// ---- Drain background notifications before each LLM call ----
+		notifs := bg.DrainNotifications()
+		if len(notifs) > 0 && len(messages) > 0 {
+			var parts []string
+			for _, n := range notifs {
+				parts = append(parts, fmt.Sprintf("[bg:%s] %s: %s", n.TaskID, n.Status, n.Result))
+			}
+			notifText := strings.Join(parts, "\n")
+			messages = append(messages,
+				anthropic.NewUserMessage(
+					anthropic.NewTextBlock(fmt.Sprintf("<background-results>\n%s\n</background-results>", notifText)),
+				),
+				anthropic.NewAssistantMessage(
+					anthropic.NewTextBlock("Noted background results."),
+				),
 			)
 		}
 
@@ -406,7 +518,6 @@ func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []an
 
 		// Execute tools via dispatch
 		var results []anthropic.ContentBlockParamUnion
-		usedTodo := false
 		for _, block := range resp.Content {
 			if block.Type == "tool_use" {
 				handler, ok := dispatch[block.Name]
@@ -418,15 +529,7 @@ func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []an
 				}
 				fmt.Printf("> %s: %s\n", block.Name, truncate(output, 200))
 				results = append(results, anthropic.NewToolResultBlock(block.ID, output, false))
-				if block.Name == "todo" {
-					usedTodo = true
-				}
 			}
-		}
-		if usedTodo {
-			roundsSinceTodo = 0
-		} else {
-			roundsSinceTodo++
 		}
 		messages = append(messages, anthropic.NewUserMessage(results...))
 	}
@@ -448,17 +551,45 @@ func main() {
 	}
 	client := anthropic.NewClient(opts...)
 
+	fmt.Println("\n  s08: Background Tasks")
+	fmt.Print("  \"Non-blocking execution with goroutines\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms03 >> \033[0m")
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms08 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Printf("\033[36ms08 >> \033[0m")
+		}
+
 		if !scanner.Scan() {
 			break
 		}
 		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
+
+		if query == "q" || query == "exit" {
 			break
+		}
+
+		if guidedIdx < len(guided) {
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+		} else {
+			if query == "" {
+				continue
+			}
 		}
 
 		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))

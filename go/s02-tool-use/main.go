@@ -38,6 +38,16 @@ var (
 	tools   []anthropic.ToolUnionParam
 )
 
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Use the read_file tool", `Read the file go.mod to see this project's dependencies`},
+	{"Use write_file to create code", `Create a file called greet/greet.go with a package greet and a Hello(name string) string function`},
+	{"Use edit_file for surgical changes", `Edit greet/greet.go to add a Goodbye function below the Hello function`},
+	{"Verify with read_file", `Read greet/greet.go to verify both functions exist`},
+}
+
 // toolHandler is the signature for every tool executor.
 type toolHandler func(input json.RawMessage) string
 
@@ -120,7 +130,7 @@ func safePath(p string) (string, error) {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
 	// Ensure the resolved path is still under workdir
-	if !strings.HasPrefix(abs, workdir) {
+	if abs != workdir && !strings.HasPrefix(abs, workdir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -321,21 +331,51 @@ func main() {
 	}
 	client := anthropic.NewClient(opts...)
 
+	fmt.Println("\n  s02: Tool Use")
+	fmt.Print("  \"The loop didn't change at all. I just added tools.\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms02 >> \033[0m")
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms02 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Print("\033[36ms02 >> \033[0m")
+		}
+
 		if !scanner.Scan() {
 			break
 		}
-		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
+		input := strings.TrimSpace(scanner.Text())
+
+		if input == "q" || input == "exit" {
 			break
 		}
 
-		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
-		messages = agentLoop(&client, messages)
+		if guidedIdx < len(guided) {
+			query := input
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
+			messages = agentLoop(&client, messages)
+		} else {
+			if input == "" {
+				continue
+			}
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(input)))
+			messages = agentLoop(&client, messages)
+		}
 
 		// Print the last assistant response text
 		if len(messages) > 0 {

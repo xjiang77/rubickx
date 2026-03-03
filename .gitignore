@@ -228,3 +228,26 @@ analysis_progress.md
 
 # MCP config (contains auth tokens)
 .mcp.json
+
+# Go build artifacts
+go/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+
+# Local Go lesson binaries (e.g. go/s06-context-compact/s06-context-compact)
+go/s[0-9][0-9]*/s*
+!go/s[0-9][0-9]*/s*.go
+skill
+
+# macOS
+.DS_Store
+
+# Editors / IDEs (uncomment if you don't want them tracked)
+# .vscode/
+# .idea/

@@ -130,15 +130,15 @@ type TaskManager struct {
 }
 
 type taskData struct {
-	ID          int       `json:"id"`
-	Subject     string    `json:"subject"`
-	Description string    `json:"description"`
-	Status      string    `json:"status"`
-	Owner       string    `json:"owner"`
-	Worktree    string    `json:"worktree"`
-	BlockedBy   []int     `json:"blockedBy"`
-	CreatedAt   float64   `json:"created_at"`
-	UpdatedAt   float64   `json:"updated_at"`
+	ID          int     `json:"id"`
+	Subject     string  `json:"subject"`
+	Description string  `json:"description"`
+	Status      string  `json:"status"`
+	Owner       string  `json:"owner"`
+	Worktree    string  `json:"worktree"`
+	BlockedBy   []int   `json:"blockedBy"`
+	CreatedAt   float64 `json:"created_at"`
+	UpdatedAt   float64 `json:"updated_at"`
 }
 
 func NewTaskManager(dir string) *TaskManager {
@@ -684,6 +684,17 @@ var (
 	dispatch  map[string]func(json.RawMessage) string
 )
 
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Create tasks", `Create tasks for "backend auth module" and "frontend login page", then list tasks.`},
+	{"Bind worktrees to tasks", `Create worktree "auth-refactor" for task 1, then bind task 2 to a new worktree "ui-login".`},
+	{"Run commands in worktree", `Run "git status --short" in worktree "auth-refactor".`},
+	{"Manage worktree lifecycle", `Keep worktree "ui-login", then list worktrees and inspect events.`},
+	{"Clean up with task completion", `Remove worktree "auth-refactor" with complete_task=true, then list tasks/worktrees/events.`},
+}
+
 // ========== Path safety + base tool implementations ==========
 
 func safePath(p string) (string, error) {
@@ -692,7 +703,7 @@ func safePath(p string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
-	if !strings.HasPrefix(abs, workDir) {
+	if abs != workDir && !strings.HasPrefix(abs, workDir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -884,7 +895,9 @@ func buildDispatch() map[string]func(json.RawMessage) string {
 	return map[string]func(json.RawMessage) string{
 		// 4 base tools
 		"bash": func(raw json.RawMessage) string {
-			var in struct{ Command string `json:"command"` }
+			var in struct {
+				Command string `json:"command"`
+			}
 			_ = json.Unmarshal(raw, &in)
 			return runBash(in.Command)
 		},
@@ -926,7 +939,9 @@ func buildDispatch() map[string]func(json.RawMessage) string {
 			return tasks.ListAll()
 		},
 		"task_get": func(raw json.RawMessage) string {
-			var in struct{ TaskID int `json:"task_id"` }
+			var in struct {
+				TaskID int `json:"task_id"`
+			}
 			_ = json.Unmarshal(raw, &in)
 			result, err := tasks.Get(in.TaskID)
 			if err != nil {
@@ -978,7 +993,9 @@ func buildDispatch() map[string]func(json.RawMessage) string {
 			return worktrees.ListAll()
 		},
 		"worktree_status": func(raw json.RawMessage) string {
-			var in struct{ Name string `json:"name"` }
+			var in struct {
+				Name string `json:"name"`
+			}
 			_ = json.Unmarshal(raw, &in)
 			return worktrees.Status(in.Name)
 		},
@@ -1004,7 +1021,9 @@ func buildDispatch() map[string]func(json.RawMessage) string {
 			return result
 		},
 		"worktree_keep": func(raw json.RawMessage) string {
-			var in struct{ Name string `json:"name"` }
+			var in struct {
+				Name string `json:"name"`
+			}
 			_ = json.Unmarshal(raw, &in)
 			result, err := worktrees.Keep(in.Name)
 			if err != nil {
@@ -1013,7 +1032,9 @@ func buildDispatch() map[string]func(json.RawMessage) string {
 			return result
 		},
 		"worktree_events": func(raw json.RawMessage) string {
-			var in struct{ Limit int `json:"limit"` }
+			var in struct {
+				Limit int `json:"limit"`
+			}
 			_ = json.Unmarshal(raw, &in)
 			return events.ListRecent(in.Limit)
 		},
@@ -1113,30 +1134,75 @@ func main() {
 		fmt.Println("Note: Not in a git repo. worktree_* tools will return errors.")
 	}
 
+	fmt.Println("\n  s12: Worktree + Task Isolation")
+	fmt.Print("  \"Isolated workspaces for parallel tasks\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms12 >> \033[0m")
-		if !scanner.Scan() {
-			break
+		var query string
+
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms12 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+			if !scanner.Scan() {
+				break
+			}
+			query = strings.TrimSpace(scanner.Text())
+			if query == "q" || query == "exit" {
+				break
+			}
+			// Local commands: handle without advancing guidedIdx
+			if strings.HasPrefix(query, "/") {
+				if query == "/tasks" {
+					fmt.Println(tasks.ListAll())
+				} else if query == "/worktrees" {
+					fmt.Println(worktrees.ListAll())
+				} else if query == "/events" {
+					fmt.Println(events.ListRecent(20))
+				}
+				continue
+			}
+			// Empty input: use guided prompt
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Printf("\033[36ms12 >> \033[0m")
+			if !scanner.Scan() {
+				break
+			}
+			query = strings.TrimSpace(scanner.Text())
+			if query == "q" || query == "exit" {
+				break
+			}
+			if query == "" {
+				continue
+			}
+			// Local commands
+			if query == "/tasks" {
+				fmt.Println(tasks.ListAll())
+				continue
+			}
+			if query == "/worktrees" {
+				fmt.Println(worktrees.ListAll())
+				continue
+			}
+			if query == "/events" {
+				fmt.Println(events.ListRecent(20))
+				continue
+			}
 		}
-		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
-			break
-		}
-		if query == "/tasks" {
-			fmt.Println(tasks.ListAll())
-			continue
-		}
-		if query == "/worktrees" {
-			fmt.Println(worktrees.ListAll())
-			continue
-		}
-		if query == "/events" {
-			fmt.Println(events.ListRecent(20))
-			continue
-		}
+
 		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
 		messages = agentLoop(messages)
 		if len(messages) > 0 {

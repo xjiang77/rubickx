@@ -1,25 +1,29 @@
-// s08 - Background Tasks
+// s05 - Skills
 //
-// Run commands in background goroutines. A notification queue is drained
-// before each LLM call to deliver results.
+// Two-layer skill injection that avoids bloating the system prompt:
 //
-//	Main goroutine              Background goroutine
-//	+-----------------+        +-----------------+
-//	| agent loop      |        | task executes   |
-//	| ...             |        | ...             |
-//	| [LLM call] <---+------- | enqueue(result) |
-//	|  ^drain queue   |        +-----------------+
-//	+-----------------+
+//	Layer 1 (cheap): skill names in system prompt (~100 tokens/skill)
+//	Layer 2 (on demand): full skill body in tool_result
 //
-//	Timeline:
-//	Agent ----[spawn A]----[spawn B]----[other work]----
-//	               |              |
-//	               v              v
-//	            [A runs]      [B runs]        (parallel)
-//	               |              |
-//	               +-- notification queue --> [results injected]
+//	System prompt:
+//	+--------------------------------------+
+//	| You are a coding agent.              |
+//	| Skills available:                    |
+//	|   - git: Git workflow helpers        |  <-- Layer 1: metadata only
+//	|   - test: Testing best practices     |
+//	+--------------------------------------+
 //
-// Key insight: "Fire and forget -- the agent doesn't block while the command runs."
+//	When model calls load_skill("git"):
+//	+--------------------------------------+
+//	| tool_result:                         |
+//	| <skill>                              |
+//	|   Full git workflow instructions...  |  <-- Layer 2: full body
+//	|   Step 1: ...                        |
+//	|   Step 2: ...                        |
+//	| </skill>                             |
+//	+--------------------------------------+
+//
+// Key insight: "Don't put everything in the system prompt. Load on demand."
 package main
 
 import (
@@ -27,196 +31,159 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"sort"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
 )
 
-// ========== BackgroundManager ==========
+// ========== SkillLoader ==========
 
-// bgTask tracks a single background command.
-type bgTask struct {
-	Status  string `json:"status"`  // running | completed | timeout | error
-	Result  string `json:"result"`
-	Command string `json:"command"`
+// Skill holds parsed metadata and body from a SKILL.md file.
+type Skill struct {
+	Name string
+	Meta map[string]string // frontmatter key-value pairs
+	Body string            // content after frontmatter
+	Path string            // file path for debugging
 }
 
-// notification is pushed to the queue when a background task finishes.
-type notification struct {
-	TaskID  string `json:"task_id"`
-	Status  string `json:"status"`
-	Command string `json:"command"`
-	Result  string `json:"result"`
+// SkillLoader discovers and parses skill files from a directory.
+type SkillLoader struct {
+	Skills map[string]*Skill
 }
 
-// BackgroundManager manages goroutine-based background execution with a
-// thread-safe notification queue.
-type BackgroundManager struct {
-	tasks map[string]*bgTask
-	queue []notification
-	mu    sync.Mutex
-}
-
-// NewBackgroundManager creates an empty manager.
-func NewBackgroundManager() *BackgroundManager {
-	return &BackgroundManager{
-		tasks: make(map[string]*bgTask),
+// NewSkillLoader scans the given directory for skills.
+// Supports two layouts:
+//   - flat:   .skills/git.md       (s05 Python convention)
+//   - nested: skills/git/SKILL.md  (rubickx convention)
+func NewSkillLoader(dirs ...string) *SkillLoader {
+	sl := &SkillLoader{Skills: make(map[string]*Skill)}
+	for _, dir := range dirs {
+		sl.loadDir(dir)
 	}
+	return sl
 }
 
-// Run starts a background goroutine and returns a task ID immediately.
-func (bg *BackgroundManager) Run(command string) string {
-	taskID := randomID()
-	bg.mu.Lock()
-	bg.tasks[taskID] = &bgTask{
-		Status:  "running",
-		Command: command,
+func (sl *SkillLoader) loadDir(dir string) {
+	info, err := os.Stat(dir)
+	if err != nil || !info.IsDir() {
+		return
 	}
-	bg.mu.Unlock()
 
-	go bg.execute(taskID, command)
-
-	cmdPreview := command
-	if len(cmdPreview) > 80 {
-		cmdPreview = cmdPreview[:80]
-	}
-	return fmt.Sprintf("Background task %s started: %s", taskID, cmdPreview)
-}
-
-// execute is the goroutine target: runs subprocess, captures output, pushes to queue.
-func (bg *BackgroundManager) execute(taskID, command string) {
-	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, "sh", "-c", command)
-	cmd.Dir = workdir
-	output, err := cmd.CombinedOutput()
-
-	var status, result string
-	if ctx.Err() == context.DeadlineExceeded {
-		status = "timeout"
-		result = "Error: Timeout (300s)"
-	} else if err != nil {
-		out := strings.TrimSpace(string(output))
-		if out != "" {
-			status = "completed"
-			result = out
-		} else {
-			status = "error"
-			result = fmt.Sprintf("Error: %v", err)
+	entries, _ := os.ReadDir(dir)
+	for _, e := range entries {
+		if e.IsDir() {
+			// nested layout: skills/<name>/SKILL.md
+			skillFile := filepath.Join(dir, e.Name(), "SKILL.md")
+			if data, err := os.ReadFile(skillFile); err == nil {
+				meta, body := parseFrontmatter(string(data))
+				sl.Skills[e.Name()] = &Skill{
+					Name: e.Name(), Meta: meta, Body: body, Path: skillFile,
+				}
+			}
+		} else if strings.HasSuffix(e.Name(), ".md") {
+			// flat layout: .skills/<name>.md
+			name := strings.TrimSuffix(e.Name(), ".md")
+			path := filepath.Join(dir, e.Name())
+			if data, err := os.ReadFile(path); err == nil {
+				meta, body := parseFrontmatter(string(data))
+				sl.Skills[name] = &Skill{
+					Name: name, Meta: meta, Body: body, Path: path,
+				}
+			}
 		}
-	} else {
-		status = "completed"
-		result = strings.TrimSpace(string(output))
 	}
-
-	if result == "" {
-		result = "(no output)"
-	}
-	if len(result) > 50000 {
-		result = result[:50000]
-	}
-
-	bg.mu.Lock()
-	defer bg.mu.Unlock()
-
-	bg.tasks[taskID].Status = status
-	bg.tasks[taskID].Result = result
-
-	// Truncate result for notification (keep full in tasks map)
-	notifResult := result
-	if len(notifResult) > 500 {
-		notifResult = notifResult[:500]
-	}
-	cmdPreview := command
-	if len(cmdPreview) > 80 {
-		cmdPreview = cmdPreview[:80]
-	}
-
-	bg.queue = append(bg.queue, notification{
-		TaskID:  taskID,
-		Status:  status,
-		Command: cmdPreview,
-		Result:  notifResult,
-	})
 }
 
-// Check returns the status of one task, or lists all if taskID is empty.
-func (bg *BackgroundManager) Check(taskID string) string {
-	bg.mu.Lock()
-	defer bg.mu.Unlock()
+var frontmatterRe = regexp.MustCompile(`(?s)^---\n(.*?)\n---\n(.*)`)
 
-	if taskID != "" {
-		t, ok := bg.tasks[taskID]
-		if !ok {
-			return fmt.Sprintf("Error: Unknown task %s", taskID)
-		}
-		r := t.Result
-		if r == "" {
-			r = "(running)"
-		}
-		cmdPreview := t.Command
-		if len(cmdPreview) > 60 {
-			cmdPreview = cmdPreview[:60]
-		}
-		return fmt.Sprintf("[%s] %s\n%s", t.Status, cmdPreview, r)
+// parseFrontmatter extracts YAML-like key: value pairs between --- delimiters.
+func parseFrontmatter(text string) (map[string]string, string) {
+	match := frontmatterRe.FindStringSubmatch(text)
+	if match == nil {
+		return map[string]string{}, text
 	}
+	meta := map[string]string{}
+	for _, line := range strings.Split(strings.TrimSpace(match[1]), "\n") {
+		if idx := strings.Index(line, ":"); idx >= 0 {
+			key := strings.TrimSpace(line[:idx])
+			val := strings.TrimSpace(line[idx+1:])
+			meta[key] = val
+		}
+	}
+	return meta, strings.TrimSpace(match[2])
+}
+
+// GetDescriptions returns Layer 1: short descriptions for the system prompt.
+func (sl *SkillLoader) GetDescriptions() string {
+	if len(sl.Skills) == 0 {
+		return "(no skills available)"
+	}
+	// Sort for deterministic output
+	names := make([]string, 0, len(sl.Skills))
+	for name := range sl.Skills {
+		names = append(names, name)
+	}
+	sort.Strings(names)
 
 	var lines []string
-	for tid, t := range bg.tasks {
-		cmdPreview := t.Command
-		if len(cmdPreview) > 60 {
-			cmdPreview = cmdPreview[:60]
+	for _, name := range names {
+		skill := sl.Skills[name]
+		desc := skill.Meta["description"]
+		if desc == "" {
+			desc = "No description"
 		}
-		lines = append(lines, fmt.Sprintf("%s: [%s] %s", tid, t.Status, cmdPreview))
-	}
-	if len(lines) == 0 {
-		return "No background tasks."
+		line := fmt.Sprintf("  - %s: %s", name, desc)
+		if tags, ok := skill.Meta["tags"]; ok && tags != "" {
+			line += fmt.Sprintf(" [%s]", tags)
+		}
+		lines = append(lines, line)
 	}
 	return strings.Join(lines, "\n")
 }
 
-// DrainNotifications returns and clears all pending completion notifications.
-func (bg *BackgroundManager) DrainNotifications() []notification {
-	bg.mu.Lock()
-	defer bg.mu.Unlock()
-
-	notifs := make([]notification, len(bg.queue))
-	copy(notifs, bg.queue)
-	bg.queue = bg.queue[:0]
-	return notifs
-}
-
-// randomID generates an 8-char hex ID (like Python's uuid4()[:8]).
-func randomID() string {
-	const chars = "0123456789abcdef"
-	b := make([]byte, 8)
-	for i := range b {
-		b[i] = chars[rand.Intn(len(chars))]
+// GetContent returns Layer 2: full skill body wrapped in <skill> tags.
+func (sl *SkillLoader) GetContent(name string) string {
+	skill, ok := sl.Skills[name]
+	if !ok {
+		available := make([]string, 0, len(sl.Skills))
+		for k := range sl.Skills {
+			available = append(available, k)
+		}
+		return fmt.Sprintf("Error: Unknown skill '%s'. Available: %s", name, strings.Join(available, ", "))
 	}
-	return string(b)
+	return fmt.Sprintf("<skill name=%q>\n%s\n</skill>", name, skill.Body)
 }
 
 // ========== Globals ==========
 
 var (
-	model   string
-	system  string
-	workdir string
-	bg      *BackgroundManager
-	tools   []anthropic.ToolUnionParam
+	model       string
+	system      string
+	workdir     string
+	skillLoader *SkillLoader
+	tools       []anthropic.ToolUnionParam
 )
 
 type toolHandler func(input json.RawMessage) string
 
 var dispatch map[string]toolHandler
+
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Discover available skills", `What skills are available?`},
+	{"Load and use a skill", `Load the agent-builder skill and follow its instructions`},
+	{"Contextual skill loading", `I need to do a code review -- load the relevant skill first`},
+	{"Complex skill workflow", `Build an MCP server using the mcp-builder skill`},
+}
 
 func init() {
 	model = os.Getenv("MODEL_ID")
@@ -226,15 +193,24 @@ func init() {
 
 	workdir, _ = os.Getwd()
 
-	bg = NewBackgroundManager()
+	// Load skills from both possible directories
+	skillLoader = NewSkillLoader(
+		filepath.Join(workdir, ".skills"),
+		filepath.Join(workdir, "skills"),
+	)
 
-	system = fmt.Sprintf("You are a coding agent at %s. Use background_run for long-running commands.", workdir)
+	// Layer 1: skill metadata injected into system prompt
+	system = fmt.Sprintf(`You are a coding agent at %s.
+Use load_skill to access specialized knowledge before tackling unfamiliar topics.
+
+Skills available:
+%s`, workdir, skillLoader.GetDescriptions())
 
 	// -- Tool definitions --
 	tools = []anthropic.ToolUnionParam{
 		{OfTool: &anthropic.ToolParam{
 			Name:        "bash",
-			Description: anthropic.String("Run a shell command (blocking)."),
+			Description: anthropic.String("Run a shell command."),
 			InputSchema: anthropic.ToolInputSchemaParam{
 				Properties: map[string]interface{}{
 					"command": map[string]interface{}{"type": "string"},
@@ -277,34 +253,24 @@ func init() {
 			},
 		}},
 		{OfTool: &anthropic.ToolParam{
-			Name:        "background_run",
-			Description: anthropic.String("Run command in background goroutine. Returns task_id immediately."),
+			Name:        "load_skill",
+			Description: anthropic.String("Load specialized knowledge by name."),
 			InputSchema: anthropic.ToolInputSchemaParam{
 				Properties: map[string]interface{}{
-					"command": map[string]interface{}{"type": "string"},
+					"name": map[string]interface{}{"type": "string", "description": "Skill name to load"},
 				},
-				Required: []string{"command"},
-			},
-		}},
-		{OfTool: &anthropic.ToolParam{
-			Name:        "check_background",
-			Description: anthropic.String("Check background task status. Omit task_id to list all."),
-			InputSchema: anthropic.ToolInputSchemaParam{
-				Properties: map[string]interface{}{
-					"task_id": map[string]interface{}{"type": "string"},
-				},
+				Required: []string{"name"},
 			},
 		}},
 	}
 
 	// -- Dispatch map --
 	dispatch = map[string]toolHandler{
-		"bash":             handleBash,
-		"read_file":        handleReadFile,
-		"write_file":       handleWriteFile,
-		"edit_file":        handleEditFile,
-		"background_run":   handleBackgroundRun,
-		"check_background": handleCheckBackground,
+		"bash":       handleBash,
+		"read_file":  handleReadFile,
+		"write_file": handleWriteFile,
+		"edit_file":  handleEditFile,
+		"load_skill": handleLoadSkill,
 	}
 }
 
@@ -316,7 +282,7 @@ func safePath(p string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
-	if !strings.HasPrefix(abs, workdir) {
+	if abs != workdir && !strings.HasPrefix(abs, workdir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -360,20 +326,12 @@ func handleEditFile(raw json.RawMessage) string {
 	return runEdit(input.Path, input.OldText, input.NewText)
 }
 
-func handleBackgroundRun(raw json.RawMessage) string {
+func handleLoadSkill(raw json.RawMessage) string {
 	var input struct {
-		Command string `json:"command"`
+		Name string `json:"name"`
 	}
 	_ = json.Unmarshal(raw, &input)
-	return bg.Run(input.Command)
-}
-
-func handleCheckBackground(raw json.RawMessage) string {
-	var input struct {
-		TaskID string `json:"task_id"`
-	}
-	_ = json.Unmarshal(raw, &input)
-	return bg.Check(input.TaskID)
+	return skillLoader.GetContent(input.Name)
 }
 
 // ========== Tool implementations ==========
@@ -464,24 +422,6 @@ func runEdit(path string, oldText string, newText string) string {
 
 func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []anthropic.MessageParam {
 	for {
-		// ---- Drain background notifications before each LLM call ----
-		notifs := bg.DrainNotifications()
-		if len(notifs) > 0 && len(messages) > 0 {
-			var parts []string
-			for _, n := range notifs {
-				parts = append(parts, fmt.Sprintf("[bg:%s] %s: %s", n.TaskID, n.Status, n.Result))
-			}
-			notifText := strings.Join(parts, "\n")
-			messages = append(messages,
-				anthropic.NewUserMessage(
-					anthropic.NewTextBlock(fmt.Sprintf("<background-results>\n%s\n</background-results>", notifText)),
-				),
-				anthropic.NewAssistantMessage(
-					anthropic.NewTextBlock("Noted background results."),
-				),
-			)
-		}
-
 		resp, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
 			Model:     anthropic.Model(model),
 			System:    []anthropic.TextBlockParam{{Text: system}},
@@ -545,17 +485,45 @@ func main() {
 	}
 	client := anthropic.NewClient(opts...)
 
+	fmt.Println("\n  s05: Skill Loading")
+	fmt.Print("  \"Lazy-load capabilities on demand\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms08 >> \033[0m")
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms05 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Printf("\033[36ms05 >> \033[0m")
+		}
+
 		if !scanner.Scan() {
 			break
 		}
 		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
+
+		if query == "q" || query == "exit" {
 			break
+		}
+
+		if guidedIdx < len(guided) {
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+		} else {
+			if query == "" {
+				continue
+			}
 		}
 
 		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))

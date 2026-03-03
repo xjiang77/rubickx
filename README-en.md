@@ -16,7 +16,7 @@ rubickx/
 │   ├── web/                   # Next.js learning platform
 │   └── skills/                # Skill files for s05
 ├── go/                        # Go implementation
-│   ├── s01/ ... s12/          # 12 progressive sessions
+│   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 progressive sessions
 │   └── docs/                  # Go walkthrough docs
 │       ├── zh/                # 中文
 │       └── en/                # English
@@ -44,7 +44,7 @@ cp .env.example .env
 # Edit .env with your API key
 
 # Run any session
-cd go && go run ./s01
+make run S=01
 ```
 
 See [go/docs/en/](go/docs/en/) for detailed walkthroughs of each session.

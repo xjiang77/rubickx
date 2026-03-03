@@ -35,9 +35,9 @@ package main
 import (
 	"bufio"
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -437,11 +437,15 @@ func (tm *TeammateManager) loop(name, role, prompt string) {
 func (tm *TeammateManager) execTool(sender, toolName string, rawInput json.RawMessage) string {
 	switch toolName {
 	case "bash":
-		var in struct{ Command string `json:"command"` }
+		var in struct {
+			Command string `json:"command"`
+		}
 		_ = json.Unmarshal(rawInput, &in)
 		return runBash(in.Command)
 	case "read_file":
-		var in struct{ Path string `json:"path"` }
+		var in struct {
+			Path string `json:"path"`
+		}
 		_ = json.Unmarshal(rawInput, &in)
 		return runRead(in.Path, 0)
 	case "write_file":
@@ -494,7 +498,9 @@ func (tm *TeammateManager) execTool(sender, toolName string, rawInput json.RawMe
 		}
 		return "Shutdown rejected"
 	case "plan_approval":
-		var in struct{ Plan string `json:"plan"` }
+		var in struct {
+			Plan string `json:"plan"`
+		}
 		_ = json.Unmarshal(rawInput, &in)
 		reqID := randomID()
 		trackerMu.Lock()
@@ -504,7 +510,9 @@ func (tm *TeammateManager) execTool(sender, toolName string, rawInput json.RawMe
 			map[string]interface{}{"request_id": reqID, "plan": in.Plan})
 		return fmt.Sprintf("Plan submitted (request_id=%s). Waiting for approval.", reqID)
 	case "claim_task":
-		var in struct{ TaskID int `json:"task_id"` }
+		var in struct {
+			TaskID int `json:"task_id"`
+		}
 		_ = json.Unmarshal(rawInput, &in)
 		return claimTask(in.TaskID, sender)
 	default:
@@ -627,6 +635,17 @@ type toolHandler func(input json.RawMessage) string
 
 var dispatch map[string]toolHandler
 
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Create tasks for auto-claim", `Create 3 tasks on the board, then spawn alice and bob. Watch them auto-claim.`},
+	{"Observe autonomous behavior", `Spawn a coder teammate and let it find work from the task board itself`},
+	{"Task dependencies respected", `Create tasks with dependencies. Watch teammates respect the blocked order.`},
+	{"Check task board", `/tasks`},
+	{"Check team status", `/team`},
+}
+
 func init() {
 	model = os.Getenv("MODEL_ID")
 	if model == "" {
@@ -676,53 +695,98 @@ func init() {
 
 	dispatch = map[string]toolHandler{
 		"bash": func(raw json.RawMessage) string {
-			var in struct{ Command string `json:"command"` }
-			_ = json.Unmarshal(raw, &in); return runBash(in.Command)
+			var in struct {
+				Command string `json:"command"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return runBash(in.Command)
 		},
 		"read_file": func(raw json.RawMessage) string {
-			var in struct { Path string `json:"path"`; Limit int `json:"limit"` }
-			_ = json.Unmarshal(raw, &in); return runRead(in.Path, in.Limit)
+			var in struct {
+				Path  string `json:"path"`
+				Limit int    `json:"limit"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return runRead(in.Path, in.Limit)
 		},
 		"write_file": func(raw json.RawMessage) string {
-			var in struct { Path string `json:"path"`; Content string `json:"content"` }
-			_ = json.Unmarshal(raw, &in); return runWrite(in.Path, in.Content)
+			var in struct {
+				Path    string `json:"path"`
+				Content string `json:"content"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return runWrite(in.Path, in.Content)
 		},
 		"edit_file": func(raw json.RawMessage) string {
-			var in struct { Path string `json:"path"`; OldText string `json:"old_text"`; NewText string `json:"new_text"` }
-			_ = json.Unmarshal(raw, &in); return runEdit(in.Path, in.OldText, in.NewText)
+			var in struct {
+				Path    string `json:"path"`
+				OldText string `json:"old_text"`
+				NewText string `json:"new_text"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return runEdit(in.Path, in.OldText, in.NewText)
 		},
 		"spawn_teammate": func(raw json.RawMessage) string {
-			var in struct { Name string `json:"name"`; Role string `json:"role"`; Prompt string `json:"prompt"` }
-			_ = json.Unmarshal(raw, &in); return team.Spawn(in.Name, in.Role, in.Prompt)
+			var in struct {
+				Name   string `json:"name"`
+				Role   string `json:"role"`
+				Prompt string `json:"prompt"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return team.Spawn(in.Name, in.Role, in.Prompt)
 		},
-		"list_teammates":  func(raw json.RawMessage) string { return team.ListAll() },
+		"list_teammates": func(raw json.RawMessage) string { return team.ListAll() },
 		"send_message": func(raw json.RawMessage) string {
-			var in struct { To string `json:"to"`; Content string `json:"content"`; MsgType string `json:"msg_type"` }
-			_ = json.Unmarshal(raw, &in); return bus.Send("lead", in.To, in.Content, in.MsgType, nil)
+			var in struct {
+				To      string `json:"to"`
+				Content string `json:"content"`
+				MsgType string `json:"msg_type"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return bus.Send("lead", in.To, in.Content, in.MsgType, nil)
 		},
 		"read_inbox": func(raw json.RawMessage) string {
-			msgs := bus.ReadInbox("lead"); data, _ := json.MarshalIndent(msgs, "", "  "); return string(data)
+			msgs := bus.ReadInbox("lead")
+			data, _ := json.MarshalIndent(msgs, "", "  ")
+			return string(data)
 		},
 		"broadcast": func(raw json.RawMessage) string {
-			var in struct{ Content string `json:"content"` }
-			_ = json.Unmarshal(raw, &in); return bus.Broadcast("lead", in.Content, team.MemberNames())
+			var in struct {
+				Content string `json:"content"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return bus.Broadcast("lead", in.Content, team.MemberNames())
 		},
 		"shutdown_request": func(raw json.RawMessage) string {
-			var in struct{ Teammate string `json:"teammate"` }
-			_ = json.Unmarshal(raw, &in); return handleShutdownRequest(in.Teammate)
+			var in struct {
+				Teammate string `json:"teammate"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return handleShutdownRequest(in.Teammate)
 		},
 		"shutdown_response": func(raw json.RawMessage) string {
-			var in struct{ RequestID string `json:"request_id"` }
-			_ = json.Unmarshal(raw, &in); return checkShutdownStatus(in.RequestID)
+			var in struct {
+				RequestID string `json:"request_id"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return checkShutdownStatus(in.RequestID)
 		},
 		"plan_approval": func(raw json.RawMessage) string {
-			var in struct { RequestID string `json:"request_id"`; Approve bool `json:"approve"`; Feedback string `json:"feedback"` }
-			_ = json.Unmarshal(raw, &in); return handlePlanReview(in.RequestID, in.Approve, in.Feedback)
+			var in struct {
+				RequestID string `json:"request_id"`
+				Approve   bool   `json:"approve"`
+				Feedback  string `json:"feedback"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return handlePlanReview(in.RequestID, in.Approve, in.Feedback)
 		},
-		"idle":       func(raw json.RawMessage) string { return "Lead does not idle." },
+		"idle": func(raw json.RawMessage) string { return "Lead does not idle." },
 		"claim_task": func(raw json.RawMessage) string {
-			var in struct{ TaskID int `json:"task_id"` }
-			_ = json.Unmarshal(raw, &in); return claimTask(in.TaskID, "lead")
+			var in struct {
+				TaskID int `json:"task_id"`
+			}
+			_ = json.Unmarshal(raw, &in)
+			return claimTask(in.TaskID, "lead")
 		},
 	}
 }
@@ -735,7 +799,7 @@ func safePath(p string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
-	if !strings.HasPrefix(abs, workdir) {
+	if abs != workdir && !strings.HasPrefix(abs, workdir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -818,13 +882,11 @@ func runEdit(path string, oldText string, newText string) string {
 		return fmt.Sprintf("Edited %s", path)
 	}()
 }
+
 func randomID() string {
-	const chars = "0123456789abcdef"
-	b := make([]byte, 8)
-	for i := range b {
-		b[i] = chars[rand.Intn(len(chars))]
-	}
-	return string(b)
+	b := make([]byte, 4)
+	_, _ = rand.Read(b)
+	return fmt.Sprintf("%x", b)
 }
 
 // ========== Agent Loop (lead) ==========
@@ -894,58 +956,110 @@ func main() {
 	}
 	apiClient = anthropic.NewClient(opts...)
 
+	fmt.Println("\n  s11: Autonomous Agents")
+	fmt.Print("  \"Idle-cycle polling & self-directed work\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
+
+	// tasksLocalCmd handles the /tasks local command inline.
+	tasksLocalCmd := func() {
+		_ = os.MkdirAll(tasksDir, 0o755)
+		entries, _ := os.ReadDir(tasksDir)
+		var names []string
+		for _, e := range entries {
+			if strings.HasPrefix(e.Name(), "task_") && strings.HasSuffix(e.Name(), ".json") {
+				names = append(names, e.Name())
+			}
+		}
+		sort.Strings(names)
+		for _, n := range names {
+			data, _ := os.ReadFile(filepath.Join(tasksDir, n))
+			var t map[string]interface{}
+			_ = json.Unmarshal(data, &t)
+			status, _ := t["status"].(string)
+			subject, _ := t["subject"].(string)
+			owner, _ := t["owner"].(string)
+			marker := map[string]string{"pending": "[ ]", "in_progress": "[>]", "completed": "[x]"}[status]
+			if marker == "" {
+				marker = "[?]"
+			}
+			ownerStr := ""
+			if owner != "" {
+				ownerStr = " @" + owner
+			}
+			id, _ := t["id"].(float64)
+			fmt.Printf("  %s #%d: %s%s\n", marker, int(id), subject, ownerStr)
+		}
+	}
 
 	for {
-		fmt.Print("\033[36ms11 >> \033[0m")
-		if !scanner.Scan() {
-			break
-		}
-		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
-			break
-		}
-		if query == "/team" {
-			fmt.Println(team.ListAll())
-			continue
-		}
-		if query == "/inbox" {
-			msgs := bus.ReadInbox("lead")
-			data, _ := json.MarshalIndent(msgs, "", "  ")
-			fmt.Println(string(data))
-			continue
-		}
-		if query == "/tasks" {
-			_ = os.MkdirAll(tasksDir, 0o755)
-			entries, _ := os.ReadDir(tasksDir)
-			var names []string
-			for _, e := range entries {
-				if strings.HasPrefix(e.Name(), "task_") && strings.HasSuffix(e.Name(), ".json") {
-					names = append(names, e.Name())
-				}
+		var query string
+
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms11 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+			if !scanner.Scan() {
+				break
 			}
-			sort.Strings(names)
-			for _, n := range names {
-				data, _ := os.ReadFile(filepath.Join(tasksDir, n))
-				var t map[string]interface{}
-				_ = json.Unmarshal(data, &t)
-				status, _ := t["status"].(string)
-				subject, _ := t["subject"].(string)
-				owner, _ := t["owner"].(string)
-				marker := map[string]string{"pending": "[ ]", "in_progress": "[>]", "completed": "[x]"}[status]
-				if marker == "" {
-					marker = "[?]"
-				}
-				ownerStr := ""
-				if owner != "" {
-					ownerStr = " @" + owner
-				}
-				id, _ := t["id"].(float64)
-				fmt.Printf("  %s #%d: %s%s\n", marker, int(id), subject, ownerStr)
+			query = strings.TrimSpace(scanner.Text())
+			if query == "q" || query == "exit" {
+				break
 			}
-			continue
+			// Local commands: handle without advancing guidedIdx
+			if strings.HasPrefix(query, "/") {
+				if query == "/team" {
+					fmt.Println(team.ListAll())
+				} else if query == "/inbox" {
+					msgs := bus.ReadInbox("lead")
+					data, _ := json.MarshalIndent(msgs, "", "  ")
+					fmt.Println(string(data))
+				} else if query == "/tasks" {
+					tasksLocalCmd()
+				}
+				continue
+			}
+			// Empty input: use guided prompt
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Printf("\033[36ms11 >> \033[0m")
+			if !scanner.Scan() {
+				break
+			}
+			query = strings.TrimSpace(scanner.Text())
+			if query == "q" || query == "exit" {
+				break
+			}
+			if query == "" {
+				continue
+			}
+			// Local commands
+			if query == "/team" {
+				fmt.Println(team.ListAll())
+				continue
+			}
+			if query == "/inbox" {
+				msgs := bus.ReadInbox("lead")
+				data, _ := json.MarshalIndent(msgs, "", "  ")
+				fmt.Println(string(data))
+				continue
+			}
+			if query == "/tasks" {
+				tasksLocalCmd()
+				continue
+			}
 		}
+
 		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
 		messages = agentLoop(messages)
 		if len(messages) > 0 {

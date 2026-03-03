@@ -38,6 +38,16 @@ var (
 	tools  []anthropic.ToolUnionParam
 )
 
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Watch the agent call bash", `Create a file called hello.go with a main function that prints "Hello, World!"`},
+	{"See it build and run Go code", `Build and run hello.go`},
+	{"Multi-step task with tool calls", `Create a directory called calc/ with a main.go that adds two numbers from command-line args, then test it with "go run ./calc/ 3 5"`},
+	{"Explore project structure", `List all Go source files in the current directory tree`},
+}
+
 func init() {
 	model = os.Getenv("MODEL_ID")
 	if model == "" {
@@ -160,21 +170,51 @@ func main() {
 	}
 	client := anthropic.NewClient(opts...)
 
+	fmt.Println("\n  s01: The Agent Loop")
+	fmt.Print("  \"One loop & Bash is all you need\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms01 >> \033[0m")
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms01 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Print("\033[36ms01 >> \033[0m")
+		}
+
 		if !scanner.Scan() {
 			break
 		}
-		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
+		input := strings.TrimSpace(scanner.Text())
+
+		if input == "q" || input == "exit" {
 			break
 		}
 
-		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
-		messages = agentLoop(&client, messages)
+		if guidedIdx < len(guided) {
+			query := input
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
+			messages = agentLoop(&client, messages)
+		} else {
+			if input == "" {
+				continue
+			}
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(input)))
+			messages = agentLoop(&client, messages)
+		}
 
 		// Print the last assistant response text
 		if len(messages) > 0 {

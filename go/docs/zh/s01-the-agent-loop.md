@@ -2,7 +2,7 @@
 
 `[ s01 ] s02 > s03 > s04 > s05 > s06 | s07 > s08 > s09 > s10 > s11 > s12`
 
-> 源码: [`go/s01/main.go`](../../s01/main.go) (190 行)
+> 源码: [`go/s01-the-agent-loop/main.go`](../../s01-the-agent-loop/main.go) (190 行)
 
 ---
 

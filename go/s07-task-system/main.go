@@ -309,6 +309,16 @@ type toolHandler func(input json.RawMessage) string
 
 var dispatch map[string]toolHandler
 
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Create dependent tasks", `Create 3 tasks: "Initialize Go module", "Implement core logic", "Write tests". Make them depend on each other in order.`},
+	{"Inspect the graph", `List all tasks and show the dependency graph`},
+	{"See unblocking in action", `Complete task 1 and then list tasks to see task 2 unblocked`},
+	{"Parallel task graph", `Create a task board for a Go project: "parse config" -> "build server" + "build client" (parallel) -> "integration test"`},
+}
+
 func init() {
 	model = os.Getenv("MODEL_ID")
 	if model == "" {
@@ -440,7 +450,7 @@ func safePath(p string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
-	if !strings.HasPrefix(abs, workdir) {
+	if abs != workdir && !strings.HasPrefix(abs, workdir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -495,10 +505,10 @@ func handleTaskCreate(raw json.RawMessage) string {
 
 func handleTaskUpdate(raw json.RawMessage) string {
 	var input struct {
-		TaskID      int    `json:"task_id"`
-		Status      string `json:"status"`
-		AddBlockedBy []int `json:"addBlockedBy"`
-		AddBlocks    []int `json:"addBlocks"`
+		TaskID       int    `json:"task_id"`
+		Status       string `json:"status"`
+		AddBlockedBy []int  `json:"addBlockedBy"`
+		AddBlocks    []int  `json:"addBlocks"`
 	}
 	_ = json.Unmarshal(raw, &input)
 	return tasks.Update(input.TaskID, input.Status, input.AddBlockedBy, input.AddBlocks)
@@ -667,17 +677,45 @@ func main() {
 	}
 	client := anthropic.NewClient(opts...)
 
+	fmt.Println("\n  s07: Task System")
+	fmt.Print("  \"DAG-based dependency tracking\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms07 >> \033[0m")
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms07 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Printf("\033[36ms07 >> \033[0m")
+		}
+
 		if !scanner.Scan() {
 			break
 		}
 		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
+
+		if query == "q" || query == "exit" {
 			break
+		}
+
+		if guidedIdx < len(guided) {
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+		} else {
+			if query == "" {
+				continue
+			}
 		}
 
 		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))

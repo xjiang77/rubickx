@@ -1,29 +1,27 @@
-// s05 - Skills
+// s03 - TodoWrite
 //
-// Two-layer skill injection that avoids bloating the system prompt:
+// The model tracks its own progress via a TodoManager. A nag reminder
+// forces it to keep updating when it forgets.
 //
-//	Layer 1 (cheap): skill names in system prompt (~100 tokens/skill)
-//	Layer 2 (on demand): full skill body in tool_result
+//	+----------+      +-------+      +---------+
+//	|   User   | ---> |  LLM  | ---> | Tools   |
+//	|  prompt  |      |       |      | + todo  |
+//	+----------+      +---+---+      +----+----+
+//	                      ^               |
+//	                      |   tool_result |
+//	                      +---------------+
+//	                            |
+//	                +-----------+-----------+
+//	                | TodoManager state     |
+//	                | [ ] task A            |
+//	                | [>] task B <- doing   |
+//	                | [x] task C            |
+//	                +-----------------------+
+//	                            |
+//	                if rounds_since_todo >= 3:
+//	                  inject <reminder>
 //
-//	System prompt:
-//	+--------------------------------------+
-//	| You are a coding agent.              |
-//	| Skills available:                    |
-//	|   - git: Git workflow helpers        |  <-- Layer 1: metadata only
-//	|   - test: Testing best practices     |
-//	+--------------------------------------+
-//
-//	When model calls load_skill("git"):
-//	+--------------------------------------+
-//	| tool_result:                         |
-//	| <skill>                              |
-//	|   Full git workflow instructions...  |  <-- Layer 2: full body
-//	|   Step 1: ...                        |
-//	|   Step 2: ...                        |
-//	| </skill>                             |
-//	+--------------------------------------+
-//
-// Key insight: "Don't put everything in the system prompt. Load on demand."
+// Key insight: "The agent can track its own progress -- and I can see it."
 package main
 
 import (
@@ -34,8 +32,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
-	"sort"
 	"strings"
 	"time"
 
@@ -43,133 +39,91 @@ import (
 	"github.com/anthropics/anthropic-sdk-go/option"
 )
 
-// ========== SkillLoader ==========
+// ========== TodoManager ==========
 
-// Skill holds parsed metadata and body from a SKILL.md file.
-type Skill struct {
-	Name string
-	Meta map[string]string // frontmatter key-value pairs
-	Body string            // content after frontmatter
-	Path string            // file path for debugging
+// TodoItem represents one task the agent is tracking.
+type TodoItem struct {
+	ID     string `json:"id"`
+	Text   string `json:"text"`
+	Status string `json:"status"` // "pending", "in_progress", "completed"
 }
 
-// SkillLoader discovers and parses skill files from a directory.
-type SkillLoader struct {
-	Skills map[string]*Skill
+// TodoManager is structured state the LLM writes to.
+type TodoManager struct {
+	Items []TodoItem
 }
 
-// NewSkillLoader scans the given directory for skills.
-// Supports two layouts:
-//   - flat:   .skills/git.md       (s05 Python convention)
-//   - nested: skills/git/SKILL.md  (rubickx convention)
-func NewSkillLoader(dirs ...string) *SkillLoader {
-	sl := &SkillLoader{Skills: make(map[string]*Skill)}
-	for _, dir := range dirs {
-		sl.loadDir(dir)
+// Update validates and replaces the entire todo list. Returns rendered text.
+func (t *TodoManager) Update(items []TodoItem) (string, error) {
+	if len(items) > 20 {
+		return "", fmt.Errorf("max 20 todos allowed")
 	}
-	return sl
-}
-
-func (sl *SkillLoader) loadDir(dir string) {
-	info, err := os.Stat(dir)
-	if err != nil || !info.IsDir() {
-		return
-	}
-
-	entries, _ := os.ReadDir(dir)
-	for _, e := range entries {
-		if e.IsDir() {
-			// nested layout: skills/<name>/SKILL.md
-			skillFile := filepath.Join(dir, e.Name(), "SKILL.md")
-			if data, err := os.ReadFile(skillFile); err == nil {
-				meta, body := parseFrontmatter(string(data))
-				sl.Skills[e.Name()] = &Skill{
-					Name: e.Name(), Meta: meta, Body: body, Path: skillFile,
-				}
-			}
-		} else if strings.HasSuffix(e.Name(), ".md") {
-			// flat layout: .skills/<name>.md
-			name := strings.TrimSuffix(e.Name(), ".md")
-			path := filepath.Join(dir, e.Name())
-			if data, err := os.ReadFile(path); err == nil {
-				meta, body := parseFrontmatter(string(data))
-				sl.Skills[name] = &Skill{
-					Name: name, Meta: meta, Body: body, Path: path,
-				}
-			}
+	inProgressCount := 0
+	for i := range items {
+		item := &items[i]
+		if item.Text == "" {
+			return "", fmt.Errorf("item %s: text required", item.ID)
+		}
+		if item.ID == "" {
+			item.ID = fmt.Sprintf("%d", i+1)
+		}
+		switch item.Status {
+		case "pending", "in_progress", "completed":
+			// valid
+		default:
+			return "", fmt.Errorf("item %s: invalid status '%s'", item.ID, item.Status)
+		}
+		if item.Status == "in_progress" {
+			inProgressCount++
 		}
 	}
+	if inProgressCount > 1 {
+		return "", fmt.Errorf("only one task can be in_progress at a time")
+	}
+	t.Items = items
+	return t.Render(), nil
 }
 
-var frontmatterRe = regexp.MustCompile(`(?s)^---\n(.*?)\n---\n(.*)`)
-
-// parseFrontmatter extracts YAML-like key: value pairs between --- delimiters.
-func parseFrontmatter(text string) (map[string]string, string) {
-	match := frontmatterRe.FindStringSubmatch(text)
-	if match == nil {
-		return map[string]string{}, text
+// Render returns a human-readable view of the todo list.
+func (t *TodoManager) Render() string {
+	if len(t.Items) == 0 {
+		return "No todos."
 	}
-	meta := map[string]string{}
-	for _, line := range strings.Split(strings.TrimSpace(match[1]), "\n") {
-		if idx := strings.Index(line, ":"); idx >= 0 {
-			key := strings.TrimSpace(line[:idx])
-			val := strings.TrimSpace(line[idx+1:])
-			meta[key] = val
-		}
+	markers := map[string]string{
+		"pending":     "[ ]",
+		"in_progress": "[>]",
+		"completed":   "[x]",
 	}
-	return meta, strings.TrimSpace(match[2])
-}
-
-// GetDescriptions returns Layer 1: short descriptions for the system prompt.
-func (sl *SkillLoader) GetDescriptions() string {
-	if len(sl.Skills) == 0 {
-		return "(no skills available)"
-	}
-	// Sort for deterministic output
-	names := make([]string, 0, len(sl.Skills))
-	for name := range sl.Skills {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-
 	var lines []string
-	for _, name := range names {
-		skill := sl.Skills[name]
-		desc := skill.Meta["description"]
-		if desc == "" {
-			desc = "No description"
+	done := 0
+	for _, item := range t.Items {
+		lines = append(lines, fmt.Sprintf("%s #%s: %s", markers[item.Status], item.ID, item.Text))
+		if item.Status == "completed" {
+			done++
 		}
-		line := fmt.Sprintf("  - %s: %s", name, desc)
-		if tags, ok := skill.Meta["tags"]; ok && tags != "" {
-			line += fmt.Sprintf(" [%s]", tags)
-		}
-		lines = append(lines, line)
 	}
+	lines = append(lines, fmt.Sprintf("\n(%d/%d completed)", done, len(t.Items)))
 	return strings.Join(lines, "\n")
-}
-
-// GetContent returns Layer 2: full skill body wrapped in <skill> tags.
-func (sl *SkillLoader) GetContent(name string) string {
-	skill, ok := sl.Skills[name]
-	if !ok {
-		available := make([]string, 0, len(sl.Skills))
-		for k := range sl.Skills {
-			available = append(available, k)
-		}
-		return fmt.Sprintf("Error: Unknown skill '%s'. Available: %s", name, strings.Join(available, ", "))
-	}
-	return fmt.Sprintf("<skill name=%q>\n%s\n</skill>", name, skill.Body)
 }
 
 // ========== Globals ==========
 
 var (
-	model       string
-	system      string
-	workdir     string
-	skillLoader *SkillLoader
-	tools       []anthropic.ToolUnionParam
+	model   string
+	system  string
+	workdir string
+	tools   []anthropic.ToolUnionParam
+	todo    = &TodoManager{}
 )
+
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Multi-step refactor with todo tracking", `Create a Go CLI tool in cmd/todo/ that manages a todo list stored in a JSON file, with add/list/done subcommands`},
+	{"Project scaffolding task", `Create a Go package in pkg/mathutil/ with Add, Subtract, Multiply functions and a corresponding test file pkg/mathutil/mathutil_test.go`},
+	{"Review task with multiple files", `Review all .go files we created and fix any issues — add missing error handling and improve naming`},
+}
 
 type toolHandler func(input json.RawMessage) string
 
@@ -182,19 +136,9 @@ func init() {
 	}
 
 	workdir, _ = os.Getwd()
-
-	// Load skills from both possible directories
-	skillLoader = NewSkillLoader(
-		filepath.Join(workdir, ".skills"),
-		filepath.Join(workdir, "skills"),
-	)
-
-	// Layer 1: skill metadata injected into system prompt
 	system = fmt.Sprintf(`You are a coding agent at %s.
-Use load_skill to access specialized knowledge before tackling unfamiliar topics.
-
-Skills available:
-%s`, workdir, skillLoader.GetDescriptions())
+Use the todo tool to plan multi-step tasks. Mark in_progress before starting, completed when done.
+Prefer tools over prose.`, workdir)
 
 	// -- Tool definitions --
 	tools = []anthropic.ToolUnionParam{
@@ -243,13 +187,24 @@ Skills available:
 			},
 		}},
 		{OfTool: &anthropic.ToolParam{
-			Name:        "load_skill",
-			Description: anthropic.String("Load specialized knowledge by name."),
+			Name:        "todo",
+			Description: anthropic.String("Update task list. Track progress on multi-step tasks."),
 			InputSchema: anthropic.ToolInputSchemaParam{
 				Properties: map[string]interface{}{
-					"name": map[string]interface{}{"type": "string", "description": "Skill name to load"},
+					"items": map[string]interface{}{
+						"type": "array",
+						"items": map[string]interface{}{
+							"type": "object",
+							"properties": map[string]interface{}{
+								"id":     map[string]interface{}{"type": "string"},
+								"text":   map[string]interface{}{"type": "string"},
+								"status": map[string]interface{}{"type": "string", "enum": []string{"pending", "in_progress", "completed"}},
+							},
+							"required": []string{"id", "text", "status"},
+						},
+					},
 				},
-				Required: []string{"name"},
+				Required: []string{"items"},
 			},
 		}},
 	}
@@ -260,7 +215,7 @@ Skills available:
 		"read_file":  handleReadFile,
 		"write_file": handleWriteFile,
 		"edit_file":  handleEditFile,
-		"load_skill": handleLoadSkill,
+		"todo":       handleTodo,
 	}
 }
 
@@ -272,7 +227,7 @@ func safePath(p string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
-	if !strings.HasPrefix(abs, workdir) {
+	if abs != workdir && !strings.HasPrefix(abs, workdir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -316,12 +271,18 @@ func handleEditFile(raw json.RawMessage) string {
 	return runEdit(input.Path, input.OldText, input.NewText)
 }
 
-func handleLoadSkill(raw json.RawMessage) string {
+func handleTodo(raw json.RawMessage) string {
 	var input struct {
-		Name string `json:"name"`
+		Items []TodoItem `json:"items"`
 	}
-	_ = json.Unmarshal(raw, &input)
-	return skillLoader.GetContent(input.Name)
+	if err := json.Unmarshal(raw, &input); err != nil {
+		return fmt.Sprintf("Error: %v", err)
+	}
+	result, err := todo.Update(input.Items)
+	if err != nil {
+		return fmt.Sprintf("Error: %v", err)
+	}
+	return result
 }
 
 // ========== Tool implementations ==========
@@ -408,10 +369,22 @@ func runEdit(path string, oldText string, newText string) string {
 	return fmt.Sprintf("Edited %s", path)
 }
 
-// ========== Agent Loop ==========
+// ========== Agent Loop (with nag reminder) ==========
 
 func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []anthropic.MessageParam {
+	roundsSinceTodo := 0
+
 	for {
+		// Nag reminder: if 3+ rounds without a todo update, inject reminder
+		if roundsSinceTodo >= 3 && len(messages) > 0 {
+			last := &messages[len(messages)-1]
+			// Prepend a text reminder into the last user message
+			last.Content = append(
+				[]anthropic.ContentBlockParamUnion{anthropic.NewTextBlock("<reminder>Update your todos.</reminder>")},
+				last.Content...,
+			)
+		}
+
 		resp, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
 			Model:     anthropic.Model(model),
 			System:    []anthropic.TextBlockParam{{Text: system}},
@@ -442,6 +415,7 @@ func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []an
 
 		// Execute tools via dispatch
 		var results []anthropic.ContentBlockParamUnion
+		usedTodo := false
 		for _, block := range resp.Content {
 			if block.Type == "tool_use" {
 				handler, ok := dispatch[block.Name]
@@ -453,7 +427,15 @@ func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []an
 				}
 				fmt.Printf("> %s: %s\n", block.Name, truncate(output, 200))
 				results = append(results, anthropic.NewToolResultBlock(block.ID, output, false))
+				if block.Name == "todo" {
+					usedTodo = true
+				}
 			}
+		}
+		if usedTodo {
+			roundsSinceTodo = 0
+		} else {
+			roundsSinceTodo++
 		}
 		messages = append(messages, anthropic.NewUserMessage(results...))
 	}
@@ -475,21 +457,51 @@ func main() {
 	}
 	client := anthropic.NewClient(opts...)
 
+	fmt.Println("\n  s03: TodoWrite")
+	fmt.Print("  \"The agent can track its own progress -- and I can see it.\"\n\n")
+
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms05 >> \033[0m")
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms03 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Print("\033[36ms03 >> \033[0m")
+		}
+
 		if !scanner.Scan() {
 			break
 		}
-		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
+		input := strings.TrimSpace(scanner.Text())
+
+		if input == "q" || input == "exit" {
 			break
 		}
 
-		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
-		messages = agentLoop(&client, messages)
+		if guidedIdx < len(guided) {
+			query := input
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
+			messages = agentLoop(&client, messages)
+		} else {
+			if input == "" {
+				continue
+			}
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(input)))
+			messages = agentLoop(&client, messages)
+		}
 
 		// Print the last assistant response text
 		if len(messages) > 0 {

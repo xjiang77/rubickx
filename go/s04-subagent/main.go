@@ -1,34 +1,23 @@
-// s06 - Compact
+// s04 - Subagents
 //
-// Three-layer compression pipeline so the agent can work forever:
+// Spawn a child agent with fresh messages=[]. The child works in its own
+// context, sharing the filesystem, then returns only a summary to the parent.
 //
-//	Every turn:
-//	+------------------+
-//	| Tool call result |
-//	+------------------+
-//	        |
-//	        v
-//	[Layer 1: microCompact]        (silent, every turn)
-//	  Replace tool_result content older than last 3
-//	  with "[Previous: used {tool_name}]"
-//	        |
-//	        v
-//	[Check: tokens > 50000?]
-//	   |               |
-//	   no              yes
-//	   |               |
-//	   v               v
-//	continue    [Layer 2: autoCompact]
-//	              Save full transcript to .transcripts/
-//	              Ask LLM to summarize conversation.
-//	              Replace all messages with [summary].
-//	                    |
-//	                    v
-//	            [Layer 3: compact tool]
-//	              Model calls compact -> immediate summarization.
-//	              Same as auto, triggered manually.
+//	Parent agent                     Subagent
+//	+------------------+             +------------------+
+//	| messages=[...]   |             | messages=[]      |  <-- fresh
+//	|                  |  dispatch   |                  |
+//	| tool: task       | ----------> | while tool_use:  |
+//	|   prompt="..."   |             |   call tools     |
+//	|   description="" |             |   append results |
+//	|                  |  summary    |                  |
+//	|   result = "..." | <---------- | return last text |
+//	+------------------+             +------------------+
+//	          |
+//	Parent context stays clean.
+//	Subagent context is discarded.
 //
-// Key insight: "The agent can forget strategically and keep working forever."
+// Key insight: "Process isolation gives context isolation for free."
 package main
 
 import (
@@ -46,23 +35,25 @@ import (
 	"github.com/anthropics/anthropic-sdk-go/option"
 )
 
-// ========== Constants ==========
-
-const (
-	threshold  = 50000 // token estimate threshold for auto_compact
-	keepRecent = 3     // number of recent tool results to preserve
-)
-
 // ========== Globals ==========
 
 var (
-	model         string
-	system        string
-	workdir       string
-	transcriptDir string
-	tools         []anthropic.ToolUnionParam
-	globalClient  *anthropic.Client
+	model          string
+	workdir        string
+	parentSystem   string
+	subagentSystem string
+	childTools     []anthropic.ToolUnionParam
+	parentTools    []anthropic.ToolUnionParam
 )
+
+var guided = []struct {
+	step   string
+	prompt string
+}{
+	{"Delegate a research task", `Use a subtask to read go.mod and summarize what each dependency does`},
+	{"Delegate file analysis", `Delegate: read all .go files in this directory tree and summarize what each one does`},
+	{"Subagent creates, parent verifies", `Use a subtask to create a Go HTTP handler in server/handler.go, then verify it compiles from here`},
+}
 
 type toolHandler func(input json.RawMessage) string
 
@@ -75,10 +66,11 @@ func init() {
 	}
 
 	workdir, _ = os.Getwd()
-	transcriptDir = filepath.Join(workdir, ".transcripts")
-	system = fmt.Sprintf("You are a coding agent at %s. Use tools to solve tasks.", workdir)
+	parentSystem = fmt.Sprintf("You are a coding agent at %s. Use the task tool to delegate exploration or subtasks.", workdir)
+	subagentSystem = fmt.Sprintf("You are a coding subagent at %s. Complete the given task, then summarize your findings.", workdir)
 
-	tools = []anthropic.ToolUnionParam{
+	// -- Child tools: base tools only (no recursive spawning) --
+	childTools = []anthropic.ToolUnionParam{
 		{OfTool: &anthropic.ToolParam{
 			Name:        "bash",
 			Description: anthropic.String("Run a shell command."),
@@ -123,151 +115,29 @@ func init() {
 				Required: []string{"path", "old_text", "new_text"},
 			},
 		}},
-		{OfTool: &anthropic.ToolParam{
-			Name:        "compact",
-			Description: anthropic.String("Trigger manual conversation compression."),
+	}
+
+	// -- Parent tools: child tools + task dispatcher --
+	parentTools = append(childTools, anthropic.ToolUnionParam{
+		OfTool: &anthropic.ToolParam{
+			Name:        "task",
+			Description: anthropic.String("Spawn a subagent with fresh context. It shares the filesystem but not conversation history."),
 			InputSchema: anthropic.ToolInputSchemaParam{
 				Properties: map[string]interface{}{
-					"focus": map[string]interface{}{
-						"type":        "string",
-						"description": "What to preserve in the summary",
-					},
+					"prompt":      map[string]interface{}{"type": "string"},
+					"description": map[string]interface{}{"type": "string", "description": "Short description of the task"},
 				},
+				Required: []string{"prompt"},
 			},
-		}},
-	}
-
-	dispatch = map[string]toolHandler{
-		"bash":      handleBash,
-		"read_file": handleReadFile,
-		"write_file": handleWriteFile,
-		"edit_file":  handleEditFile,
-	}
-}
-
-// ========== Token estimation ==========
-
-// estimateTokens gives a rough token count: ~4 chars per token.
-func estimateTokens(messages []anthropic.MessageParam) int {
-	data, _ := json.Marshal(messages)
-	return len(data) / 4
-}
-
-// ========== Layer 1: micro_compact ==========
-
-// microCompact replaces old tool_result contents with short placeholders.
-// Keeps only the last keepRecent tool results intact.
-func microCompact(messages []anthropic.MessageParam) {
-	// Collect all tool result locations
-	type toolResultLoc struct {
-		msgIdx  int
-		partIdx int
-	}
-	var locs []toolResultLoc
-
-	for i, msg := range messages {
-		if msg.Role != "user" {
-			continue
-		}
-		for j, part := range msg.Content {
-			if part.OfToolResult != nil {
-				locs = append(locs, toolResultLoc{i, j})
-			}
-		}
-	}
-
-	if len(locs) <= keepRecent {
-		return
-	}
-
-	// Build tool_use_id → tool_name map from assistant messages
-	toolNameMap := map[string]string{}
-	for _, msg := range messages {
-		if msg.Role != "assistant" {
-			continue
-		}
-		for _, part := range msg.Content {
-			if part.OfToolUse != nil {
-				toolNameMap[part.OfToolUse.ID] = part.OfToolUse.Name
-			}
-		}
-	}
-
-	// Clear old results (keep last keepRecent)
-	toClear := locs[:len(locs)-keepRecent]
-	for _, loc := range toClear {
-		tr := messages[loc.msgIdx].Content[loc.partIdx].OfToolResult
-		if tr == nil {
-			continue
-		}
-		// Check if content is long enough to compact
-		contentLen := 0
-		for _, c := range tr.Content {
-			if c.OfText != nil {
-				contentLen += len(c.OfText.Text)
-			}
-		}
-		if contentLen > 100 {
-			toolName := toolNameMap[tr.ToolUseID]
-			if toolName == "" {
-				toolName = "unknown"
-			}
-			tr.Content = []anthropic.ToolResultBlockParamContentUnion{
-				{OfText: &anthropic.TextBlockParam{Text: fmt.Sprintf("[Previous: used %s]", toolName)}},
-			}
-		}
-	}
-}
-
-// ========== Layer 2: auto_compact ==========
-
-// autoCompact saves the full transcript to disk, asks the LLM to summarize,
-// and returns a fresh two-message history with the summary.
-func autoCompact(messages []anthropic.MessageParam) []anthropic.MessageParam {
-	// Save transcript to .transcripts/
-	os.MkdirAll(transcriptDir, 0o755)
-	transcriptPath := filepath.Join(transcriptDir,
-		fmt.Sprintf("transcript_%d.jsonl", time.Now().Unix()))
-
-	f, err := os.Create(transcriptPath)
-	if err == nil {
-		encoder := json.NewEncoder(f)
-		for _, msg := range messages {
-			encoder.Encode(msg)
-		}
-		f.Close()
-	}
-	fmt.Printf("[transcript saved: %s]\n", transcriptPath)
-
-	// Ask LLM to summarize
-	conversationData, _ := json.Marshal(messages)
-	conversationText := string(conversationData)
-	if len(conversationText) > 80000 {
-		conversationText = conversationText[:80000]
-	}
-
-	resp, err := globalClient.Messages.New(context.Background(), anthropic.MessageNewParams{
-		Model: anthropic.Model(model),
-		Messages: []anthropic.MessageParam{
-			anthropic.NewUserMessage(anthropic.NewTextBlock(
-				"Summarize this conversation for continuity. Include: " +
-					"1) What was accomplished, 2) Current state, 3) Key decisions made. " +
-					"Be concise but preserve critical details.\n\n" + conversationText)),
 		},
-		MaxTokens: 2000,
 	})
 
-	summary := "(summary failed)"
-	if err == nil && len(resp.Content) > 0 {
-		summary = resp.Content[0].Text
-	}
-
-	// Replace all messages with compressed summary
-	return []anthropic.MessageParam{
-		anthropic.NewUserMessage(anthropic.NewTextBlock(
-			fmt.Sprintf("[Conversation compressed. Transcript: %s]\n\n%s", transcriptPath, summary))),
-		anthropic.NewAssistantMessage(anthropic.NewTextBlock(
-			"Understood. I have the context from the summary. Continuing.")),
+	// -- Dispatch map: base tools only (task handled separately) --
+	dispatch = map[string]toolHandler{
+		"bash":       handleBash,
+		"read_file":  handleReadFile,
+		"write_file": handleWriteFile,
+		"edit_file":  handleEditFile,
 	}
 }
 
@@ -279,7 +149,7 @@ func safePath(p string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %s", p)
 	}
-	if !strings.HasPrefix(abs, workdir) {
+	if abs != workdir && !strings.HasPrefix(abs, workdir+string(filepath.Separator)) {
 		return "", fmt.Errorf("path escapes workspace: %s", p)
 	}
 	return abs, nil
@@ -407,29 +277,27 @@ func runEdit(path string, oldText string, newText string) string {
 	return fmt.Sprintf("Edited %s", path)
 }
 
-// ========== Agent Loop (with three-layer compression) ==========
+// ========== Subagent ==========
 
-func agentLoop(messages *[]anthropic.MessageParam) {
-	for {
-		// Layer 1: micro_compact before each LLM call
-		microCompact(*messages)
+// runSubagent spawns a child agent with fresh context.
+// It runs its own agent loop, then returns only the final text summary.
+// The child's message history is discarded after completion.
+func runSubagent(client *anthropic.Client, prompt string) string {
+	// Fresh context — no parent history
+	subMessages := []anthropic.MessageParam{
+		anthropic.NewUserMessage(anthropic.NewTextBlock(prompt)),
+	}
 
-		// Layer 2: auto_compact if token estimate exceeds threshold
-		if estimateTokens(*messages) > threshold {
-			fmt.Println("[auto_compact triggered]")
-			*messages = autoCompact(*messages)
-		}
-
-		resp, err := globalClient.Messages.New(context.Background(), anthropic.MessageNewParams{
+	for i := 0; i < 30; i++ { // safety limit
+		resp, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
 			Model:     anthropic.Model(model),
-			System:    []anthropic.TextBlockParam{{Text: system}},
-			Messages:  *messages,
-			Tools:     tools,
+			System:    []anthropic.TextBlockParam{{Text: subagentSystem}},
+			Messages:  subMessages,
+			Tools:     childTools, // no "task" tool — prevents recursive spawning
 			MaxTokens: 8000,
 		})
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "API error: %v\n", err)
-			return
+			return fmt.Sprintf("Subagent error: %v", err)
 		}
 
 		// Append assistant turn
@@ -442,21 +310,94 @@ func agentLoop(messages *[]anthropic.MessageParam) {
 				assistantBlocks = append(assistantBlocks, anthropic.NewToolUseBlock(block.ID, block.Input, block.Name))
 			}
 		}
-		*messages = append(*messages, anthropic.NewAssistantMessage(assistantBlocks...))
+		subMessages = append(subMessages, anthropic.NewAssistantMessage(assistantBlocks...))
 
 		if resp.StopReason != "tool_use" {
-			return
+			// Extract final text and return — child context discarded
+			var texts []string
+			for _, block := range resp.Content {
+				if block.Type == "text" && block.Text != "" {
+					texts = append(texts, block.Text)
+				}
+			}
+			if len(texts) == 0 {
+				return "(no summary)"
+			}
+			return strings.Join(texts, "")
 		}
 
 		// Execute tools
 		var results []anthropic.ContentBlockParamUnion
-		manualCompact := false
+		for _, block := range resp.Content {
+			if block.Type == "tool_use" {
+				handler, ok := dispatch[block.Name]
+				var output string
+				if ok {
+					output = handler(block.Input)
+				} else {
+					output = fmt.Sprintf("Unknown tool: %s", block.Name)
+				}
+				if len(output) > 50000 {
+					output = output[:50000]
+				}
+				results = append(results, anthropic.NewToolResultBlock(block.ID, output, false))
+			}
+		}
+		subMessages = append(subMessages, anthropic.NewUserMessage(results...))
+	}
+
+	return "(subagent hit iteration limit)"
+}
+
+// ========== Parent Agent Loop ==========
+
+func agentLoop(client *anthropic.Client, messages []anthropic.MessageParam) []anthropic.MessageParam {
+	for {
+		resp, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
+			Model:     anthropic.Model(model),
+			System:    []anthropic.TextBlockParam{{Text: parentSystem}},
+			Messages:  messages,
+			Tools:     parentTools,
+			MaxTokens: 8000,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "API error: %v\n", err)
+			return messages
+		}
+
+		// Append assistant turn
+		assistantBlocks := make([]anthropic.ContentBlockParamUnion, 0, len(resp.Content))
+		for _, block := range resp.Content {
+			switch block.Type {
+			case "text":
+				assistantBlocks = append(assistantBlocks, anthropic.NewTextBlock(block.Text))
+			case "tool_use":
+				assistantBlocks = append(assistantBlocks, anthropic.NewToolUseBlock(block.ID, block.Input, block.Name))
+			}
+		}
+		messages = append(messages, anthropic.NewAssistantMessage(assistantBlocks...))
+
+		if resp.StopReason != "tool_use" {
+			return messages
+		}
+
+		// Execute tools — task gets special handling
+		var results []anthropic.ContentBlockParamUnion
 		for _, block := range resp.Content {
 			if block.Type == "tool_use" {
 				var output string
-				if block.Name == "compact" {
-					manualCompact = true
-					output = "Compressing..."
+				if block.Name == "task" {
+					var input struct {
+						Prompt      string `json:"prompt"`
+						Description string `json:"description"`
+					}
+					_ = json.Unmarshal(block.Input, &input)
+					desc := input.Description
+					if desc == "" {
+						desc = "subtask"
+					}
+					fmt.Printf("> task (%s): %s\n", desc, truncate(input.Prompt, 80))
+					output = runSubagent(client, input.Prompt)
 				} else {
 					handler, ok := dispatch[block.Name]
 					if ok {
@@ -465,17 +406,11 @@ func agentLoop(messages *[]anthropic.MessageParam) {
 						output = fmt.Sprintf("Unknown tool: %s", block.Name)
 					}
 				}
-				fmt.Printf("> %s: %s\n", block.Name, truncate(output, 200))
+				fmt.Printf("  %s\n", truncate(output, 200))
 				results = append(results, anthropic.NewToolResultBlock(block.ID, output, false))
 			}
 		}
-		*messages = append(*messages, anthropic.NewUserMessage(results...))
-
-		// Layer 3: manual compact triggered by the compact tool
-		if manualCompact {
-			fmt.Println("[manual compact]")
-			*messages = autoCompact(*messages)
-		}
+		messages = append(messages, anthropic.NewUserMessage(results...))
 	}
 }
 
@@ -494,23 +429,52 @@ func main() {
 		opts = append(opts, option.WithBaseURL(baseURL))
 	}
 	client := anthropic.NewClient(opts...)
-	globalClient = &client
+
+	fmt.Println("\n  s04: Subagents")
+	fmt.Print("  \"Process isolation gives context isolation for free.\"\n\n")
 
 	var messages []anthropic.MessageParam
 	scanner := bufio.NewScanner(os.Stdin)
+	guidedIdx := 0
+	freeModePrinted := false
 
 	for {
-		fmt.Print("\033[36ms06 >> \033[0m")
+		if guidedIdx < len(guided) {
+			fmt.Printf("  Step %d/%d: %s\n", guidedIdx+1, len(guided), guided[guidedIdx].step)
+			fmt.Printf("  → %s\n", guided[guidedIdx].prompt)
+			fmt.Printf("\033[36ms04 [%d/%d] >> \033[0m", guidedIdx+1, len(guided))
+		} else {
+			if !freeModePrinted {
+				fmt.Print("\n  ✓ Guided tour complete. Free mode — type anything, or q to quit.\n\n")
+				freeModePrinted = true
+			}
+			fmt.Print("\033[36ms04 >> \033[0m")
+		}
+
 		if !scanner.Scan() {
 			break
 		}
-		query := strings.TrimSpace(scanner.Text())
-		if query == "" || query == "q" || query == "exit" {
+		input := strings.TrimSpace(scanner.Text())
+
+		if input == "q" || input == "exit" {
 			break
 		}
 
-		messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
-		agentLoop(&messages)
+		if guidedIdx < len(guided) {
+			query := input
+			if query == "" {
+				query = guided[guidedIdx].prompt
+			}
+			guidedIdx++
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(query)))
+			messages = agentLoop(&client, messages)
+		} else {
+			if input == "" {
+				continue
+			}
+			messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(input)))
+			messages = agentLoop(&client, messages)
+		}
 
 		// Print the last assistant response text
 		if len(messages) > 0 {

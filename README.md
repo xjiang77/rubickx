@@ -16,7 +16,7 @@ rubickx/
 │   ├── web/                   # Next.js 学习平台
 │   └── skills/                # Skill 文件 (供 s05 使用)
 ├── go/                        # Go 实现
-│   ├── s01/ ... s12/          # 12 个递进式课程
+│   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 个递进式课程
 │   └── docs/                  # Go walkthrough 文档
 │       ├── zh/                # 中文
 │       └── en/                # English
@@ -44,7 +44,7 @@ cp .env.example .env
 # 编辑 .env，填入你的 API key
 
 # 运行任意课程
-cd go && go run ./s01
+make run S=01
 ```
 
 每个课程都有对应的 walkthrough 文档，详见 [go/docs/zh/](go/docs/zh/)：

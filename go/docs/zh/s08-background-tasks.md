@@ -2,7 +2,7 @@
 
 `s01 > s02 > s03 > s04 > s05 > s06 | s07 > [ s08 ] s09 > s10 > s11 > s12`
 
-> 源码: [`go/s08/main.go`](../../s08/main.go)
+> 源码: [`go/s08-background-tasks/main.go`](../../s08-background-tasks/main.go)
 
 ---
 

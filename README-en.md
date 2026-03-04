@@ -74,12 +74,3 @@ npm install
 npm run dev
 ```
 
-## Tests
-
-```bash
-python tests/test_unit.py
-```
-
-## Future Plans
-
-- Add new language implementations: create `rust/`, `ts/`, etc. at the top level

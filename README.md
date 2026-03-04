@@ -49,20 +49,22 @@ make run S=01
 
 每个课程都有对应的 walkthrough 文档，详见 [go/docs/zh/](go/docs/zh/)：
 
-| 课程 | 主题 | 格言 | 文档 |
-|------|------|------|------|
-| s01 | Agent Loop | "One loop & Bash is all you need" | [walkthrough](go/docs/zh/s01-the-agent-loop.md) |
-| s02 | Tool Use | "加一个工具，只加一个 handler" | [walkthrough](go/docs/zh/s02-tool-use.md) |
-| s03 | Todo Write | "结构化状态，模型自己管理" | [walkthrough](go/docs/zh/s03-todo-write.md) |
-| s04 | Subagent | "fork 一个子循环，隔离上下文" | [walkthrough](go/docs/zh/s04-subagent.md) |
-| s05 | Skill Loading | "动态注入 system prompt" | [walkthrough](go/docs/zh/s05-skill-loading.md) |
-| s06 | Context Compact | "上下文满了就压缩，循环不断" | [walkthrough](go/docs/zh/s06-context-compact.md) |
-| s07 | Task System | "任务是持久化的 todo" | [walkthrough](go/docs/zh/s07-task-system.md) |
-| s08 | Background Tasks | "后台执行，异步通知" | [walkthrough](go/docs/zh/s08-background-tasks.md) |
-| s09 | Agent Teams | "多 agent 协作，共享 task list" | [walkthrough](go/docs/zh/s09-agent-teams.md) |
-| s10 | Team Protocols | "shutdown / plan approval 协议" | [walkthrough](go/docs/zh/s10-team-protocols.md) |
-| s11 | Autonomous Agents | "自治循环，自动发现并执行任务" | [walkthrough](go/docs/zh/s11-autonomous-agents.md) |
-| s12 | Worktree Task Isolation | "git worktree 隔离并行任务" | [walkthrough](go/docs/zh/s12-worktree-task-isolation.md) |
+
+| 课程  | 主题                      | 格言                                | 文档                                                       |
+| --- | ----------------------- | --------------------------------- | -------------------------------------------------------- |
+| s01 | Agent Loop              | "One loop & Bash is all you need" | [walkthrough](go/docs/zh/s01-the-agent-loop.md)          |
+| s02 | Tool Use                | "加一个工具，只加一个 handler"              | [walkthrough](go/docs/zh/s02-tool-use.md)                |
+| s03 | Todo Write              | "结构化状态，模型自己管理"                    | [walkthrough](go/docs/zh/s03-todo-write.md)              |
+| s04 | Subagent                | "fork 一个子循环，隔离上下文"                | [walkthrough](go/docs/zh/s04-subagent.md)                |
+| s05 | Skill Loading           | "动态注入 system prompt"              | [walkthrough](go/docs/zh/s05-skill-loading.md)           |
+| s06 | Context Compact         | "上下文满了就压缩，循环不断"                   | [walkthrough](go/docs/zh/s06-context-compact.md)         |
+| s07 | Task System             | "任务是持久化的 todo"                    | [walkthrough](go/docs/zh/s07-task-system.md)             |
+| s08 | Background Tasks        | "后台执行，异步通知"                       | [walkthrough](go/docs/zh/s08-background-tasks.md)        |
+| s09 | Agent Teams             | "多 agent 协作，共享 task list"         | [walkthrough](go/docs/zh/s09-agent-teams.md)             |
+| s10 | Team Protocols          | "shutdown / plan approval 协议"     | [walkthrough](go/docs/zh/s10-team-protocols.md)          |
+| s11 | Autonomous Agents       | "自治循环，自动发现并执行任务"                  | [walkthrough](go/docs/zh/s11-autonomous-agents.md)       |
+| s12 | Worktree Task Isolation | "git worktree 隔离并行任务"             | [walkthrough](go/docs/zh/s12-worktree-task-isolation.md) |
+
 
 ## Web 学习平台
 
@@ -73,13 +75,3 @@ cd deps/learn-claude-code/web
 npm install
 npm run dev
 ```
-
-## 测试
-
-```bash
-python tests/test_unit.py
-```
-
-## 未来计划
-
-- 新增语言实现：直接在顶层创建 `rust/`, `ts/` 等目录

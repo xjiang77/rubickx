@@ -255,3 +255,9 @@ skill
 # Editors / IDEs (uncomment if you don't want them tracked)
 # .vscode/
 # .idea/
+
+# Local AI/editor config & blog drafts
+.claude/settings.json
+.claude/metadata-updater.sh
+agent-orchestrator.yaml
+blog-invisible-loop.md

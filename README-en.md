@@ -29,7 +29,7 @@ rubickx/
 
 ```bash
 # Clone with submodule
-git clone --recurse-submodules https://github.com/xjiang77/rubickx.git
+git clone --recurse-submodules https://cnb.woa.com/kevinxjiang/rubickx.git
 cd rubickx
 
 # If already cloned without --recurse-submodules
@@ -83,4 +83,3 @@ python tests/test_unit.py
 ## Future Plans
 
 - Add new language implementations: create `rust/`, `ts/`, etc. at the top level
-- Add new upstream dependencies: `git submodule add <url> deps/<name>`

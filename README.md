@@ -29,7 +29,7 @@ rubickx/
 
 ```bash
 # clone（含 submodule）
-git clone --recurse-submodules https://github.com/xjiang77/rubickx.git
+git clone --recurse-submodules https://cnb.woa.com/kevinxjiang/rubickx.git
 cd rubickx
 
 # 如果已经 clone 但没带 --recurse-submodules
@@ -83,4 +83,3 @@ python tests/test_unit.py
 ## 未来计划
 
 - 新增语言实现：直接在顶层创建 `rust/`, `ts/` 等目录
-- 新增上游依赖：`git submodule add <url> deps/<name>`

@@ -74,3 +74,59 @@ npm install
 npm run dev
 ```
 
+## Harness Engineering
+
+The repo now includes a harness for the actual rubickx content loop:
+
+1. intake a classic learning resource
+2. decide whether it should be curated
+3. write a Chinese summary
+4. transform it into an interactive course or blog post when appropriate
+5. keep a trace for failure analysis
+
+Quick commands:
+
+```bash
+make harness-list
+make harness-init RUN=harness/runs/demo
+make harness-init RUN=harness/runs/git-only CASE=git-pro-book
+make harness-grade RUN=harness/runs/demo
+```
+
+See [harness/README.md](harness/README.md) for the contract, scoring model, and case set.
+
+## Project Landing Page
+
+[web/index.html](web/index.html) is now a plain static landing page for the project, intended for GitHub Pages deployment.
+
+```bash
+python3 -m http.server 8000 -d web
+```
+
+Live URL:
+
+- `https://xjiang77.github.io/rubickx/`
+
+Deployment contract:
+
+- `web/` is the only Pages artifact root
+- `main` is the only branch that triggers the production site deploy
+- `.github/workflows/pages.yml` is the only production Pages workflow
+- deployment is gated by `bash .github/scripts/check-pages.sh`
+
+One-time repository setting:
+
+- `Settings -> Pages -> Build and deployment -> Source` must be set to `GitHub Actions`
+
+Local check:
+
+```bash
+bash .github/scripts/check-pages.sh
+```
+
+Troubleshooting:
+
+- If the workflow succeeds but no site is published, verify that Pages `Source` is set to `GitHub Actions` instead of `Deploy from a branch`
+- If artifact upload or deploy fails, verify that the workflow still uploads the `web` directory
+- If `Basic gate` fails, `index.html` is usually referencing a missing local asset, or one of `web/index.html`, `web/styles.css`, `web/favicon.svg` is missing
+- The site is served under the project-site path `/rubickx/`, so future assets must continue to use relative URLs instead of root-based `/...` references

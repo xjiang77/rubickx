@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rubickx | 把经典学习材料变成中文学习资产</title>
+    <meta
+      name="description"
+      content="rubickx 是一个面向 AI Agent 与学习工程的项目，用来搜集经典材料、沉淀中文摘要，并在需要时转成 interactive course 或 blog post。"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <nav class="topbar">
+          <div class="brand">
+            <span class="brand-mark">R</span>
+            <span class="brand-name">rubickx</span>
+          </div>
+          <div class="nav-links">
+            <a href="#mission">Mission</a>
+            <a href="#tracks">Tracks</a>
+            <a href="#harness">Harness</a>
+            <a href="https://github.com/xjiang77/rubickx" target="_blank" rel="noreferrer">GitHub</a>
+          </div>
+        </nav>
+
+        <section class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Learning Engineering for the Chinese-first web</p>
+            <h1>把网上经典学习材料，变成可复用、可迭代、可评测的中文学习资产。</h1>
+            <p class="hero-text">
+              rubickx 的目标不是再造一个资料收藏夹，而是建立一条完整工作流：
+              从 GitHub repo、podcast、YouTube video 到中文摘要、interactive
+              course、blog post，再到可重复运行的 harness evaluation。
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="#mission">了解项目</a>
+              <a class="button secondary" href="#harness">查看 Harness</a>
+            </div>
+          </div>
+
+          <aside class="hero-panel">
+            <p class="panel-label">Current Loop</p>
+            <ol class="loop-list">
+              <li>Collect timeless learning resources</li>
+              <li>Extract durable concepts and trade-offs</li>
+              <li>Write Chinese-first summaries</li>
+              <li>Transform into course or article when needed</li>
+              <li>Grade outputs with a deterministic harness</li>
+            </ol>
+            <div class="pulse-card">
+              <span class="pulse-dot"></span>
+              <div>
+                <strong>Primary language</strong>
+                <p>Chinese explanation, English terms preserved where they matter.</p>
+              </div>
+            </div>
+          </aside>
+        </section>
+      </header>
+
+      <main>
+        <section class="section" id="mission">
+          <div class="section-heading">
+            <p class="section-kicker">Mission</p>
+            <h2>不是做“内容搬运”，而是做“学习重构”。</h2>
+          </div>
+          <div class="card-grid three-up">
+            <article class="info-card">
+              <h3>Input</h3>
+              <p>
+                经典材料来源于真实互联网：优秀 repo、技术播客、视频课程、长文档、reference
+                book。
+              </p>
+            </article>
+            <article class="info-card">
+              <h3>Transformation</h3>
+              <p>
+                每份材料都先判断适不适合重构，再决定输出为中文摘要、interactive
+                course，或 blog post。
+              </p>
+            </article>
+            <article class="info-card">
+              <h3>Evaluation</h3>
+              <p>
+                输出不是“看起来不错”就算完成，而是进入 harness，用 grounding、
+                pedagogy、traceability 等标准评分。
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section highlight-section" id="tracks">
+          <div class="section-heading">
+            <p class="section-kicker">Project Tracks</p>
+            <h2>rubickx 同时做两件事：学 agent，也学怎么教人学习。</h2>
+          </div>
+          <div class="track-grid">
+            <article class="track-card">
+              <span class="track-tag">Track A</span>
+              <h3>Agent Tutorial Core</h3>
+              <p>
+                基于 learn-claude-code 的多语言实现，当前重点是 Go 版本的 12 个递进式 session。
+              </p>
+              <ul>
+                <li>从 agent loop 到 worktree task isolation</li>
+                <li>保留 tutorial 结构，便于系统理解 agent mechanism</li>
+                <li>中文 walkthrough 和英文文档并存</li>
+              </ul>
+            </article>
+            <article class="track-card accent-card">
+              <span class="track-tag">Track B</span>
+              <h3>Content Forge</h3>
+              <p>
+                面向真实学习材料构建“收集、判断、转化、评分”的内容生产管线。
+              </p>
+              <ul>
+                <li>经典资源优先，而不是追热点</li>
+                <li>Chinese-first 输出，保留关键 English terminology</li>
+                <li>最终目标是沉淀可复用学习资产库</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="harness">
+          <div class="section-heading">
+            <p class="section-kicker">Harness Engineering</p>
+            <h2>用可执行评测，而不是口头标准，来逼近高质量学习内容。</h2>
+          </div>
+          <div class="harness-layout">
+            <div class="terminal-card">
+              <div class="terminal-head">
+                <span></span><span></span><span></span>
+              </div>
+              <pre><code>make harness-list
+make harness-init RUN=harness/runs/demo
+make harness-grade RUN=harness/runs/demo</code></pre>
+            </div>
+            <div class="score-card">
+              <h3>What gets graded</h3>
+              <dl>
+                <div>
+                  <dt>Grounding</dt>
+                  <dd>输出是否真的 anchored 在 source material。</dd>
+                </div>
+                <div>
+                  <dt>Decision Fit</dt>
+                  <dd>这份材料到底该做 course 还是 blog，判断是否合理。</dd>
+                </div>
+                <div>
+                  <dt>Chinese Output</dt>
+                  <dd>是否真正做到中文优先，而不是英文摘要加少量翻译。</dd>
+                </div>
+                <div>
+                  <dt>Traceability</dt>
+                  <dd>失败时能否从 trace 里看见过程，而不是只看到坏结果。</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-heading">
+            <p class="section-kicker">Why It Matters</p>
+            <h2>经典材料很多，但真正被“学会”的很少。</h2>
+          </div>
+          <div class="quote-grid">
+            <blockquote class="quote-card">
+              <p>
+                “资料收藏”解决的是获取问题；rubickx 想解决的是理解、重构、复用和验证的问题。
+              </p>
+            </blockquote>
+            <blockquote class="quote-card">
+              <p>
+                对 AI agent 而言，最有价值的不是写出一篇漂亮总结，而是能稳定地产出适合学习的内容。
+              </p>
+            </blockquote>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div>
+          <p class="footer-title">rubickx</p>
+          <p>From classic resources to Chinese learning assets.</p>
+        </div>
+        <div class="footer-links">
+          <a href="#mission">Mission</a>
+          <a href="#tracks">Tracks</a>
+          <a href="#harness">Harness</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

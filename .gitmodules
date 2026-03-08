@@ -3,4 +3,4 @@
 	url = https://github.com/shareAI-lab/learn-claude-code.git
 [submodule "deps/autoresearch-macos"]
 	path = deps/autoresearch-macos
-	url = https://github.com/miolini/autoresearch-macos.git
+	url = https://github.com/xjiang77/autoresearch-macos.git

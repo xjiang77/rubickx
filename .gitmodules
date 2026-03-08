@@ -1,3 +1,6 @@
 [submodule "deps/learn-claude-code"]
 	path = deps/learn-claude-code
 	url = https://github.com/shareAI-lab/learn-claude-code.git
+[submodule "deps/autoresearch-macos"]
+	path = deps/autoresearch-macos
+	url = https://github.com/miolini/autoresearch-macos.git

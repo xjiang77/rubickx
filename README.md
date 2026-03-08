@@ -15,6 +15,7 @@ rubickx/
 │   ├── docs/                  # 三语文档 (en/ja/zh)
 │   ├── web/                   # Next.js 学习平台
 │   └── skills/                # Skill 文件 (供 s05 使用)
+├── deps/autoresearch-macos/   # autoresearch 的 macOS fork (git submodule)
 ├── go/                        # Go 实现
 │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 个递进式课程
 │   └── docs/                  # Go walkthrough 文档
@@ -74,4 +75,22 @@ make run S=01
 cd deps/learn-claude-code/web
 npm install
 npm run dev
+```
+
+## autoresearch-macos
+
+已接入 [miolini/autoresearch-macos](https://github.com/miolini/autoresearch-macos) 作为 `deps/autoresearch-macos` submodule。
+
+```bash
+# 安装 Python 依赖
+make autoresearch-sync
+
+# 首次准备数据与 tokenizer
+make autoresearch-prepare
+
+# 启动一次 5 分钟训练实验
+make autoresearch-run
+
+# 或者一条命令完成上述步骤
+make autoresearch-start
 ```

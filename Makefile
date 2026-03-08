@@ -8,7 +8,7 @@ S ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run run-trpc test test-unit test-api check check-trpc web-dev web-install setup
+.PHONY: help run run-trpc test test-unit test-api check check-trpc web-dev web-install autoresearch-sync autoresearch-prepare autoresearch-run autoresearch-chart autoresearch-batch autoresearch-start setup
 
 help:  ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -43,6 +43,23 @@ web-dev:  ## Start the Next.js dev server
 
 web-install:  ## Install web app dependencies
 	cd deps/learn-claude-code/web && npm install
+
+autoresearch-sync:  ## Install autoresearch-macos dependencies with uv
+	cd deps/autoresearch-macos && uv sync
+
+autoresearch-prepare:  ## Download autoresearch data and train tokenizer
+	cd deps/autoresearch-macos && .venv/bin/python prepare.py
+
+autoresearch-run:  ## Run a single autoresearch-macos training experiment
+	cd deps/autoresearch-macos && .venv/bin/python train.py
+
+autoresearch-chart:  ## Render the autoresearch-macos progress chart from results.tsv
+	cd deps/autoresearch-macos && MPLCONFIGDIR=.mplconfig .venv/bin/python plot_results.py
+
+autoresearch-batch:  ## Run a batch of autoresearch-macos experiments (set N=10)
+	cd deps/autoresearch-macos && MPLCONFIGDIR=.mplconfig .venv/bin/python batch_experiments.py --count $${N:-10}
+
+autoresearch-start: autoresearch-sync autoresearch-prepare autoresearch-run  ## Set up and start autoresearch-macos
 
 setup:  ## Initial project setup (submodule + deps)
 	git submodule update --init --recursive

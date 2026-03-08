@@ -15,6 +15,7 @@ rubickx/
 │   ├── docs/                  # Trilingual documentation (en/ja/zh)
 │   ├── web/                   # Next.js learning platform
 │   └── skills/                # Skill files for s05
+├── deps/autoresearch-macos/   # macOS fork of autoresearch (git submodule)
 ├── go/                        # Go implementation
 │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 progressive sessions
 │   └── docs/                  # Go walkthrough docs
@@ -74,3 +75,20 @@ npm install
 npm run dev
 ```
 
+## autoresearch-macos
+
+The repository now includes [miolini/autoresearch-macos](https://github.com/miolini/autoresearch-macos) as the `deps/autoresearch-macos` submodule.
+
+```bash
+# Install Python dependencies
+make autoresearch-sync
+
+# Prepare data and tokenizer on first run
+make autoresearch-prepare
+
+# Start a single 5-minute training experiment
+make autoresearch-run
+
+# Or do all of the above in one step
+make autoresearch-start
+```

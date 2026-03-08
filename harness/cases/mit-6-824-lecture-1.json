@@ -1,0 +1,24 @@
+{
+  "id": "mit-6-824-lecture-1",
+  "title": "MIT 6.824 Lecture 1",
+  "resource_type": "video",
+  "source": {
+    "url": "https://www.youtube.com/watch?v=cQP8WApzIQQ",
+    "publisher": "MIT CSAIL",
+    "author_or_speaker": "Robert Morris"
+  },
+  "audience": "想系统学习 distributed systems 入门的中文工程师或学生",
+  "learning_goal": "理解 distributed systems 的动机、failure model、performance trade-off，以及为什么课程从 MapReduce 开始。",
+  "expected_transform": "interactive_course",
+  "must_cover": [
+    "distributed systems",
+    "failure model",
+    "performance",
+    "fault tolerance",
+    "MapReduce",
+    "RPC",
+    "state machines"
+  ],
+  "notes": "lecture 适合转成 structured course，因为原始视频线性展开，复习成本高。",
+  "fixture_file": "mit-6-824-lecture-1.md"
+}

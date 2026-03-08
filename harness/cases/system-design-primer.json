@@ -1,0 +1,24 @@
+{
+  "id": "system-design-primer",
+  "title": "The System Design Primer",
+  "resource_type": "repo",
+  "source": {
+    "url": "https://github.com/donnemartin/system-design-primer",
+    "publisher": "GitHub",
+    "author_or_speaker": "Donne Martin and contributors"
+  },
+  "audience": "准备系统设计面试、也想补 distributed systems 基础的中文工程师",
+  "learning_goal": "把零散 system design 面试知识整理成结构化学习路径，并能把核心 trade-off 讲明白。",
+  "expected_transform": "interactive_course",
+  "must_cover": [
+    "scalability",
+    "latency",
+    "availability",
+    "consistency",
+    "load balancer",
+    "database sharding",
+    "cache"
+  ],
+  "notes": "仓库体量大、覆盖面广，适合先重组再教学，不适合直接原样阅读。",
+  "fixture_file": "system-design-primer.md"
+}

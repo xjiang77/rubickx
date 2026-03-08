@@ -25,6 +25,9 @@ jobs:
       - name: Run unit tests
         run: python tests/test_unit.py
 
+      - name: Run harness tests
+        run: python tests/test_harness.py
+
   session-test:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}

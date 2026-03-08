@@ -94,3 +94,68 @@ make autoresearch-run
 # 或者一条命令完成上述步骤
 make autoresearch-start
 ```
+
+## Harness Engineering
+
+项目现在包含一套面向内容策展与课程化的 harness，目标不是测 toy prompt，而是评估这条真实工作流：
+
+1. intake 经典学习材料
+2. 判断是否值得沉淀
+3. 生成中文摘要
+4. 必要时转成 interactive course 或 blog post
+5. 保留 trace 做 failure analysis
+
+快速命令：
+
+```bash
+# 查看 case
+make harness-list
+
+# 初始化一个 run 目录
+make harness-init RUN=harness/runs/demo
+
+# 只跑一个 case
+make harness-init RUN=harness/runs/git-only CASE=git-pro-book
+
+# 填完输出后评分
+make harness-grade RUN=harness/runs/demo
+```
+
+当前 harness 使用 deterministic fixtures 和 heuristic grader，细节见 [harness/README.md](harness/README.md)。
+
+## 项目静态网页
+
+仓库内的 [web/index.html](web/index.html) 是一个纯静态介绍页，适合直接部署到 GitHub Pages。
+
+```bash
+# 本地预览
+python3 -m http.server 8000 -d web
+```
+
+线上地址：
+
+- `https://xjiang77.github.io/rubickx/`
+
+自动发布约定：
+
+- 发布入口固定为 `web/`
+- 只有 `main` 会触发正式发布
+- `.github/workflows/pages.yml` 是唯一正式 Pages deploy 流程
+- 发布前会先跑 `bash .github/scripts/check-pages.sh`
+
+首次启用时需要在 GitHub 仓库设置里完成这一项：
+
+- `Settings -> Pages -> Build and deployment -> Source` 设为 `GitHub Actions`
+
+本地检查：
+
+```bash
+bash .github/scripts/check-pages.sh
+```
+
+故障排查：
+
+- 如果 workflow 能跑但没有生成站点，先检查 Pages 的 `Source` 是否还是 `Deploy from a branch`，它必须改成 `GitHub Actions`
+- 如果 `upload-pages-artifact` 或 deploy 失败，先检查 workflow 里的 artifact path 是否仍然是 `web`
+- 如果 `Basic gate` 失败，通常是 `index.html` 引用了不存在的本地资源，或 `web/index.html` / `web/styles.css` / `web/favicon.svg` 缺失
+- 站点运行在 project-site 路径 `/rubickx/` 下，新增资源时继续使用相对路径，不要写成依赖站点根路径 `/` 的绝对引用

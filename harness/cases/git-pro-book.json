@@ -1,0 +1,24 @@
+{
+  "id": "git-pro-book",
+  "title": "Pro Git",
+  "resource_type": "book",
+  "source": {
+    "url": "https://git-scm.com/book/en/v2",
+    "publisher": "git-scm.com",
+    "author_or_speaker": "Scott Chacon and Ben Straub"
+  },
+  "audience": "希望系统掌握 Git 的中文工程师",
+  "learning_goal": "建立 Git mental model，并能解释 working tree、index、commit graph 与协作命令之间的关系。",
+  "expected_transform": "interactive_course",
+  "must_cover": [
+    "working tree",
+    "index",
+    "commit graph",
+    "branch",
+    "merge",
+    "rebase",
+    "remote collaboration"
+  ],
+  "notes": "经典 reference material，信息密度高，适合拆成 lesson + exercise + checkpoint。",
+  "fixture_file": "git-pro-book.md"
+}

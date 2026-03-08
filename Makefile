@@ -5,10 +5,12 @@
 export
 
 S ?=
+RUN ?= harness/runs/manual
+CASE ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run run-trpc test test-unit test-api check check-trpc web-dev web-install autoresearch-sync autoresearch-prepare autoresearch-run autoresearch-chart autoresearch-batch autoresearch-start setup
+.PHONY: help run run-trpc test test-unit test-harness test-api check check-trpc web-dev web-install autoresearch-sync autoresearch-prepare autoresearch-run autoresearch-chart autoresearch-batch autoresearch-start setup harness-list harness-init harness-grade
 
 help:  ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -22,10 +24,13 @@ run-trpc:  ## Run a session REPL (trpc-agent-go): make run-trpc S=01
 	@test -n "$(S)" || { echo "Usage: make run-trpc S=01"; exit 1; }
 	cd trpc-agent-go && go run ./s$(S)*/
 
-test: check check-trpc test-unit test-api  ## Run all tests (check → unit → api)
+test: check check-trpc test-unit test-harness test-api  ## Run all tests (check → unit → harness → api)
 
 test-unit:  ## Run offline Python unit tests
 	python3 tests/test_unit.py
+
+test-harness:  ## Run harness tests
+	python3 tests/test_harness.py
 
 test-api:  ## Run API connectivity test (needs ANTHROPIC_API_KEY)
 	python3 tests/test_s01_verify.py
@@ -66,3 +71,12 @@ setup:  ## Initial project setup (submodule + deps)
 	cd go && go mod download
 	cd trpc-agent-go && go mod download
 	$(MAKE) web-install
+
+harness-list:  ## List deterministic harness cases
+	python3 -m harness.run list-cases
+
+harness-init:  ## Initialize a harness run directory: make harness-init RUN=harness/runs/demo CASE=git-pro-book
+	python3 -m harness.run init-run --run-dir "$(RUN)" $(if $(CASE),--case $(CASE),)
+
+harness-grade:  ## Grade a harness run directory: make harness-grade RUN=harness/runs/demo
+	python3 -m harness.run grade --run-dir "$(RUN)"

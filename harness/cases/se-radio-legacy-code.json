@@ -1,0 +1,23 @@
+{
+  "id": "se-radio-legacy-code",
+  "title": "Software Engineering Radio: Working Effectively with Legacy Code",
+  "resource_type": "podcast",
+  "source": {
+    "url": "https://www.se-radio.net/2020/09/episode-429-michael-feathers-on-working-effectively-with-legacy-code/",
+    "publisher": "Software Engineering Radio",
+    "author_or_speaker": "Michael Feathers"
+  },
+  "audience": "经常在遗留系统里修 bug 或做 incremental refactor 的中文工程师",
+  "learning_goal": "总结 legacy code 场景下可立即落地的 working rules，而不是只记概念。",
+  "expected_transform": "blog_post",
+  "must_cover": [
+    "legacy code",
+    "safety net",
+    "seams",
+    "small refactor",
+    "tests",
+    "feedback loop"
+  ],
+  "notes": "podcast 更适合沉淀成高可读性的中文 blog，而不是直接做课程。",
+  "fixture_file": "se-radio-legacy-code.md"
+}

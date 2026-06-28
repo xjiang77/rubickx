@@ -1,0 +1,15 @@
+# data / checkpoints / runs
+data/
+*.bin
+*.pt
+*.safetensors
+checkpoints/
+experiments/runs/
+# python
+__pycache__/
+*.pyc
+.venv/
+.uv/
+# os
+.DS_Store
+.writetest

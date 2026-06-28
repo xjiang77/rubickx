@@ -1,0 +1,9 @@
+.build/
+.cache/
+node_modules/
+__pycache__/
+*.class
+.scala-build/
+.bsp/
+.metals/
+.pytest_cache/

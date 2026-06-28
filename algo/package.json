@@ -1,0 +1,12 @@
+{
+  "name": "rubickx-algo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Polyglot LeetCode practice (Python/Go/JS/Java/Scala) for FAANG interview prep.",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

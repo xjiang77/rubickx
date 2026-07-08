@@ -10,11 +10,12 @@
 
 ```
 rubickx/
-├── deps/learn-claude-code/    # 上游课程 (git submodule)
+├── deps/learn-claude-code/    # Learn Claude Code 上游课程 (git submodule)
 │   ├── agents/                # Python 参考实现
 │   ├── docs/                  # 三语文档 (en/ja/zh)
 │   ├── web/                   # Next.js 学习平台
 │   └── skills/                # Skill 文件 (供 s05 使用)
+├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
 ├── go/                        # Go 实现
 │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 个递进式课程
 │   └── docs/                  # Go walkthrough 文档
@@ -35,6 +36,17 @@ cd rubickx
 # 如果已经 clone 但没带 --recurse-submodules
 git submodule update --init --recursive
 ```
+
+## 学习资源源码
+
+Rubickx 首页现在是一个学习 repo / website 索引，入口在 [web/index.html](web/index.html)。
+
+当前收录的源码资源：
+
+| 资源 | Website | Upstream / Fork | 本地源码 | 状态 |
+| --- | --- | --- | --- | --- |
+| Learn Claude Code | <https://learn.shareai.run/> | <https://github.com/shareAI-lab/learn-claude-code> | `deps/learn-claude-code` | 已作为上游 submodule 引入 |
+| Learn Harness Engineering | <https://walkinglabs.github.io/learn-harness-engineering/zh/> | fork: <https://github.com/xjiang77/learn-harness-engineering>；upstream: <https://github.com/walkinglabs/learn-harness-engineering> | `deps/learn-harness-engineering` | 已通过 fork submodule 引入，后续修改提交到 fork |
 
 ## Go 实现
 

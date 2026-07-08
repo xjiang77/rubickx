@@ -3,198 +3,126 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rubickx | 把经典学习材料变成中文学习资产</title>
+    <title>rubickx | 学习资源</title>
     <meta
       name="description"
-      content="rubickx 是一个面向 AI Agent 与学习工程的项目，用来搜集经典材料、沉淀中文摘要，并在需要时转成 interactive course 或 blog post。"
+      content="rubickx 收录值得系统学习和改造的 AI coding、agent engineering 与 learning engineering repo / website。"
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="hero">
-        <nav class="topbar">
-          <div class="brand">
-            <span class="brand-mark">R</span>
-            <span class="brand-name">rubickx</span>
-          </div>
-          <div class="nav-links">
-            <a href="#mission">Mission</a>
-            <a href="#tracks">Tracks</a>
-            <a href="#harness">Harness</a>
-            <a href="https://github.com/xjiang77/rubickx" target="_blank" rel="noreferrer">GitHub</a>
-          </div>
+    <div class="page">
+      <header class="header">
+        <nav class="nav" aria-label="Primary navigation">
+          <a class="brand" href="./index.html">rubickx</a>
+          <a href="https://github.com/xjiang77/rubickx" target="_blank" rel="noreferrer">GitHub</a>
         </nav>
 
-        <section class="hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow">Learning Engineering for the Chinese-first web</p>
-            <h1>把网上经典学习材料，变成可复用、可迭代、可评测的中文学习资产。</h1>
-            <p class="hero-text">
-              rubickx 的目标不是再造一个资料收藏夹，而是建立一条完整工作流：
-              从 GitHub repo、podcast、YouTube video 到中文摘要、interactive
-              course、blog post，再到可重复运行的 harness evaluation。
-            </p>
-            <div class="hero-actions">
-              <a class="button primary" href="#mission">了解项目</a>
-              <a class="button secondary" href="#harness">查看 Harness</a>
-            </div>
-          </div>
-
-          <aside class="hero-panel">
-            <p class="panel-label">Current Loop</p>
-            <ol class="loop-list">
-              <li>Collect timeless learning resources</li>
-              <li>Extract durable concepts and trade-offs</li>
-              <li>Write Chinese-first summaries</li>
-              <li>Transform into course or article when needed</li>
-              <li>Grade outputs with a deterministic harness</li>
-            </ol>
-            <div class="pulse-card">
-              <span class="pulse-dot"></span>
-              <div>
-                <strong>Primary language</strong>
-                <p>Chinese explanation, English terms preserved where they matter.</p>
-              </div>
-            </div>
-          </aside>
-        </section>
+        <p class="eyebrow">Learning repo / website index</p>
+        <h1>学习资源</h1>
+        <p class="intro">
+          收录值得持续学习、复刻和改造的 repo / website。每个条目保留学习入口、
+          上游源码、本地源码位置和源码状态。
+        </p>
       </header>
 
-      <main>
-        <section class="section" id="mission">
-          <div class="section-heading">
-            <p class="section-kicker">Mission</p>
-            <h2>不是做“内容搬运”，而是做“学习重构”。</h2>
+      <main class="resources" aria-label="Learning resources">
+        <article class="resource">
+          <div class="resource-title">
+            <h2>Learn Claude Code</h2>
+            <span>已引入</span>
           </div>
-          <div class="card-grid three-up">
-            <article class="info-card">
-              <h3>Input</h3>
-              <p>
-                经典材料来源于真实互联网：优秀 repo、技术播客、视频课程、长文档、reference
-                book。
-              </p>
-            </article>
-            <article class="info-card">
-              <h3>Transformation</h3>
-              <p>
-                每份材料都先判断适不适合重构，再决定输出为中文摘要、interactive
-                course，或 blog post。
-              </p>
-            </article>
-            <article class="info-card">
-              <h3>Evaluation</h3>
-              <p>
-                输出不是“看起来不错”就算完成，而是进入 harness，用 grounding、
-                pedagogy、traceability 等标准评分。
-              </p>
-            </article>
-          </div>
-        </section>
-
-        <section class="section highlight-section" id="tracks">
-          <div class="section-heading">
-            <p class="section-kicker">Project Tracks</p>
-            <h2>rubickx 同时做两件事：学 agent，也学怎么教人学习。</h2>
-          </div>
-          <div class="track-grid">
-            <article class="track-card">
-              <span class="track-tag">Track A</span>
-              <h3>Agent Tutorial Core</h3>
-              <p>
-                基于 learn-claude-code 的多语言实现，当前重点是 Go 版本的 12 个递进式 session。
-              </p>
-              <ul>
-                <li>从 agent loop 到 worktree task isolation</li>
-                <li>保留 tutorial 结构，便于系统理解 agent mechanism</li>
-                <li>中文 walkthrough 和英文文档并存</li>
-              </ul>
-            </article>
-            <article class="track-card accent-card">
-              <span class="track-tag">Track B</span>
-              <h3>Content Forge</h3>
-              <p>
-                面向真实学习材料构建“收集、判断、转化、评分”的内容生产管线。
-              </p>
-              <ul>
-                <li>经典资源优先，而不是追热点</li>
-                <li>Chinese-first 输出，保留关键 English terminology</li>
-                <li>最终目标是沉淀可复用学习资产库</li>
-              </ul>
-            </article>
-          </div>
-        </section>
-
-        <section class="section" id="harness">
-          <div class="section-heading">
-            <p class="section-kicker">Harness Engineering</p>
-            <h2>用可执行评测，而不是口头标准，来逼近高质量学习内容。</h2>
-          </div>
-          <div class="harness-layout">
-            <div class="terminal-card">
-              <div class="terminal-head">
-                <span></span><span></span><span></span>
-              </div>
-              <pre><code>make harness-list
-make harness-init RUN=harness/runs/demo
-make harness-grade RUN=harness/runs/demo</code></pre>
+          <p>
+            Rubickx 当前 Go 课程实现的上游来源。重点学习 agent loop、tool use、
+            skill loading、context compact、task system、team protocols、
+            worktree isolation 等 agent harness 机制。
+          </p>
+          <p class="why">
+            价值：把 coding agent 的核心能力拆成 12 个递进 session，适合作为理解
+            terminal-native agent workflow 的基础教材。
+          </p>
+          <dl class="meta">
+            <div>
+              <dt>Topics</dt>
+              <dd>Agent Loop, Tool Use, Skill Loading, Context Compact, Worktree Isolation</dd>
             </div>
-            <div class="score-card">
-              <h3>What gets graded</h3>
-              <dl>
-                <div>
-                  <dt>Grounding</dt>
-                  <dd>输出是否真的 anchored 在 source material。</dd>
-                </div>
-                <div>
-                  <dt>Decision Fit</dt>
-                  <dd>这份材料到底该做 course 还是 blog，判断是否合理。</dd>
-                </div>
-                <div>
-                  <dt>Chinese Output</dt>
-                  <dd>是否真正做到中文优先，而不是英文摘要加少量翻译。</dd>
-                </div>
-                <div>
-                  <dt>Traceability</dt>
-                  <dd>失败时能否从 trace 里看见过程，而不是只看到坏结果。</dd>
-                </div>
-              </dl>
+            <div>
+              <dt>Website</dt>
+              <dd><a href="https://learn.shareai.run/" target="_blank" rel="noreferrer">learn.shareai.run</a></dd>
             </div>
-          </div>
-        </section>
+            <div>
+              <dt>Upstream</dt>
+              <dd>
+                <a href="https://github.com/shareAI-lab/learn-claude-code" target="_blank" rel="noreferrer">
+                  shareAI-lab/learn-claude-code
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt>Local Source</dt>
+              <dd><code>deps/learn-claude-code</code></dd>
+            </div>
+            <div>
+              <dt>Source Status</dt>
+              <dd>已作为 submodule 引入，保持现有上游引用。</dd>
+            </div>
+          </dl>
+        </article>
 
-        <section class="section">
-          <div class="section-heading">
-            <p class="section-kicker">Why It Matters</p>
-            <h2>经典材料很多，但真正被“学会”的很少。</h2>
+        <article class="resource">
+          <div class="resource-title">
+            <h2>Learn Harness Engineering</h2>
+            <span>fork submodule 已引入</span>
           </div>
-          <div class="quote-grid">
-            <blockquote class="quote-card">
-              <p>
-                “资料收藏”解决的是获取问题；rubickx 想解决的是理解、重构、复用和验证的问题。
-              </p>
-            </blockquote>
-            <blockquote class="quote-card">
-              <p>
-                对 AI agent 而言，最有价值的不是写出一篇漂亮总结，而是能稳定地产出适合学习的内容。
-              </p>
-            </blockquote>
-          </div>
-        </section>
+          <p>
+            系统学习 coding agent 的 instructions、state、verification、scope、
+            session lifecycle 等 harness 子系统。后续可基于本地 fork 源码继续改造。
+          </p>
+          <p class="why">
+            价值：把“如何稳定使用 coding agent”拆成可执行的工程问题，适合建立 Rubickx
+            后续课程、评测和源码改造的基础框架。
+          </p>
+          <dl class="meta">
+            <div>
+              <dt>Topics</dt>
+              <dd>Harness Engineering, AI Coding Agent, Instructions, Verification, Session Lifecycle</dd>
+            </div>
+            <div>
+              <dt>Website</dt>
+              <dd>
+                <a href="https://walkinglabs.github.io/learn-harness-engineering/zh/" target="_blank" rel="noreferrer">
+                  walkinglabs.github.io/learn-harness-engineering/zh
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt>Fork</dt>
+              <dd>
+                <a href="https://github.com/xjiang77/learn-harness-engineering" target="_blank" rel="noreferrer">
+                  xjiang77/learn-harness-engineering
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt>Upstream</dt>
+              <dd>
+                <a href="https://github.com/walkinglabs/learn-harness-engineering" target="_blank" rel="noreferrer">
+                  walkinglabs/learn-harness-engineering
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt>Local Source</dt>
+              <dd><code>deps/learn-harness-engineering</code></dd>
+            </div>
+            <div>
+              <dt>Source Status</dt>
+              <dd>已通过 fork submodule 引入，后续修改提交到 fork。</dd>
+            </div>
+          </dl>
+        </article>
       </main>
-
-      <footer class="footer">
-        <div>
-          <p class="footer-title">rubickx</p>
-          <p>From classic resources to Chinese learning assets.</p>
-        </div>
-        <div class="footer-links">
-          <a href="#mission">Mission</a>
-          <a href="#tracks">Tracks</a>
-          <a href="#harness">Harness</a>
-        </div>
-      </footer>
     </div>
   </body>
 </html>

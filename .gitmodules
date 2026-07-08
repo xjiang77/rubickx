@@ -1,3 +1,6 @@
 [submodule "deps/learn-claude-code"]
 	path = deps/learn-claude-code
 	url = https://github.com/shareAI-lab/learn-claude-code.git
+[submodule "deps/learn-harness-engineering"]
+	path = deps/learn-harness-engineering
+	url = https://github.com/xjiang77/learn-harness-engineering.git

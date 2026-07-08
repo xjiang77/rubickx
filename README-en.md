@@ -10,11 +10,12 @@ The upstream project provides Python reference implementations and trilingual do
 
 ```
 rubickx/
-├── deps/learn-claude-code/    # Upstream course (git submodule)
+├── deps/learn-claude-code/    # Learn Claude Code upstream course (git submodule)
 │   ├── agents/                # Python reference implementations
 │   ├── docs/                  # Trilingual documentation (en/ja/zh)
 │   ├── web/                   # Next.js learning platform
 │   └── skills/                # Skill files for s05
+├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
 ├── go/                        # Go implementation
 │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 progressive sessions
 │   └── docs/                  # Go walkthrough docs
@@ -35,6 +36,17 @@ cd rubickx
 # If already cloned without --recurse-submodules
 git submodule update --init --recursive
 ```
+
+## Learning Source Repos
+
+The Rubickx homepage is now a learning repo / website index, implemented in [web/index.html](web/index.html).
+
+Current source-backed learning resources:
+
+| Resource | Website | Upstream / Fork | Local Source | Status |
+| --- | --- | --- | --- | --- |
+| Learn Claude Code | <https://learn.shareai.run/> | <https://github.com/shareAI-lab/learn-claude-code> | `deps/learn-claude-code` | Already referenced as an upstream submodule |
+| Learn Harness Engineering | <https://walkinglabs.github.io/learn-harness-engineering/zh/> | fork: <https://github.com/xjiang77/learn-harness-engineering>; upstream: <https://github.com/walkinglabs/learn-harness-engineering> | `deps/learn-harness-engineering` | Added as a fork submodule for future local changes |
 
 ## Go Implementation
 

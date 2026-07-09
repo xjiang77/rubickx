@@ -31,7 +31,8 @@ public class TokenBucket {
         this.capacity = capacity;
         this.refillRate = refillRate;
         this.nowNanos = nowNanos;
-        // 初始化时桶是满的，允许立即处理一次"突发"请求
+        // 初始化时桶是满的：启动即可瞬间放行最多 capacity 个请求，
+        // 用于扛住刚启动时的流量洪峰（突发），之后才按 refillRate 慢慢补充
         this.tokens = capacity;
         // 记录上次补充时间，作为后续计算时间差的基准
         this.last = nowNanos.getAsLong();

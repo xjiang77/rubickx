@@ -1,0 +1,225 @@
+[
+  {
+    "name": "fixed-window-boundary-and-time-jump",
+    "algorithm": "fixed-window",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 0.5, "key": "alice"},
+      {"atMs": 0, "cost": 1.5, "key": "alice"},
+      {"atMs": 999, "cost": 0.5, "key": "alice"},
+      {"atMs": 1000, "cost": 2, "key": "alice"},
+      {"atMs": 100000, "cost": 1, "key": "alice"},
+      {"atMs": 200000, "cost": 10, "key": "alice"}
+    ],
+    "expectedAllowed": [true, true, false, true, true, false],
+    "expectedRemaining": [1.5, 0, 0, 0, 1, 2],
+    "expectedLastReason": "cost_exceeds_limit",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "sliding-log-boundary-and-time-jump",
+    "algorithm": "sliding-window-log",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 0.5, "key": "alice"},
+      {"atMs": 0, "cost": 1.5, "key": "alice"},
+      {"atMs": 999, "cost": 0.5, "key": "alice"},
+      {"atMs": 1000, "cost": 2, "key": "alice"},
+      {"atMs": 100000, "cost": 2, "key": "alice"},
+      {"atMs": 200000, "cost": 10, "key": "alice"}
+    ],
+    "expectedAllowed": [true, true, false, true, true, false],
+    "expectedRemaining": [1.5, 0, 0, 0, 0, 2],
+    "expectedLastReason": "cost_exceeds_limit",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "sliding-counter-weight-and-time-jump",
+    "algorithm": "sliding-window-counter",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 2, "key": "alice"},
+      {"atMs": 1000, "cost": 0.5, "key": "alice"},
+      {"atMs": 1500, "cost": 1, "key": "alice"},
+      {"atMs": 1999, "cost": 1, "key": "alice"},
+      {"atMs": 3000, "cost": 2, "key": "alice"},
+      {"atMs": 200000, "cost": 10, "key": "alice"}
+    ],
+    "expectedAllowed": [true, false, true, false, true, false],
+    "expectedRemaining": [0, 0, 0, 0.998, 0, 2],
+    "expectedLastReason": "cost_exceeds_limit",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "sliding-counter-earliest-retry-from-previous-window-decay",
+    "algorithm": "sliding-window-counter",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 2, "key": "alice"},
+      {"atMs": 1000, "cost": 0.5, "key": "alice"}
+    ],
+    "expectedAllowed": [true, false],
+    "expectedRemaining": [0, 0],
+    "expectedLastReason": "limit_exceeded",
+    "expectedLastRetryAfterMs": 250,
+    "expectedLastResetAtMs": 1250
+  },
+  {
+    "name": "sliding-counter-retry-crosses-boundary-then-decays-current",
+    "algorithm": "sliding-window-counter",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 2, "key": "alice"},
+      {"atMs": 0, "cost": 0.5, "key": "alice"}
+    ],
+    "expectedAllowed": [true, false],
+    "expectedRemaining": [0, 0],
+    "expectedLastReason": "limit_exceeded",
+    "expectedLastRetryAfterMs": 1250,
+    "expectedLastResetAtMs": 1250
+  },
+  {
+    "name": "sliding-counter-late-first-request-snapshot",
+    "algorithm": "sliding-window-counter",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 5000, "cost": 1, "key": "alice"}
+    ],
+    "expectedAllowed": [true],
+    "expectedRemaining": [1],
+    "expectedLastReason": "within_limit",
+    "expectedLastRetryAfterMs": 0,
+    "expectedLastResetAtMs": 6000
+  },
+  {
+    "name": "token-bucket-fractional-refill-and-time-jump",
+    "algorithm": "token-bucket",
+    "config": {"capacity": 2, "ratePerSecond": 1},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 1.5, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 500, "cost": 1, "key": "alice"},
+      {"atMs": 500, "cost": 2, "key": "alice"},
+      {"atMs": 100000, "cost": 2, "key": "alice"},
+      {"atMs": 200000, "cost": 10, "key": "alice"}
+    ],
+    "expectedAllowed": [true, false, true, false, true, false],
+    "expectedRemaining": [0.5, 0.5, 0, 0, 0, 2],
+    "expectedLastReason": "cost_exceeds_capacity",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "leaky-bucket-fractional-drain-and-time-jump",
+    "algorithm": "leaky-bucket",
+    "config": {"capacity": 2, "ratePerSecond": 1},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 1.5, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 500, "cost": 1, "key": "alice"},
+      {"atMs": 500, "cost": 2, "key": "alice"},
+      {"atMs": 100000, "cost": 2, "key": "alice"},
+      {"atMs": 200000, "cost": 10, "key": "alice"}
+    ],
+    "expectedAllowed": [true, false, true, false, true, false],
+    "expectedRemaining": [0.5, 0.5, 0, 0, 0, 2],
+    "expectedLastReason": "cost_exceeds_capacity",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "token-bucket-ieee754-quantization-edge",
+    "algorithm": "token-bucket",
+    "config": {"capacity": 1, "ratePerSecond": 1},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 0.9999985, "key": "alice"}
+    ],
+    "expectedAllowed": [true],
+    "expectedRemaining": [0.000001],
+    "expectedLastReason": "token_available",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "concurrent-callers-alice-bob-interleave",
+    "algorithm": "token-bucket",
+    "config": {"capacity": 2, "ratePerSecond": 1},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 1000, "cost": 1, "key": "bob"}
+    ],
+    "expectedAllowed": [true, true, true, true, false, true],
+    "expectedRemaining": [1, 1, 0, 0, 0, 0],
+    "expectedLastReason": "token_available",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "fixed-window-concurrent-callers-per-key-isolation",
+    "algorithm": "fixed-window",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 1000, "cost": 1, "key": "bob"}
+    ],
+    "expectedAllowed": [true, true, true, true, false, true],
+    "expectedRemaining": [1, 1, 0, 0, 0, 1],
+    "expectedLastReason": "within_limit",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "sliding-log-concurrent-callers-per-key-isolation",
+    "algorithm": "sliding-window-log",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 1000, "cost": 1, "key": "bob"}
+    ],
+    "expectedAllowed": [true, true, true, true, false, true],
+    "expectedRemaining": [1, 1, 0, 0, 0, 1],
+    "expectedLastReason": "within_limit",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "sliding-counter-concurrent-callers-per-key-isolation",
+    "algorithm": "sliding-window-counter",
+    "config": {"limit": 2, "windowMs": 1000},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 2000, "cost": 1, "key": "bob"}
+    ],
+    "expectedAllowed": [true, true, true, true, false, true],
+    "expectedRemaining": [1, 1, 0, 0, 0, 1],
+    "expectedLastReason": "within_limit",
+    "expectedLastRetryAfterMs": 0
+  },
+  {
+    "name": "leaky-bucket-concurrent-callers-per-key-isolation",
+    "algorithm": "leaky-bucket",
+    "config": {"capacity": 2, "ratePerSecond": 1},
+    "requestTimeline": [
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 0, "cost": 1, "key": "bob"},
+      {"atMs": 0, "cost": 1, "key": "alice"},
+      {"atMs": 1000, "cost": 1, "key": "bob"}
+    ],
+    "expectedAllowed": [true, true, true, true, false, true],
+    "expectedRemaining": [1, 1, 0, 0, 0, 0],
+    "expectedLastReason": "queue_has_capacity",
+    "expectedLastRetryAfterMs": 0
+  }
+]

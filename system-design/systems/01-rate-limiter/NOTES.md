@@ -1,7 +1,7 @@
-# Rate Limiter → Token Bucket · 三语言对比笔记
+# Rate Limiter · 四语言算法与系统链路对比笔记
 
 > 配套理论：vault [[01 - Rate Limiter]]（RESHADED 设计）+ [[Eng - Redis：架构、实现与高阶实战]]（集中式版本）。
-> 本篇只聚焦**单机进程内**的 Token Bucket：在 Python / Go / Java 里怎么写、为什么这么写、最佳实践是什么。
+> `python/`、`go/`、`java/` 保留最小 Token Bucket baseline；[`lab/`](lab/) 将学习面扩展为 Python / Go / Java / JavaScript 的五算法真实执行，以及 Go-only HTTP / Redis / Delve 系统链路。
 
 ## 核心思路（语言无关）
 
@@ -16,19 +16,16 @@ if tokens >= n: tokens -= n; allow
 else:           deny
 ```
 
-这段"读 tokens → 算 → 写 tokens"是**复合操作**，并发下必须保护，否则就是 [[Eng - Redis：架构、实现与高阶实战]] 里那个 check-then-act 竞态。三种语言的差别，主要就在**怎么保护**和**怎么注入时间**。
+这段“读 tokens → 算 → 写 tokens”是**复合操作**，并发下必须保护，否则就是 [[Eng - Redis：架构、实现与高阶实战]] 里那个 check-then-act 竞态。四种语言的差别，主要就在**怎么保护**、**哪里可能交错**和**怎么注入时间**。
 
-## 三语言关键差异
+## 四语言关键差异
 
-| 维度 | Python | Go | Java |
-|---|---|---|---|
-| 并发保护 | `threading.Lock` | `sync.Mutex` | `synchronized` 方法 |
-| 为什么需要锁 | GIL 只保证单条字节码原子，`-=` 是多条 → 仍需锁 | 编译器/CPU 会重排，多 goroutine 真并行 → 必须锁 | JMM 下多线程可见性/原子性都无保证 → 必须锁 |
-| 时钟注入 | 传 `Callable[[], float]` | 传 `func() time.Time` | 传 `LongSupplier`(纳秒) |
-| 数值类型 | `float`(双精度) | `float64` | `double` |
-| 取最小值 | `min()` 内建 | `min()` 内建(Go 1.21+) | `Math.min()` |
-| 构造重载 | 默认参数 `now=time.monotonic` | 两个构造函数 `New`/`NewWithClock` | 两个构造函数重载 |
-| 并发计数验证 | `threading.Lock` 累加 | `atomic.AddInt64` + `-race` | `AtomicLong` |
+| 维度 | Python | Go | Java | JavaScript |
+|---|---|---|---|---|
+| 并发保护 | `threading.Lock` | `sync.Mutex` | `synchronized` | 同步 `allow()` 不跨 turn；共享远端状态需原子 store |
+| 主要竞态 | GIL 不让复合操作原子 | goroutine 真并行 | JMM 可见性与原子性 | read 与 write 之间出现 `await` |
+| 时钟注入 | `Callable[[], float]` | `func() time.Time` | `LongSupplier` | injected millisecond clock |
+| 测试 | pytest | `testing` + `-race` | JUnit 5 | `node:test` |
 
 ## 各语言要点与最佳实践
 
@@ -50,30 +47,40 @@ else:           deny
 - **最佳实践**：纯计数器场景优先 `AtomicLong`（无锁 CAS，见测试里的计数）；需要"限速 + 阻塞等待"用 `Semaphore`；生产里 Guava 的 `RateLimiter`（SmoothBursty/SmoothWarmingUp）或 Resilience4j 的 `RateLimiter` 是成熟轮子。
 - **JMM 提醒**：若把 `tokens` 暴露成无锁读取，必须 `volatile` 才有可见性保证——本实现所有读写都在 `synchronized` 内，已隐含 happens-before，无需额外 `volatile`。
 
-## 并发模型深差异（这才是三语言最该比的）
+### JavaScript
 
-| | Python | Go | Java |
-|---|---|---|---|
-| 执行单元 | OS 线程（受 GIL 串行化 CPU） | goroutine（runtime 调度，~2KB 栈，几十万个） | OS 线程（~1MB 栈）/ 虚拟线程(Loom, 21+) |
-| 真并行 | ❌ CPU 受 GIL；I/O 可并发 | ✅ 多核真并行 | ✅ 多核真并行 |
-| 同步原语 | `threading.Lock/RLock/Semaphore` | `sync.Mutex/RWMutex`、channel、`atomic` | `synchronized`、`j.u.c.locks`、`atomic` |
-| 竞态检测 | 无内建（靠测试/审查） | `go test -race` 一等公民 | 无内建（靠测试/FindBugs 类工具） |
-| 设计取向 | 简单优先；CPU 密集靠多进程/C 扩展 | "用通信共享内存"(channel) 与"共享内存+锁"并存 | 成熟庞大的 `java.util.concurrent` 生态 |
+- **event loop ≠ 通用原子性**：不含 `await` 的同步 `allow()` 会在一个 turn 内完成，别为了单线程内的同步状态机械加 mutex。
+- **`await` 是明确的交错 seam**：把 read 与 write 分在两个 `await` 之间，另一个 task 就能观察旧值并造成 lost update。Lab 包含 deterministic race case，不用概率性 `sleep` 证明它。
+- **进程边界更重要**：Node cluster、多实例和其它语言进程完全不共享 event loop。共享 quota 要在 Redis 中用 `INCR`/Lua 原子执行，不能把“JavaScript 单线程”误当 distributed lock。
+- **最佳实践**：Node runner 使用 plain ESM、injected millisecond clock 与内建 `node:test`，不把 UI 的 TypeScript toolchain 泄漏进算法实现。
 
-> 一句话：**同一个令牌桶，三种语言的算法完全一样，差的全是"并发怎么保证正确"和"时间怎么拿"**。这正是用多语言重写来吃透语言差异的价值。
+## 并发模型深差异（这才是四语言最该比的）
+
+| | Python | Go | Java | JavaScript |
+|---|---|---|---|---|
+| 执行单元 | OS 线程（受 GIL 串行化 CPU） | goroutine（runtime 调度） | OS/virtual thread | event-loop task / worker |
+| 真并行 | CPU 默认受 GIL | 多核 | 多核 | 单 loop 否；worker/多进程是 |
+| 同步原语 | `Lock/RLock/Semaphore` | `Mutex`、channel、`atomic` | `synchronized`、`j.u.c` | 避免跨 `await` RMW；远端原子 store |
+| 竞态验证 | 测试/审查 | `go test -race` | 测试/分析工具 | deterministic interleaving test |
+| 设计取向 | 简单优先；CPU 密集靠多进程/C 扩展 | "用通信共享内存"(channel) 与"共享内存+锁"并存 | 成熟庞大的 `java.util.concurrent` 生态 | 单进程保持同步状态简单；跨进程把原子性下沉到 shared store |
+
+> 一句话：**同一个限流算法，四种语言的数学规则相同，差的是“状态在哪、何时交错、怎样证明正确”**。这正是多语言重写的价值。
 
 ## 怎么验证
 
 ```bash
 cd system-design
-make test-py     # ✅ 沙箱已验证通过
-make test-go     # 本机；并发安全建议 go test -race ./systems/01-rate-limiter/go
-make test-java   # 本机（需 JDK 含 javac）
+make test
+make -C systems/01-rate-limiter/lab test-race
+make -C systems/01-rate-limiter/lab verify
+make -C systems/01-rate-limiter/lab verify-redis
+make -C systems/01-rate-limiter/lab verify-debug
 ```
 
-四个测试三语言一致：满桶突发、按时间补充、封顶、并发恰好放行 1000（线程安全证明）。
+Lab 通过共享 fixtures 对比 `5 algorithms × 4 languages` 的 allow/deny、remaining 和 retry timing；语言自己的测试再覆盖并发模型与输入边界。
 
-## 下一步
+## Practice surface
 
-- 同目录补 **Sliding Window Counter**（O(1) 近似），同样三语言并排。
-- 把 Token Bucket 接成一个最小 HTTP 中间件（Tier B mini-system），观察"加在请求关键路径"的延迟。
+- `cd lab && make dev`：在浏览器里逐步运行真实源码 trace。
+- `cd lab && make verify-redis`：验证 Lua atomicity、TTL、shared quota 与 outage policy。
+- `cd lab && make verify-debug`：通过真实 Delve DAP 查看 Go source line、stack 和 locals。

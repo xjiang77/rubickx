@@ -226,6 +226,12 @@ web/out/
 .env*.local
 test_providers.py
 
+# Rate Limiter Lab generated assets
+system-design/systems/01-rate-limiter/lab/ui/node_modules/
+!system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/
+system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/*
+!system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/.keep
+
 # Internal analysis artifacts (not learning material)
 analysis/
 analysis_progress.md

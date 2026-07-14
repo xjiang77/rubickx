@@ -1,11 +1,12 @@
-.PHONY: test test-py test-go test-java setup clean
+.PHONY: test test-py test-go test-java test-js test-ui build-lab setup clean
 
-# 一键跑全部三种语言
-test: test-py test-go test-java
+# 一键跑全部四种语言；UI 是独立构建面，CI 通过 test-ui/build-lab 验证。
+test: test-py test-go test-java test-js
 
 # 安装可在仓库内直接运行的依赖（Python）
 setup:
 	pip install -q pytest
+	cd systems/01-rate-limiter/lab/ui && npm install
 
 test-py:
 	@echo "== Python (pytest) =="
@@ -25,9 +26,20 @@ test-java: $(JUNIT_JAR)
 	javac -cp "$(JUNIT_JAR)" -d .build/java @.build/java/sources.txt
 	java -jar "$(JUNIT_JAR)" execute -cp .build/java --scan-classpath --details=summary
 
+test-js:
+	@echo "== JavaScript (node:test) =="
+	cd systems/01-rate-limiter/lab/runners/js && node --test
+
+test-ui:
+	@echo "== Rate Limiter Lab UI (Vitest) =="
+	cd systems/01-rate-limiter/lab/ui && npm test -- --run
+
+build-lab:
+	$(MAKE) -C systems/01-rate-limiter/lab build
+
 $(JUNIT_JAR):
 	@mkdir -p .cache
 	curl -sSL -o "$(JUNIT_JAR)" https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/$(JUNIT_VER)/junit-platform-console-standalone-$(JUNIT_VER).jar
 
 clean:
-	rm -rf .build .cache
+	rm -rf .build .cache systems/01-rate-limiter/lab/.build

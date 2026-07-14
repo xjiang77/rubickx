@@ -90,3 +90,47 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  system-design:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.24"
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: system-design/systems/01-rate-limiter/lab/ui/package-lock.json
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest
+          npm ci --prefix system-design/systems/01-rate-limiter/lab/ui
+
+      - name: Test four-language rate limiter implementations
+        run: make -C system-design test
+
+      - name: Race-test Go system path
+        run: make -C system-design/systems/01-rate-limiter/lab test-race
+
+      - name: Test and build Rate Limiter Lab UI
+        run: |
+          make -C system-design test-ui
+          make -C system-design build-lab

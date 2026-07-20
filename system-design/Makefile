@@ -1,4 +1,4 @@
-.PHONY: test test-py test-go test-java test-js test-ui build-lab setup clean
+.PHONY: test test-py test-go test-go-race test-java test-js test-ui build-lab setup clean
 
 # 一键跑全部四种语言；UI 是独立构建面，CI 通过 test-ui/build-lab 验证。
 test: test-py test-go test-java test-js
@@ -15,6 +15,10 @@ test-py:
 test-go:
 	@echo "== Go (go test) =="
 	go test ./...
+
+test-go-race:
+	@echo "== Go (go test -race) =="
+	go test -race ./...
 
 JUNIT_VER := 1.10.2
 JUNIT_JAR := .cache/junit-platform-console-standalone-$(JUNIT_VER).jar
@@ -39,7 +43,7 @@ build-lab:
 
 $(JUNIT_JAR):
 	@mkdir -p .cache
-	curl -sSL -o "$(JUNIT_JAR)" https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/$(JUNIT_VER)/junit-platform-console-standalone-$(JUNIT_VER).jar
+	curl -fSL -o "$(JUNIT_JAR)" https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/$(JUNIT_VER)/junit-platform-console-standalone-$(JUNIT_VER).jar
 
 clean:
 	rm -rf .build .cache systems/01-rate-limiter/lab/.build

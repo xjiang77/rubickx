@@ -7,6 +7,8 @@
 
 配套 Vault 知识层：[Rate Limiting：策略、状态与失败语义](https://github.com/xjiang7712/dragon-vault/blob/main/02_Knowledge/02_Engineering/08%20-%20Components/02%20-%20Eng%20-%20Rate%20Limiting%EF%BC%9A%E7%AD%96%E7%95%A5%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%A4%B1%E8%B4%A5%E8%AF%AD%E4%B9%89.md) 与 [Redis：契约、状态与运维](https://github.com/xjiang7712/dragon-vault/blob/main/02_Knowledge/02_Engineering/08%20-%20Components/01%20-%20Redis/00%20-%20Eng%20-%20Redis%EF%BC%9A%E5%A5%91%E7%BA%A6%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E8%BF%90%E7%BB%B4.md)。稳定判断在 Vault，四语言实现、动态完成度与可运行 Lab 在本仓库；进度只以 [`PROGRESS.md`](PROGRESS.md) 为准。
 
+Rate Limiter 的 repo-adjacent 系统设计镜像见 [`DESIGN.md`](systems/01-rate-limiter/DESIGN.md)，实现比较见 [`NOTES.md`](systems/01-rate-limiter/NOTES.md)。
+
 ## Rate Limiter Lab
 
 [`systems/01-rate-limiter/lab/`](systems/01-rate-limiter/lab/) 是本板的第一个完整 practice surface：五种经典算法、四语言真实 semantic trace、Go HTTP/Redis 链路和 Delve DAP 调试都收在一个本地 Web App 中。
@@ -22,12 +24,13 @@ make dev
 
 ```
 system-design/
-├── Makefile                 # make test / test-py / test-go / test-java / test-js
+├── Makefile                 # make test / test-py / test-go / test-go-race / test-java / test-js
 ├── go.mod                   # 单一 Go module: rubickx/system-design
 ├── pytest.ini               # Python: pytest
 ├── PROGRESS.md              # 进度追踪表
 └── systems/
     └── 01-rate-limiter/
+        ├── DESIGN.md        # 系统设计的 repo-adjacent 镜像
         ├── NOTES.md         # ⭐ 四语言对比 + 最佳实践（中文，核心）
         ├── python/  token_bucket.py      + token_bucket_test.py
         ├── go/      tokenbucket.go        + tokenbucket_test.go   (package ratelimiter)
@@ -46,6 +49,7 @@ make test         # 跑全部四种语言
 # 或单独跑：
 make test-py      # pytest
 make test-go      # go test ./...
+make test-go-race # go test -race ./...
 make test-java    # javac + JUnit 5 console
 make test-js      # Node.js built-in node:test
 ```

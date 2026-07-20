@@ -1,8 +1,12 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongSupplier;
 import org.junit.jupiter.api.Test;
 
 public class TokenBucketTest {
@@ -18,6 +22,24 @@ public class TokenBucketTest {
         void advance(double seconds) {
             t += (long) (seconds * 1_000_000_000.0);
         }
+
+        void set(double seconds) {
+            t = (long) (seconds * 1_000_000_000.0);
+        }
+    }
+
+    @Test
+    void invalidConfigFailsFast() {
+        assertThrows(IllegalArgumentException.class, () -> new TokenBucket(0, 1));
+        assertThrows(IllegalArgumentException.class, () -> new TokenBucket(-1, 1));
+        assertThrows(IllegalArgumentException.class, () -> new TokenBucket(Double.POSITIVE_INFINITY, 1));
+        assertThrows(IllegalArgumentException.class, () -> new TokenBucket(Double.NaN, 1));
+        assertThrows(IllegalArgumentException.class, () -> new TokenBucket(1, -1));
+        assertThrows(IllegalArgumentException.class, () -> new TokenBucket(1, Double.POSITIVE_INFINITY));
+        assertThrows(IllegalArgumentException.class, () -> new TokenBucket(1, Double.NaN));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new TokenBucket(1, 1, (LongSupplier) null));
     }
 
     @Test
@@ -62,23 +84,74 @@ public class TokenBucketTest {
     }
 
     @Test
+    void fractionalRefillAndMultiTokenCost() {
+        Clock c = new Clock();
+        TokenBucket b = new TokenBucket(5, 1, c::now);
+        assertTrue(b.allow(2.5));
+        assertEquals(2.5, b.tokens(), 1e-9);
+        assertFalse(b.allow(3));
+        c.advance(0.5);
+        assertTrue(b.allow(3));
+        assertEquals(0, b.tokens(), 1e-9);
+    }
+
+    @Test
+    void invalidCostIsRejectedWithoutChangingState() {
+        Clock c = new Clock();
+        TokenBucket b = new TokenBucket(5, 1, c::now);
+        assertTrue(b.allow(2));
+        c.advance(1);
+        for (double n : new double[] {0, -1, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NaN}) {
+            assertFalse(b.allow(n));
+            assertEquals(3, b.tokens(), 1e-9);
+        }
+        assertTrue(b.allow(4)); // 非法请求没有消耗令牌，也没有推进补充基准
+    }
+
+    @Test
+    void clockRollbackDoesNotMoveRefillBaselineBackwards() {
+        Clock c = new Clock();
+        TokenBucket b = new TokenBucket(1, 1, c::now);
+        assertTrue(b.allow());
+        c.set(1);
+        assertTrue(b.allow());
+        c.set(0.5);
+        assertFalse(b.allow());
+        c.set(1.5);
+        assertTrue(b.allow(0.5));
+        assertFalse(b.allow(0.5));
+    }
+
+    @Test
     void concurrentSafe() throws InterruptedException {
         TokenBucket b = new TokenBucket(1000, 0); // 无补充，恰好 1000 令牌
         AtomicLong allowed = new AtomicLong();
-        Thread[] threads = new Thread[100];
-        for (int i = 0; i < 100; i++) {
+        int workers = 100;
+        CountDownLatch ready = new CountDownLatch(workers);
+        CountDownLatch start = new CountDownLatch(1);
+        CountDownLatch done = new CountDownLatch(workers);
+        Thread[] threads = new Thread[workers];
+        for (int i = 0; i < workers; i++) {
             threads[i] = new Thread(() -> {
-                for (int j = 0; j < 50; j++) {
-                    if (b.allow()) {
-                        allowed.incrementAndGet();
+                ready.countDown();
+                try {
+                    start.await();
+                    for (int j = 0; j < 50; j++) {
+                        if (b.allow()) {
+                            allowed.incrementAndGet();
+                        }
                     }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    done.countDown();
                 }
             });
             threads[i].start();
         }
-        for (Thread t : threads) {
-            t.join();
-        }
+        assertTrue(ready.await(5, TimeUnit.SECONDS));
+        start.countDown();
+        assertTrue(done.await(10, TimeUnit.SECONDS));
         assertEquals(1000, allowed.get());
     }
 }

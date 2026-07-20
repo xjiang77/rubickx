@@ -28,6 +28,15 @@ public class TokenBucket {
      * @param nowNanos  时钟来源，返回纳秒级时间；便于注入假时钟做确定性测试
      */
     public TokenBucket(double capacity, double refillRate, LongSupplier nowNanos) {
+        if (!Double.isFinite(capacity) || capacity <= 0) {
+            throw new IllegalArgumentException("capacity must be finite and greater than zero");
+        }
+        if (!Double.isFinite(refillRate) || refillRate < 0) {
+            throw new IllegalArgumentException("refillRate must be finite and non-negative");
+        }
+        if (nowNanos == null) {
+            throw new IllegalArgumentException("nowNanos must not be null");
+        }
         this.capacity = capacity;
         this.refillRate = refillRate;
         this.nowNanos = nowNanos;
@@ -50,12 +59,17 @@ public class TokenBucket {
      * @return true 表示放行；false 表示令牌不足、请求被限流
      */
     public synchronized boolean allow(double n) {
+        if (!Double.isFinite(n) || n <= 0) {
+            return false;
+        }
         // 1. 读取当前时间，与上次补充时间做差得到"流逝时间"
         long t = nowNanos.getAsLong();
         // 2. 换算成秒（纳秒 / 1e9），用于按速率补充令牌
-        double elapsed = (t - last) / 1_000_000_000.0;
-        // 3. 先更新基准时间，避免重复计算这段间隔
-        last = t;
+        double elapsed = Math.max(0, ((double) t - last) / 1_000_000_000.0);
+        // 3. 时钟回拨时不倒退基准，避免后续重复补充
+        if (t > last) {
+            last = t;
+        }
         // 4. 按"速率 × 时间"补充令牌，且不超过桶容量（上限截断）
         tokens = Math.min(capacity, tokens + elapsed * refillRate);
         // 5. 令牌充足则扣减并放行，否则拒绝（不扣减，保持当前水位）
@@ -66,7 +80,7 @@ public class TokenBucket {
         return false;
     }
 
-    /** 读取当前令牌数（用于观测/测试）。 */
+    /** 读取最近一次 allow 物化后的令牌数；本方法不主动补充。 */
     public synchronized double tokens() {
         return tokens;
     }

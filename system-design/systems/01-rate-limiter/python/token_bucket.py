@@ -1,3 +1,4 @@
+import math
 import threading
 import time
 from typing import Callable
@@ -20,24 +21,48 @@ class TokenBucket:
         refill_rate: float,
         now: Callable[[], float] = time.monotonic,
     ) -> None:
-        self.capacity = float(capacity)
-        self.refill_rate = float(refill_rate)
+        try:
+            capacity = float(capacity)
+            refill_rate = float(refill_rate)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("capacity and refill_rate must be numbers") from exc
+        if not math.isfinite(capacity) or capacity <= 0:
+            raise ValueError("capacity must be finite and greater than zero")
+        if not math.isfinite(refill_rate) or refill_rate < 0:
+            raise ValueError("refill_rate must be finite and non-negative")
+        if not callable(now):
+            raise ValueError("now must be callable")
+
+        self.capacity = capacity
+        self.refill_rate = refill_rate
         self._now = now
-        self._tokens = float(capacity)
+        self._tokens = capacity
         self._last = now()
         self._lock = threading.Lock()
 
     def allow(self, n: float = 1.0) -> bool:
+        try:
+            n = float(n)
+        except (TypeError, ValueError):
+            return False
+        if not math.isfinite(n) or n <= 0:
+            return False
+
         with self._lock:
             t = self._now()
-            elapsed = t - self._last
-            self._last = t
-            self._tokens = min(self.capacity, self._tokens + elapsed * self.refill_rate)
+            elapsed = max(0.0, t - self._last)
+            if t > self._last:
+                self._last = t
+            self._tokens = min(
+                self.capacity,
+                self._tokens + elapsed * self.refill_rate,
+            )
             if self._tokens >= n:
                 self._tokens -= n
                 return True
             return False
 
     def tokens(self) -> float:
+        """返回最近一次 allow 物化后的水位，不主动补充令牌。"""
         with self._lock:
             return self._tokens

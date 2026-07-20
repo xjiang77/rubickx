@@ -7,6 +7,7 @@
 package ratelimiter
 
 import (
+	"math"
 	"sync"
 	"time"
 )
@@ -28,6 +29,16 @@ func New(capacity, refillRate float64) *TokenBucket {
 
 // NewWithClock 用可注入时钟构造（测试用假时钟推进）。
 func NewWithClock(capacity, refillRate float64, now func() time.Time) *TokenBucket {
+	if capacity <= 0 || math.IsNaN(capacity) || math.IsInf(capacity, 0) {
+		panic("capacity must be positive and finite")
+	}
+	if refillRate < 0 || math.IsNaN(refillRate) || math.IsInf(refillRate, 0) {
+		panic("refillRate must be non-negative and finite")
+	}
+	if now == nil {
+		panic("now must not be nil")
+	}
+
 	return &TokenBucket{
 		capacity:   capacity,
 		refillRate: refillRate,
@@ -42,12 +53,19 @@ func (b *TokenBucket) Allow() bool { return b.AllowN(1) }
 
 // AllowN 取 n 个令牌，成功返回 true。
 func (b *TokenBucket) AllowN(n float64) bool {
+	if n <= 0 || math.IsNaN(n) || math.IsInf(n, 0) {
+		return false
+	}
+
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
 	t := b.now()
-	elapsed := t.Sub(b.last).Seconds()
-	b.last = t
+	elapsed := 0.0
+	if !t.Before(b.last) {
+		elapsed = t.Sub(b.last).Seconds()
+		b.last = t
+	}
 	b.tokens = min(b.capacity, b.tokens+elapsed*b.refillRate)
 
 	if b.tokens >= n {
@@ -57,7 +75,7 @@ func (b *TokenBucket) AllowN(n float64) bool {
 	return false
 }
 
-// Tokens 返回当前令牌数（主要用于测试/观测）。
+// Tokens 返回最近一次 Allow/AllowN 物化后的令牌数，不主动按当前时间补充。
 func (b *TokenBucket) Tokens() float64 {
 	b.mu.Lock()
 	defer b.mu.Unlock()

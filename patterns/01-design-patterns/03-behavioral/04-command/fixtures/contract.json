@@ -1,0 +1,78 @@
+{
+  "pattern_id": "gof.behavioral.command",
+  "cases": [
+    {
+      "id": "sets_route",
+      "category": "nominal",
+      "input": {
+        "initial": {
+          "chat": "p1"
+        },
+        "commands": [
+          {
+            "key": "chat",
+            "value": "p2"
+          }
+        ],
+        "undo": 0
+      },
+      "expected": {
+        "routes": {
+          "chat": "p2"
+        },
+        "history": 1
+      }
+    },
+    {
+      "id": "no_commands",
+      "category": "boundary",
+      "input": {
+        "initial": {},
+        "commands": [],
+        "undo": 0
+      },
+      "expected": {
+        "routes": {},
+        "history": 0
+      }
+    },
+    {
+      "id": "undo_without_history",
+      "category": "failure",
+      "input": {
+        "initial": {},
+        "commands": [],
+        "undo": 1
+      },
+      "expected_error": {
+        "code": "no_history"
+      }
+    },
+    {
+      "id": "undo_restores_previous_value",
+      "category": "lifecycle",
+      "input": {
+        "initial": {
+          "chat": "p0"
+        },
+        "commands": [
+          {
+            "key": "chat",
+            "value": "p1"
+          },
+          {
+            "key": "embed",
+            "value": "e1"
+          }
+        ],
+        "undo": 1
+      },
+      "expected": {
+        "routes": {
+          "chat": "p1"
+        },
+        "history": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "module": "github.com/xjiang77/rubickx/network-security",
+  "knowledge_owners": [
+    "Eng - End-to-End Network Path：从名称解析到应用响应",
+    "Eng - IP Connectivity：IPv4、IPv6、Routing、NAT、ICMP 与 MTU",
+    "Eng - Transport Semantics：TCP、UDP、QUIC、Flow Control 与 Backpressure",
+    "Eng - DNS & Service Discovery：递归、缓存、分流与失败语义",
+    "Eng - TLS & PKI：身份、信任链、mTLS 与证书生命周期",
+    "Eng - Traffic Intermediation：Proxy、Gateway、Load Balancer、Tunnel 与 VPN",
+    "Eng - SSO and Federation：OIDC、SAML、Kerberos 与协议选型",
+    "Eng - Continuous Trust：PDP、PEP、Posture、Session、SSF 与 CAEP",
+    "Eng - Enterprise Access Network：ZTNA、NAC、SSE、SASE、Segmentation 与 Egress",
+    "Eng - Distributed Enforcement Lifecycle：Endpoint、DLP、Policy Revision 与 Effective State",
+    "Eng - Network Observability：Packet、Flow、Log、Trace 与 Evidence",
+    "Eng - Detection to Recovery：Telemetry、Signal、Decision、Action、Ack 与 Evidence"
+  ],
+  "safety": {
+    "listeners": "127.0.0.1:ephemeral",
+    "external_targets": false,
+    "raw_sockets": false,
+    "system_network_changes": false,
+    "production_conformance_claim": false
+  },
+  "labs": [
+    {
+      "id": "LAB-NETSEC-01",
+      "title": "Resolver to TCP to HTTP path",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - End-to-End Network Path：从名称解析到应用响应", "role": "primary", "coverage": "executable"},
+        {"owner": "Eng - IP Connectivity：IPv4、IPv6、Routing、NAT、ICMP 与 MTU", "role": "primary", "coverage": "model"},
+        {"owner": "Eng - DNS & Service Discovery：递归、缓存、分流与失败语义", "role": "primary", "coverage": "executable"},
+        {"owner": "Eng - Network Observability：Packet、Flow、Log、Trace 与 Evidence", "role": "integration", "coverage": "executable"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-01 -out evidence/lab01.json",
+      "browser_required": false,
+      "evidence": "evidence/lab01.json"
+    },
+    {
+      "id": "LAB-NETSEC-02",
+      "title": "Transport framing, deadlines and backpressure",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - Transport Semantics：TCP、UDP、QUIC、Flow Control 与 Backpressure", "role": "primary", "coverage": "executable"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-02 -out evidence/lab02.json",
+      "browser_required": false,
+      "evidence": "evidence/lab02.json"
+    },
+    {
+      "id": "LAB-NETSEC-03",
+      "title": "TLS identity and certificate lifecycle",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - TLS & PKI：身份、信任链、mTLS 与证书生命周期", "role": "primary", "coverage": "executable"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-03 -out evidence/lab03.json",
+      "browser_required": false,
+      "evidence": "evidence/lab03.json"
+    },
+    {
+      "id": "LAB-NETSEC-04",
+      "title": "Proxy routing and effective configuration",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - Traffic Intermediation：Proxy、Gateway、Load Balancer、Tunnel 与 VPN", "role": "primary", "coverage": "executable"},
+        {"owner": "Eng - Enterprise Access Network：ZTNA、NAC、SSE、SASE、Segmentation 与 Egress", "role": "integration", "coverage": "model"},
+        {"owner": "Eng - Distributed Enforcement Lifecycle：Endpoint、DLP、Policy Revision 与 Effective State", "role": "integration", "coverage": "executable"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-04 -out evidence/lab04.json",
+      "browser_required": false,
+      "evidence": "evidence/lab04.json"
+    },
+    {
+      "id": "LAB-NETSEC-05",
+      "title": "Browser origin, CORS, cookie and CSRF boundaries",
+      "scope": "adjacent",
+      "mappings": [],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-05 -out evidence/lab05.json",
+      "browser_required": true,
+      "evidence": "evidence/lab05.json"
+    },
+    {
+      "id": "LAB-NETSEC-06",
+      "title": "Server-side request and API abuse controls",
+      "scope": "adjacent",
+      "mappings": [],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-06 -out evidence/lab06.json",
+      "browser_required": false,
+      "evidence": "evidence/lab06.json"
+    },
+    {
+      "id": "LAB-NETSEC-07",
+      "title": "OIDC-style Authorization Code and PKCE",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - SSO and Federation：OIDC、SAML、Kerberos 与协议选型", "role": "primary", "coverage": "executable"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-07 -out evidence/lab07.json",
+      "browser_required": true,
+      "evidence": "evidence/lab07.json"
+    },
+    {
+      "id": "LAB-NETSEC-08",
+      "title": "Federation, logout and provisioning lifecycle",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - SSO and Federation：OIDC、SAML、Kerberos 与协议选型", "role": "integration", "coverage": "executable"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-08 -out evidence/lab08.json",
+      "browser_required": true,
+      "evidence": "evidence/lab08.json"
+    },
+    {
+      "id": "LAB-NETSEC-09",
+      "title": "Continuous access and signal ordering",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - Continuous Trust：PDP、PEP、Posture、Session、SSF 与 CAEP", "role": "primary", "coverage": "executable"},
+        {"owner": "Eng - Enterprise Access Network：ZTNA、NAC、SSE、SASE、Segmentation 与 Egress", "role": "primary", "coverage": "model"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-09 -out evidence/lab09.json",
+      "browser_required": true,
+      "evidence": "evidence/lab09.json"
+    },
+    {
+      "id": "LAB-NETSEC-10",
+      "title": "Enterprise access evidence-closure capstone",
+      "scope": "core",
+      "mappings": [
+        {"owner": "Eng - End-to-End Network Path：从名称解析到应用响应", "role": "integration", "coverage": "model"},
+        {"owner": "Eng - Continuous Trust：PDP、PEP、Posture、Session、SSF 与 CAEP", "role": "integration", "coverage": "executable"},
+        {"owner": "Eng - Enterprise Access Network：ZTNA、NAC、SSE、SASE、Segmentation 与 Egress", "role": "integration", "coverage": "model"},
+        {"owner": "Eng - Distributed Enforcement Lifecycle：Endpoint、DLP、Policy Revision 与 Effective State", "role": "primary", "coverage": "executable"},
+        {"owner": "Eng - Network Observability：Packet、Flow、Log、Trace 与 Evidence", "role": "primary", "coverage": "executable"},
+        {"owner": "Eng - Detection to Recovery：Telemetry、Signal、Decision、Action、Ack 与 Evidence", "role": "primary", "coverage": "executable"}
+      ],
+      "outcomes": ["normal", "reject", "dependency_failure", "degraded", "recovery"],
+      "command": "go run ./cmd/netsec-lab -lab LAB-NETSEC-10 -out evidence/lab10.json",
+      "browser_required": false,
+      "evidence": "evidence/lab10.json"
+    }
+  ]
+}

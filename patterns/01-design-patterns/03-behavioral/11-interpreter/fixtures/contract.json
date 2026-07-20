@@ -1,0 +1,66 @@
+{
+  "pattern_id": "gof.behavioral.interpreter",
+  "cases": [
+    {
+      "id": "quota_rule_passes",
+      "category": "nominal",
+      "input": {
+        "expression": "quota >= used and enabled == 1",
+        "context": {
+          "quota": 10,
+          "used": 3,
+          "enabled": 1
+        }
+      },
+      "expected": {
+        "allowed": true,
+        "comparisons": 2
+      }
+    },
+    {
+      "id": "equality_boundary",
+      "category": "boundary",
+      "input": {
+        "expression": "quota >= used",
+        "context": {
+          "quota": 5,
+          "used": 5
+        }
+      },
+      "expected": {
+        "allowed": true,
+        "comparisons": 1
+      }
+    },
+    {
+      "id": "unsupported_operator",
+      "category": "failure",
+      "input": {
+        "expression": "quota > used",
+        "context": {
+          "quota": 5,
+          "used": 3
+        }
+      },
+      "expected_error": {
+        "code": "unsupported_operator"
+      }
+    },
+    {
+      "id": "and_short_circuits",
+      "category": "lifecycle",
+      "input": {
+        "expression": "quota >= used and enabled == 1",
+        "context": {
+          "quota": 2,
+          "used": 3,
+          "enabled": 1
+        }
+      },
+      "expected": {
+        "allowed": false,
+        "comparisons": 1
+      }
+    }
+  ]
+}

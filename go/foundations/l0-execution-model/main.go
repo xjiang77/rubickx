@@ -1,9 +1,10 @@
 // foundations/l0-execution-model
 //
 // GP0 · L0 执行模型的可跑实验：goroutine 有多轻 + 并发下的数据竞态。
-// 配套笔记：vault [[Session Log - GP0 系统基础前置]] / [[Eng - Redis：架构、实现与高阶实战]]
+// 配套笔记：Vault `Session Log - GP0 系统基础前置` / `Redis：契约、状态与运维`
 //
-// 一句话桥接：同一个"读-改-写竞态"，Redis 用单线程服务端消除，Go 单机用 Mutex/atomic 消除。
+// 一句话桥接：Redis 用单 shard execution owner 串行执行单条 command；
+// Go 单机用 Mutex/atomic 保护同一 read-modify-write。两者的 atomicity scope 不同。
 //
 // 跑法：
 //

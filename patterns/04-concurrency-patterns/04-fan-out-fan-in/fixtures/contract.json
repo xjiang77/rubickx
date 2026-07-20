@@ -1,0 +1,175 @@
+{
+  "pattern_id": "concurrency.fan-out-fan-in",
+  "cases": [
+    {
+      "id": "all_merges_by_completion",
+      "category": "nominal",
+      "input": {
+        "mode": "all",
+        "tasks": [
+          {
+            "id": "a",
+            "outcome": "success",
+            "value": "A",
+            "complete_at": 2
+          },
+          {
+            "id": "b",
+            "outcome": "success",
+            "value": "B",
+            "complete_at": 1
+          }
+        ]
+      },
+      "expected": {
+        "completion_order": [
+          "b",
+          "a"
+        ],
+        "results": [
+          "b:B",
+          "a:A"
+        ],
+        "failures": [],
+        "cancelled": [],
+        "status": "completed"
+      }
+    },
+    {
+      "id": "empty_all",
+      "category": "boundary",
+      "input": {
+        "mode": "all",
+        "tasks": []
+      },
+      "expected": {
+        "completion_order": [],
+        "results": [],
+        "failures": [],
+        "cancelled": [],
+        "status": "completed"
+      }
+    },
+    {
+      "id": "all_candidates_fail",
+      "category": "failure",
+      "input": {
+        "mode": "first_success",
+        "tasks": [
+          {
+            "id": "a",
+            "outcome": "failure",
+            "value": "x",
+            "complete_at": 1
+          },
+          {
+            "id": "b",
+            "outcome": "failure",
+            "value": "x",
+            "complete_at": 2
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "all_tasks_failed"
+      }
+    },
+    {
+      "id": "first_success_cancels_later",
+      "category": "lifecycle",
+      "input": {
+        "mode": "first_success",
+        "tasks": [
+          {
+            "id": "fail",
+            "outcome": "failure",
+            "value": "x",
+            "complete_at": 1
+          },
+          {
+            "id": "winner",
+            "outcome": "success",
+            "value": "W",
+            "complete_at": 2
+          },
+          {
+            "id": "late",
+            "outcome": "success",
+            "value": "L",
+            "complete_at": 3
+          }
+        ]
+      },
+      "expected": {
+        "completion_order": [
+          "fail",
+          "winner"
+        ],
+        "results": [
+          "winner:W"
+        ],
+        "failures": [
+          "fail"
+        ],
+        "cancelled": [
+          "late"
+        ],
+        "status": "completed"
+      }
+    },
+    {
+      "id": "equal_time_preserves_identity_order",
+      "category": "non-interference",
+      "input": {
+        "mode": "all",
+        "tasks": [
+          {
+            "id": "first",
+            "outcome": "success",
+            "value": "1",
+            "complete_at": 1
+          },
+          {
+            "id": "second",
+            "outcome": "failure",
+            "value": "x",
+            "complete_at": 1
+          }
+        ]
+      },
+      "expected": {
+        "completion_order": [
+          "first",
+          "second"
+        ],
+        "results": [
+          "first:1"
+        ],
+        "failures": [
+          "second"
+        ],
+        "cancelled": [],
+        "status": "partial"
+      }
+    },
+    {
+      "id": "side_effecting_first_success_rejected",
+      "category": "failure",
+      "input": {
+        "mode": "first_success",
+        "side_effecting": true,
+        "tasks": [
+          {
+            "id": "charge",
+            "outcome": "success",
+            "value": "ok",
+            "complete_at": 1
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "fanout_not_allowed"
+      }
+    }
+  ]
+}

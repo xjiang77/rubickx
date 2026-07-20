@@ -1,0 +1,102 @@
+{
+  "pattern_id": "gof.behavioral.template-method",
+  "cases": [
+    {
+      "id": "csv_ingestion",
+      "category": "nominal",
+      "input": {
+        "jobs": [
+          {
+            "format": "csv",
+            "payload": "a,b"
+          }
+        ]
+      },
+      "expected": {
+        "results": [
+          {
+            "format": "csv",
+            "data": [
+              "a",
+              "b"
+            ],
+            "steps": [
+              "validate",
+              "transform:csv",
+              "persist"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty_jobs",
+      "category": "boundary",
+      "input": {
+        "jobs": []
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "id": "empty_payload",
+      "category": "failure",
+      "input": {
+        "jobs": [
+          {
+            "format": "json",
+            "payload": ""
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "invalid_payload"
+      }
+    },
+    {
+      "id": "templates_do_not_share_state",
+      "category": "non-interference",
+      "input": {
+        "jobs": [
+          {
+            "format": "json",
+            "payload": "x|y"
+          },
+          {
+            "format": "csv",
+            "payload": "c,d"
+          }
+        ]
+      },
+      "expected": {
+        "results": [
+          {
+            "format": "json",
+            "data": [
+              "x",
+              "y"
+            ],
+            "steps": [
+              "validate",
+              "transform:json",
+              "persist"
+            ]
+          },
+          {
+            "format": "csv",
+            "data": [
+              "c",
+              "d"
+            ],
+            "steps": [
+              "validate",
+              "transform:csv",
+              "persist"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

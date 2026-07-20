@@ -1,0 +1,182 @@
+{
+  "pattern_id": "concurrency.structured-concurrency-cancellation",
+  "cases": [
+    {
+      "id": "all_children_complete",
+      "category": "nominal",
+      "input": {
+        "children": [
+          {
+            "name": "a",
+            "outcome": "success",
+            "value": "A"
+          },
+          {
+            "name": "b",
+            "outcome": "success",
+            "value": "B"
+          }
+        ],
+        "completion_order": [
+          "b",
+          "a"
+        ]
+      },
+      "expected": {
+        "parent_status": "completed",
+        "child_states": [
+          "a:completed",
+          "b:completed"
+        ],
+        "results": [
+          "b:B",
+          "a:A"
+        ],
+        "joined_count": 2,
+        "leaked": 0
+      }
+    },
+    {
+      "id": "empty_scope",
+      "category": "boundary",
+      "input": {
+        "children": [],
+        "completion_order": []
+      },
+      "expected": {
+        "parent_status": "completed",
+        "child_states": [],
+        "results": [],
+        "joined_count": 0,
+        "leaked": 0
+      }
+    },
+    {
+      "id": "child_failure_cancels_pending",
+      "category": "failure",
+      "input": {
+        "children": [
+          {
+            "name": "bad",
+            "outcome": "failure",
+            "value": "x"
+          },
+          {
+            "name": "later",
+            "outcome": "success",
+            "value": "L"
+          }
+        ],
+        "completion_order": [
+          "bad",
+          "later"
+        ]
+      },
+      "expected": {
+        "parent_status": "failed",
+        "child_states": [
+          "bad:failed",
+          "later:cancelled"
+        ],
+        "results": [],
+        "joined_count": 2,
+        "leaked": 0
+      }
+    },
+    {
+      "id": "parent_cancel_after_one",
+      "category": "lifecycle",
+      "input": {
+        "children": [
+          {
+            "name": "first",
+            "outcome": "success",
+            "value": "1"
+          },
+          {
+            "name": "second",
+            "outcome": "success",
+            "value": "2"
+          }
+        ],
+        "completion_order": [
+          "first",
+          "second"
+        ],
+        "parent_cancel_after": 1
+      },
+      "expected": {
+        "parent_status": "cancelled",
+        "child_states": [
+          "first:completed",
+          "second:cancelled"
+        ],
+        "results": [
+          "first:1"
+        ],
+        "joined_count": 2,
+        "leaked": 0
+      }
+    },
+    {
+      "id": "completed_sibling_stays_completed",
+      "category": "non-interference",
+      "input": {
+        "children": [
+          {
+            "name": "done",
+            "outcome": "success",
+            "value": "D"
+          },
+          {
+            "name": "bad",
+            "outcome": "failure",
+            "value": "x"
+          },
+          {
+            "name": "pending",
+            "outcome": "success",
+            "value": "P"
+          }
+        ],
+        "completion_order": [
+          "done",
+          "bad",
+          "pending"
+        ]
+      },
+      "expected": {
+        "parent_status": "failed",
+        "child_states": [
+          "done:completed",
+          "bad:failed",
+          "pending:cancelled"
+        ],
+        "results": [
+          "done:D"
+        ],
+        "joined_count": 3,
+        "leaked": 0
+      }
+    },
+    {
+      "id": "invalid_completion_schedule",
+      "category": "failure",
+      "input": {
+        "children": [
+          {
+            "name": "a",
+            "outcome": "success",
+            "value": "A"
+          }
+        ],
+        "completion_order": [
+          "missing"
+        ]
+      },
+      "expected_error": {
+        "code": "invalid_completion_order"
+      }
+    }
+  ]
+}

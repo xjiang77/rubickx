@@ -1,0 +1,108 @@
+{
+  "pattern_id": "data-messaging.event-sourcing",
+  "cases": [
+    {
+      "id": "history_rebuilds_state",
+      "category": "nominal",
+      "input": {
+        "events": [
+          {
+            "type": "deposited",
+            "amount": 100
+          },
+          {
+            "type": "withdrawn",
+            "amount": 30
+          }
+        ]
+      },
+      "expected": {
+        "balance": 70,
+        "version": 2,
+        "history_count": 2,
+        "appended_events": []
+      }
+    },
+    {
+      "id": "empty_stream",
+      "category": "boundary",
+      "input": {
+        "events": []
+      },
+      "expected": {
+        "balance": 0,
+        "version": 0,
+        "history_count": 0,
+        "appended_events": []
+      }
+    },
+    {
+      "id": "stale_command_conflicts",
+      "category": "failure",
+      "input": {
+        "events": [
+          {
+            "type": "deposited",
+            "amount": 100
+          }
+        ],
+        "command": {
+          "expected_version": 0,
+          "type": "withdraw",
+          "amount": 20
+        }
+      },
+      "expected_error": {
+        "code": "version_conflict"
+      }
+    },
+    {
+      "id": "append_then_rebuild",
+      "category": "lifecycle",
+      "input": {
+        "events": [
+          {
+            "type": "deposited",
+            "amount": 100
+          },
+          {
+            "type": "withdrawn",
+            "amount": 30
+          }
+        ],
+        "command": {
+          "expected_version": 2,
+          "type": "withdraw",
+          "amount": 20
+        }
+      },
+      "expected": {
+        "balance": 50,
+        "version": 3,
+        "history_count": 3,
+        "appended_events": [
+          {
+            "type": "withdrawn",
+            "amount": 20,
+            "version": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "unknown_event_fails_rebuild",
+      "category": "failure",
+      "input": {
+        "events": [
+          {
+            "type": "renamed",
+            "amount": 1
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "unknown_event_type"
+      }
+    }
+  ]
+}

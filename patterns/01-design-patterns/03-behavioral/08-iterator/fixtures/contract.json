@@ -1,0 +1,86 @@
+{
+  "pattern_id": "gof.behavioral.iterator",
+  "cases": [
+    {
+      "id": "walks_all_pages",
+      "category": "nominal",
+      "input": {
+        "pages": [
+          [
+            1,
+            2
+          ],
+          [
+            3
+          ]
+        ],
+        "take": 10
+      },
+      "expected": {
+        "items": [
+          1,
+          2,
+          3
+        ],
+        "fetched_pages": 2,
+        "exhausted": true
+      }
+    },
+    {
+      "id": "empty_pages",
+      "category": "boundary",
+      "input": {
+        "pages": [],
+        "take": 10
+      },
+      "expected": {
+        "items": [],
+        "fetched_pages": 0,
+        "exhausted": true
+      }
+    },
+    {
+      "id": "failed_page_is_not_end",
+      "category": "failure",
+      "input": {
+        "pages": [
+          [
+            1
+          ],
+          {
+            "error": "page_fetch_failed"
+          }
+        ],
+        "take": 10
+      },
+      "expected_error": {
+        "code": "page_fetch_failed"
+      }
+    },
+    {
+      "id": "take_does_not_prefetch",
+      "category": "lifecycle",
+      "input": {
+        "pages": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ]
+        ],
+        "take": 2
+      },
+      "expected": {
+        "items": [
+          1,
+          2
+        ],
+        "fetched_pages": 1,
+        "exhausted": false
+      }
+    }
+  ]
+}

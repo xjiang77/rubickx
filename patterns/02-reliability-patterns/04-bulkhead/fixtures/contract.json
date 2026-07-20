@@ -1,0 +1,144 @@
+{
+  "pattern_id": "reliability.bulkhead",
+  "cases": [
+    {
+      "id": "pools_accept_independently",
+      "category": "nominal",
+      "input": {
+        "capacities": {
+          "gold": 1,
+          "bulk": 1
+        },
+        "actions": [
+          {
+            "op": "acquire",
+            "pool": "gold"
+          },
+          {
+            "op": "acquire",
+            "pool": "bulk"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "accepted:gold",
+          "accepted:bulk"
+        ],
+        "used": {
+          "bulk": 1,
+          "gold": 1
+        }
+      }
+    },
+    {
+      "id": "zero_capacity_rejects",
+      "category": "boundary",
+      "input": {
+        "capacities": {
+          "bulk": 0
+        },
+        "actions": [
+          {
+            "op": "acquire",
+            "pool": "bulk"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "rejected:bulk"
+        ],
+        "used": {
+          "bulk": 0
+        }
+      }
+    },
+    {
+      "id": "saturation_is_contained",
+      "category": "failure",
+      "input": {
+        "capacities": {
+          "gold": 1,
+          "bulk": 1
+        },
+        "actions": [
+          {
+            "op": "acquire",
+            "pool": "bulk"
+          },
+          {
+            "op": "acquire",
+            "pool": "bulk"
+          },
+          {
+            "op": "acquire",
+            "pool": "gold"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "accepted:bulk",
+          "rejected:bulk",
+          "accepted:gold"
+        ],
+        "used": {
+          "bulk": 1,
+          "gold": 1
+        }
+      }
+    },
+    {
+      "id": "release_allows_reuse",
+      "category": "lifecycle",
+      "input": {
+        "capacities": {
+          "gold": 1
+        },
+        "actions": [
+          {
+            "op": "acquire",
+            "pool": "gold"
+          },
+          {
+            "op": "release",
+            "pool": "gold"
+          },
+          {
+            "op": "acquire",
+            "pool": "gold"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "accepted:gold",
+          "released:gold",
+          "accepted:gold"
+        ],
+        "used": {
+          "gold": 1
+        }
+      }
+    },
+    {
+      "id": "over_release_is_rejected",
+      "category": "failure",
+      "input": {
+        "capacities": {
+          "gold": 1
+        },
+        "actions": [
+          {
+            "op": "release",
+            "pool": "gold"
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "over_release"
+      }
+    }
+  ]
+}

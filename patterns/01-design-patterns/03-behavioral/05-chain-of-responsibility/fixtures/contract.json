@@ -1,0 +1,94 @@
+{
+  "pattern_id": "gof.behavioral.chain-of-responsibility",
+  "cases": [
+    {
+      "id": "request_is_accepted",
+      "category": "nominal",
+      "input": {
+        "requests": [
+          {
+            "token": "valid",
+            "quota": 1,
+            "payload": "order-1"
+          }
+        ]
+      },
+      "expected": {
+        "responses": [
+          {
+            "decision": "accepted:order-1",
+            "visited": [
+              "auth",
+              "quota",
+              "execute"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty_batch",
+      "category": "boundary",
+      "input": {
+        "requests": []
+      },
+      "expected": {
+        "responses": []
+      }
+    },
+    {
+      "id": "authentication_stops_chain",
+      "category": "failure",
+      "input": {
+        "requests": [
+          {
+            "token": "bad",
+            "quota": 1,
+            "payload": "order-1"
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "unauthenticated"
+      }
+    },
+    {
+      "id": "request_traces_are_isolated",
+      "category": "non-interference",
+      "input": {
+        "requests": [
+          {
+            "token": "valid",
+            "quota": 2,
+            "payload": "a"
+          },
+          {
+            "token": "valid",
+            "quota": 1,
+            "payload": "b"
+          }
+        ]
+      },
+      "expected": {
+        "responses": [
+          {
+            "decision": "accepted:a",
+            "visited": [
+              "auth",
+              "quota",
+              "execute"
+            ]
+          },
+          {
+            "decision": "accepted:b",
+            "visited": [
+              "auth",
+              "quota",
+              "execute"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

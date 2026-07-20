@@ -1,0 +1,78 @@
+{
+  "pattern_id": "reliability.retry",
+  "cases": [
+    {
+      "id": "transient_then_success",
+      "category": "nominal",
+      "input": {
+        "outcomes": [
+          "transient",
+          "transient",
+          "success"
+        ],
+        "max_attempts": 4,
+        "base_delay_ms": 10
+      },
+      "expected": {
+        "status": "success",
+        "attempts": 3,
+        "delays_ms": [
+          10,
+          20
+        ]
+      }
+    },
+    {
+      "id": "immediate_success",
+      "category": "boundary",
+      "input": {
+        "outcomes": [
+          "success"
+        ],
+        "max_attempts": 1,
+        "base_delay_ms": 10
+      },
+      "expected": {
+        "status": "success",
+        "attempts": 1,
+        "delays_ms": []
+      }
+    },
+    {
+      "id": "permanent_error",
+      "category": "failure",
+      "input": {
+        "outcomes": [
+          "permanent",
+          "success"
+        ],
+        "max_attempts": 3,
+        "base_delay_ms": 10
+      },
+      "expected_error": {
+        "code": "non_retryable"
+      }
+    },
+    {
+      "id": "budget_is_exhausted",
+      "category": "lifecycle",
+      "input": {
+        "outcomes": [
+          "transient",
+          "transient",
+          "transient"
+        ],
+        "max_attempts": 3,
+        "base_delay_ms": 5
+      },
+      "expected": {
+        "status": "exhausted",
+        "attempts": 3,
+        "delays_ms": [
+          5,
+          10
+        ]
+      }
+    }
+  ]
+}

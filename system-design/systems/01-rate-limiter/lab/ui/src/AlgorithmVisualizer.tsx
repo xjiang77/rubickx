@@ -1,10 +1,13 @@
 import type { AlgorithmVisualState, AdmissionState, LoadState } from "./algorithmVisualState";
+import { useI18n, type Strings, type UiLang } from "./i18n";
 
 export function AlgorithmVisualizer({ state }: { state: AlgorithmVisualState }) {
+  const { lang, t } = useI18n();
+
   if (state.kind === "unavailable") {
     return (
       <div className="visual-unavailable" role="note">
-        <strong>State unavailable</strong>
+        <strong>{t.tStateUnavailable}</strong>
         <span>{state.reason}</span>
       </div>
     );
@@ -13,13 +16,13 @@ export function AlgorithmVisualizer({ state }: { state: AlgorithmVisualState }) 
   return (
     <section className={`algorithm-visualizer ${state.kind}`} aria-label="Limiter state">
       <div className="visual-context">
-        <div><span>Quota key</span><strong>{state.actor || "request"}</strong></div>
-        <div><span>Trace time</span><strong>{formatMs(state.timestampMs)}</strong></div>
-        <div><span>Capacity</span><strong>{formatNumber(state.capacity)}</strong></div>
+        <div><span>{t.tQuotaKey}</span><strong>{state.actor || "request"}</strong></div>
+        <div><span>{t.tTraceTime}</span><strong>{formatMs(state.timestampMs)}</strong></div>
+        <div><span>{t.tCapacity}</span><strong>{formatNumber(state.capacity)}</strong></div>
       </div>
       <div className="visual-statuses">
         <div className={`visual-status load ${state.loadState}`} aria-label="Capacity status">
-          <span>Capacity</span>{statusLabel(state.loadState)}
+          <span>{t.tCapacity}</span>{statusLabel(state.loadState)}
         </div>
         <div
           className={`visual-status admission ${state.admission}`}
@@ -27,24 +30,27 @@ export function AlgorithmVisualizer({ state }: { state: AlgorithmVisualState }) 
           role={state.admission === "evaluating" ? undefined : "status"}
           aria-live={state.admission === "evaluating" ? undefined : "polite"}
         >
-          <span>Request</span>{admissionLabel(state.admission)}
+          <span>{t.tRequest}</span>{admissionLabel(state.admission)}
         </div>
       </div>
-      {state.kind === "fixed-window" && <FixedWindowVisual state={state} />}
-      {state.kind === "sliding-window-log" && <SlidingLogVisual state={state} />}
-      {state.kind === "sliding-window-counter" && <SlidingCounterVisual state={state} />}
-      {state.kind === "token-bucket" && <TokenBucketVisual state={state} />}
-      {state.kind === "leaky-bucket" && <LeakyBucketVisual state={state} />}
+      {state.kind === "fixed-window" && <FixedWindowVisual state={state} t={t} />}
+      {state.kind === "sliding-window-log" && <SlidingLogVisual state={state} t={t} lang={lang} />}
+      {state.kind === "sliding-window-counter" && <SlidingCounterVisual state={state} t={t} lang={lang} />}
+      {state.kind === "token-bucket" && <TokenBucketVisual state={state} t={t} lang={lang} />}
+      {state.kind === "leaky-bucket" && <LeakyBucketVisual state={state} t={t} lang={lang} />}
     </section>
   );
 }
 
-function FixedWindowVisual({ state }: { state: Extract<AlgorithmVisualState, { kind: "fixed-window" }> }) {
+function FixedWindowVisual({ state, t }: {
+  state: Extract<AlgorithmVisualState, { kind: "fixed-window" }>;
+  t: Strings;
+}) {
   return (
     <div className="window-visual-card">
       <UsageBar
         label="Fixed window usage"
-        caption="Window used"
+        caption={t.tWindowUsed}
         value={state.used}
         capacity={state.capacity}
         valueText={`${formatNumber(state.used)} of ${formatNumber(state.capacity)} window capacity used`}
@@ -55,20 +61,24 @@ function FixedWindowVisual({ state }: { state: Extract<AlgorithmVisualState, { k
       </div>
       <div className="window-time-labels">
         <span>{formatMs(state.windowStartMs)}</span>
-        <strong>now · {formatMs(state.timestampMs)}</strong>
+        <strong>{t.tNow} · {formatMs(state.timestampMs)}</strong>
         <span>{formatMs(state.windowEndMs)}</span>
       </div>
-      <p className="visual-delta">{state.rollover ? "Window rolled over" : "Current fixed window"}</p>
+      <p className="visual-delta">{state.rollover ? t.tWindowRolled : t.tCurrentWindow}</p>
     </div>
   );
 }
 
-function SlidingLogVisual({ state }: { state: Extract<AlgorithmVisualState, { kind: "sliding-window-log" }> }) {
+function SlidingLogVisual({ state, t, lang }: {
+  state: Extract<AlgorithmVisualState, { kind: "sliding-window-log" }>;
+  t: Strings;
+  lang: UiLang;
+}) {
   return (
     <div className="window-visual-card">
       <UsageBar
         label="Sliding window log usage"
-        caption="Rolling window used"
+        caption={t.tRollingUsed}
         value={state.used}
         capacity={state.capacity}
         valueText={`${formatNumber(state.used)} of ${formatNumber(state.capacity)} rolling window capacity used`}
@@ -84,26 +94,35 @@ function SlidingLogVisual({ state }: { state: Extract<AlgorithmVisualState, { ki
       </div>
       <div className="window-time-labels">
         <span>{formatMs(state.rangeStartMs)}</span>
-        <strong>rolling now</strong>
+        <strong>{t.tRollingNow}</strong>
         <span>{formatMs(state.rangeEndMs)}</span>
       </div>
       <p className="visual-delta split-delta">
-        <span>{plural(state.entries.length, "live entry", "live entries")}</span>
-        <span>{plural(state.evictedCount, "evicted", "evicted")}</span>
+        <span>{lang === "zh"
+          ? `${formatNumber(state.entries.length)} 条存活记录`
+          : plural(state.entries.length, "live entry", "live entries")}</span>
+        <span>{lang === "zh"
+          ? `已驱逐 ${formatNumber(state.evictedCount)} 条`
+          : plural(state.evictedCount, "evicted", "evicted")}</span>
       </p>
     </div>
   );
 }
 
-function SlidingCounterVisual({ state }: { state: Extract<AlgorithmVisualState, { kind: "sliding-window-counter" }> }) {
+function SlidingCounterVisual({ state, t, lang }: {
+  state: Extract<AlgorithmVisualState, { kind: "sliding-window-counter" }>;
+  t: Strings;
+  lang: UiLang;
+}) {
   const estimated = state.estimatedCount;
+  const previousWeight = state.previousWeight;
   const previousWidth = percent(state.weightedPreviousCount ?? 0, state.capacity);
   const currentWidth = Math.min(percent(state.currentCount, state.capacity), 100 - previousWidth);
   return (
     <div className="window-visual-card">
       <div className="capacity-labels visual-capacity-labels">
-        <span>Weighted window used</span>
-        <strong>{estimated === undefined ? "estimating…" : `${formatNumber(estimated)} / ${formatNumber(state.capacity)}`}</strong>
+        <span>{t.tWeightedUsed}</span>
+        <strong>{estimated === undefined ? t.tEstimating : `${formatNumber(estimated)} / ${formatNumber(state.capacity)}`}</strong>
       </div>
       <div
         className={`counter-stack${estimated === undefined ? " estimating" : ""}`}
@@ -120,16 +139,16 @@ function SlidingCounterVisual({ state }: { state: Extract<AlgorithmVisualState, 
         <span className="counter-current" style={{ left: `${previousWidth}%`, width: `${currentWidth}%` }} />
       </div>
       <div className="counter-legend">
-        <span><i className="previous-key" />weighted previous</span>
-        <span><i className="current-key" />current</span>
+        <span><i className="previous-key" />{t.tWeightedPrev}</span>
+        <span><i className="current-key" />{t.tCurrentLegend}</span>
       </div>
       <p className="counter-equation">
-        {estimated === undefined || state.previousWeight === undefined
-          ? "Estimate pending after window rotation"
-          : `${formatNumber(state.currentCount)} current + ${formatNumber(state.previousCount)} × ${formatNumber(state.previousWeight)} = ${formatNumber(estimated)}`}
+        {estimated === undefined || previousWeight === undefined
+          ? t.tEstimatePending
+          : counterEquation(state.currentCount, state.previousCount, previousWeight, estimated, lang)}
       </p>
       <div className="window-time-labels counter-time-labels">
-        <span>previous</span>
+        <span>{t.tPrevious}</span>
         <strong>{formatMs(state.currentWindowStartMs)}</strong>
         <span>{formatMs(state.currentWindowEndMs)}</span>
       </div>
@@ -137,7 +156,11 @@ function SlidingCounterVisual({ state }: { state: Extract<AlgorithmVisualState, 
   );
 }
 
-function TokenBucketVisual({ state }: { state: Extract<AlgorithmVisualState, { kind: "token-bucket" }> }) {
+function TokenBucketVisual({ state, t, lang }: {
+  state: Extract<AlgorithmVisualState, { kind: "token-bucket" }>;
+  t: Strings;
+  lang: UiLang;
+}) {
   const fill = percent(state.available, state.capacity);
   return (
     <div className="bucket-visual-grid">
@@ -154,19 +177,23 @@ function TokenBucketVisual({ state }: { state: Extract<AlgorithmVisualState, { k
         <span className="bucket-value">{formatNumber(state.available)}</span>
       </div>
       <div className="bucket-copy">
-        <span>Available tokens</span>
+        <span>{t.tAvailTokens}</span>
         <strong>{formatNumber(state.available)} / {formatNumber(state.capacity)}</strong>
-        <p>{tokenDeltaLabel(state.delta, state.stepId)}</p>
+        <p>{tokenDeltaLabel(state.delta, state.stepId, t, lang)}</p>
         <dl>
-          <div><dt>Refill rate</dt><dd>{formatNumber(state.ratePerSecond)} / sec</dd></div>
-          <div><dt>Refill checkpoint</dt><dd>{formatMs(state.lastRefillMs)}</dd></div>
+          <div><dt>{t.tRefillRate}</dt><dd>{formatNumber(state.ratePerSecond)} / sec</dd></div>
+          <div><dt>{t.tRefillCk}</dt><dd>{formatMs(state.lastRefillMs)}</dd></div>
         </dl>
       </div>
     </div>
   );
 }
 
-function LeakyBucketVisual({ state }: { state: Extract<AlgorithmVisualState, { kind: "leaky-bucket" }> }) {
+function LeakyBucketVisual({ state, t, lang }: {
+  state: Extract<AlgorithmVisualState, { kind: "leaky-bucket" }>;
+  t: Strings;
+  lang: UiLang;
+}) {
   const fill = percent(state.used, state.capacity);
   return (
     <div className="bucket-visual-grid">
@@ -183,12 +210,12 @@ function LeakyBucketVisual({ state }: { state: Extract<AlgorithmVisualState, { k
         <span className="bucket-value">{formatNumber(state.used)}</span>
       </div>
       <div className="bucket-copy">
-        <span>Queued work</span>
+        <span>{t.tQueuedWork}</span>
         <strong>{formatNumber(state.used)} / {formatNumber(state.capacity)}</strong>
-        <p>{leakyDeltaLabel(state.delta, state.stepId)}</p>
+        <p>{leakyDeltaLabel(state.delta, state.stepId, t, lang)}</p>
         <dl>
-          <div><dt>Drain rate</dt><dd>{formatNumber(state.ratePerSecond)} / sec</dd></div>
-          <div><dt>Drain checkpoint</dt><dd>{formatMs(state.lastLeakMs)}</dd></div>
+          <div><dt>{t.tDrainRate}</dt><dd>{formatNumber(state.ratePerSecond)} / sec</dd></div>
+          <div><dt>{t.tDrainCk}</dt><dd>{formatMs(state.lastLeakMs)}</dd></div>
         </dl>
       </div>
     </div>
@@ -229,16 +256,32 @@ function UsageBar({
   );
 }
 
-function tokenDeltaLabel(delta: number, stepId: string) {
-  if (delta > 0) return `+${formatNumber(delta)} refilled`;
-  if (delta < 0) return `${formatNumber(delta)} consumed`;
-  return stepId === "token.decision" ? "No tokens consumed" : "No refill needed";
+function tokenDeltaLabel(delta: number, stepId: string, t: Strings, lang: UiLang) {
+  if (delta > 0) return lang === "zh" ? `已补充 +${formatNumber(delta)}` : `+${formatNumber(delta)} refilled`;
+  if (delta < 0) return lang === "zh" ? `已消耗 ${formatNumber(delta)}` : `${formatNumber(delta)} consumed`;
+  return stepId === "token.decision" ? t.tNoTokensConsumed : t.tNoRefill;
 }
 
-function leakyDeltaLabel(delta: number, stepId: string) {
-  if (delta < 0) return `${formatNumber(delta)} drained`;
-  if (delta > 0) return `+${formatNumber(delta)} enqueued`;
-  return stepId === "leaky.decision" ? "Queue unchanged" : "Nothing to drain";
+function leakyDeltaLabel(delta: number, stepId: string, t: Strings, lang: UiLang) {
+  if (delta < 0) return lang === "zh" ? `已泄出 ${formatNumber(delta)}` : `${formatNumber(delta)} drained`;
+  if (delta > 0) return lang === "zh" ? `已入队 +${formatNumber(delta)}` : `+${formatNumber(delta)} enqueued`;
+  return stepId === "leaky.decision" ? t.tQueueUnchanged : t.tNothingToDrain;
+}
+
+function counterEquation(
+  currentCount: number,
+  previousCount: number,
+  previousWeight: number,
+  estimated: number,
+  lang: UiLang,
+) {
+  const current = formatNumber(currentCount);
+  const previous = formatNumber(previousCount);
+  const weight = formatNumber(previousWeight);
+  const estimate = formatNumber(estimated);
+  return lang === "zh"
+    ? `当前 ${current} + 上一 ${previous} × ${weight} = ${estimate}`
+    : `${current} current + ${previous} × ${weight} = ${estimate}`;
 }
 
 function statusLabel(state: LoadState) {

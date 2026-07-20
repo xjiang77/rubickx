@@ -1,0 +1,4 @@
+export class PatternError extends Error{constructor(code){super(code);this.code=code;}}
+class State{constructor(name,transitions){this.name=name;this.transitions=transitions;}handle(event){const target=this.transitions[event];if(target===undefined)throw new PatternError("invalid_transition");return states()[target];}}
+const states=()=>({queued:new State("queued",{start:"running",cancel:"cancelled"}),running:new State("running",{complete:"completed",fail:"failed"}),failed:new State("failed",{retry:"running",cancel:"cancelled"}),completed:new State("completed",{}),cancelled:new State("cancelled",{})});
+export function evaluate(input){let current=states()[input.initial];if(current===undefined)throw new PatternError("unknown_state");const history=[current.name];for(const event of input.events??[]){current=current.handle(event);history.push(current.name);}return{final:current.name,history};}

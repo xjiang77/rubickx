@@ -1,0 +1,119 @@
+{
+  "pattern_id": "gof.behavioral.observer",
+  "cases": [
+    {
+      "id": "notifies_all_observers",
+      "category": "nominal",
+      "input": {
+        "observers": [
+          "audit",
+          "metrics"
+        ],
+        "events": [
+          "v2"
+        ]
+      },
+      "expected": {
+        "receipts": [
+          {
+            "event": "v2",
+            "observer": "audit",
+            "status": "delivered"
+          },
+          {
+            "event": "v2",
+            "observer": "metrics",
+            "status": "delivered"
+          }
+        ],
+        "active": 2
+      }
+    },
+    {
+      "id": "no_observers",
+      "category": "boundary",
+      "input": {
+        "observers": [],
+        "events": [
+          "v1"
+        ]
+      },
+      "expected": {
+        "receipts": [],
+        "active": 0
+      }
+    },
+    {
+      "id": "observer_failure_is_isolated",
+      "category": "failure",
+      "input": {
+        "observers": [
+          "audit",
+          "failing",
+          "metrics"
+        ],
+        "events": [
+          "v3"
+        ]
+      },
+      "expected": {
+        "receipts": [
+          {
+            "event": "v3",
+            "observer": "audit",
+            "status": "delivered"
+          },
+          {
+            "event": "v3",
+            "observer": "failing",
+            "status": "failed",
+            "error": "observer_failed"
+          },
+          {
+            "event": "v3",
+            "observer": "metrics",
+            "status": "delivered"
+          }
+        ],
+        "active": 3
+      }
+    },
+    {
+      "id": "unsubscribe_affects_later_events",
+      "category": "lifecycle",
+      "input": {
+        "observers": [
+          "audit",
+          "metrics"
+        ],
+        "events": [
+          "v1",
+          "v2"
+        ],
+        "unsubscribe_after_first": [
+          "metrics"
+        ]
+      },
+      "expected": {
+        "receipts": [
+          {
+            "event": "v1",
+            "observer": "audit",
+            "status": "delivered"
+          },
+          {
+            "event": "v1",
+            "observer": "metrics",
+            "status": "delivered"
+          },
+          {
+            "event": "v2",
+            "observer": "audit",
+            "status": "delivered"
+          }
+        ],
+        "active": 1
+      }
+    }
+  ]
+}

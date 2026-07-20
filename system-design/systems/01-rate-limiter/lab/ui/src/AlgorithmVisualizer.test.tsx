@@ -1,7 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AlgorithmVisualizer } from "./AlgorithmVisualizer";
 import type { AlgorithmVisualState } from "./algorithmVisualState";
+import type { UiLang } from "./i18n";
+import { renderWithI18n as render } from "./test/renderWithI18n";
+
+function renderVisualizer(state: AlgorithmVisualState, lang: UiLang = "en") {
+  return render(<AlgorithmVisualizer state={state} />, { lang });
+}
 
 describe("AlgorithmVisualizer", () => {
   it("shows token availability separately from request admission", () => {
@@ -21,7 +27,7 @@ describe("AlgorithmVisualizer", () => {
       delta: 1,
     };
 
-    render(<AlgorithmVisualizer state={state} />);
+    renderVisualizer(state);
 
     expect(screen.getByLabelText("Capacity status")).toHaveTextContent("ACTIVE");
     expect(screen.getByLabelText("Admission")).toHaveTextContent("EVALUATING");
@@ -131,7 +137,7 @@ describe("AlgorithmVisualizer", () => {
       visibleText: "-1 drained",
     },
   ])("renders the $name visual and accessibility contract", ({ state, progressName, valueNow, valueText, visibleText }) => {
-    render(<AlgorithmVisualizer state={state} />);
+    renderVisualizer(state);
 
     const progress = screen.getByRole("progressbar", { name: progressName });
     expect(progress).toHaveAttribute("aria-valuenow", valueNow);
@@ -163,11 +169,12 @@ describe("AlgorithmVisualizer", () => {
       delta: 0,
     };
 
-    render(<AlgorithmVisualizer state={state} />);
+    renderVisualizer(state, "zh");
 
     expect(screen.getByLabelText("Admission")).toHaveTextContent("DENY");
     expect(screen.getByLabelText("Admission")).toHaveAttribute("aria-live", "polite");
     expect(screen.getByRole("status", { name: "Admission" })).toBeInTheDocument();
+    expect(screen.getByText("未消耗令牌")).toBeInTheDocument();
   });
 
   it("renders a counter rotate as an indeterminate estimate", () => {
@@ -185,7 +192,7 @@ describe("AlgorithmVisualizer", () => {
       previousCount: 2,
     };
 
-    render(<AlgorithmVisualizer state={state} />);
+    renderVisualizer(state);
 
     const progress = screen.getByRole("progressbar", { name: "Sliding window estimated usage" });
     expect(progress).not.toHaveAttribute("aria-valuenow");
@@ -203,9 +210,134 @@ describe("AlgorithmVisualizer", () => {
       reason: "Token-bucket state is incomplete",
     };
 
-    render(<AlgorithmVisualizer state={state} />);
+    renderVisualizer(state);
 
     expect(screen.getByText("State unavailable")).toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    {
+      name: "fixed window",
+      state: {
+        kind: "fixed-window",
+        actor: "client-a",
+        timestampMs: 1_000,
+        stepId: "fixed.locate-window",
+        admission: "evaluating",
+        capacity: 3,
+        used: 0,
+        available: 3,
+        loadState: "idle",
+        windowStartMs: 1_000,
+        windowEndMs: 2_000,
+        windowProgress: 0,
+        rollover: true,
+      } satisfies AlgorithmVisualState,
+      progressName: "Fixed window usage",
+      valueText: "0 of 3 window capacity used",
+      visibleText: ["窗口已用", "当前 · 1,000 ms", "窗口已滚动"],
+    },
+    {
+      name: "sliding log",
+      state: {
+        kind: "sliding-window-log",
+        actor: "client-a",
+        timestampMs: 1_500,
+        stepId: "sliding-log.evict",
+        admission: "evaluating",
+        capacity: 3,
+        used: 1,
+        available: 2,
+        loadState: "active",
+        rangeStartMs: 500,
+        rangeEndMs: 1_500,
+        entries: [{ key: "1000:1:0", atMs: 1_000, cost: 1, position: 0.5 }],
+        evictedCount: 1,
+      } satisfies AlgorithmVisualState,
+      progressName: "Sliding window log usage",
+      valueText: "1 of 3 rolling window capacity used",
+      visibleText: ["滚动窗口已用", "滚动当前", "1 条存活记录", "已驱逐 1 条"],
+    },
+    {
+      name: "sliding counter",
+      state: {
+        kind: "sliding-window-counter",
+        actor: "client-a",
+        timestampMs: 1_500,
+        stepId: "sliding-counter.estimate",
+        admission: "evaluating",
+        capacity: 2,
+        used: 1.5,
+        available: 0.5,
+        loadState: "active",
+        currentWindowStartMs: 1_000,
+        currentWindowEndMs: 2_000,
+        currentCount: 0.5,
+        previousCount: 2,
+        previousWeight: 0.5,
+        weightedPreviousCount: 1,
+        estimatedCount: 1.5,
+      } satisfies AlgorithmVisualState,
+      progressName: "Sliding window estimated usage",
+      valueText: "1.5 of 2 estimated window capacity used",
+      visibleText: ["加权窗口已用", "加权上一窗口", "当前窗口", "当前 0.5 + 上一 2 × 0.5 = 1.5", "上一窗口"],
+    },
+    {
+      name: "token bucket",
+      state: {
+        kind: "token-bucket",
+        actor: "client-a",
+        timestampMs: 1_000,
+        stepId: "token.refill",
+        admission: "evaluating",
+        capacity: 2,
+        used: 0.5,
+        available: 1.5,
+        loadState: "active",
+        tokens: 1.5,
+        ratePerSecond: 1,
+        lastRefillMs: 1_000,
+        delta: 1,
+      } satisfies AlgorithmVisualState,
+      progressName: "Token availability",
+      valueText: "1.5 of 2 tokens available",
+      visibleText: ["配额 Key", "追踪时间", "容量", "请求", "可用令牌", "已补充 +1", "补充速率", "补充检查点"],
+    },
+    {
+      name: "leaky bucket",
+      state: {
+        kind: "leaky-bucket",
+        actor: "client-a",
+        timestampMs: 1_000,
+        stepId: "leaky.drain",
+        admission: "evaluating",
+        capacity: 2,
+        used: 1,
+        available: 1,
+        loadState: "active",
+        water: 1,
+        ratePerSecond: 1,
+        lastLeakMs: 1_000,
+        delta: -1,
+      } satisfies AlgorithmVisualState,
+      progressName: "Leaky bucket queue usage",
+      valueText: "1 of 2 queue capacity used",
+      visibleText: ["排队工作", "已泄出 -1", "泄出速率", "泄出检查点"],
+    },
+  ])("translates the $name chrome while preserving English state and accessibility contracts", ({
+    state,
+    progressName,
+    valueText,
+    visibleText,
+  }) => {
+    renderVisualizer(state, "zh");
+
+    for (const text of visibleText) {
+      expect(screen.getAllByText(text).length).toBeGreaterThan(0);
+    }
+    expect(screen.getByRole("progressbar", { name: progressName })).toHaveAttribute("aria-valuetext", valueText);
+    expect(screen.getByLabelText("Capacity status")).toHaveTextContent(state.loadState.toUpperCase());
+    expect(screen.getByLabelText("Admission")).toHaveTextContent("EVALUATING");
   });
 });

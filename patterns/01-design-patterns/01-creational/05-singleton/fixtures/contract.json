@@ -1,0 +1,83 @@
+{
+  "pattern_id": "gof.creational.singleton",
+  "cases": [
+    {
+      "id": "shared_catalog",
+      "category": "nominal",
+      "input": {
+        "registrations": [
+          {
+            "name": "openai",
+            "endpoint": "https://api"
+          },
+          {
+            "name": "local",
+            "endpoint": "http://local"
+          }
+        ]
+      },
+      "expected": {
+        "same_instance": true,
+        "entries": {
+          "local": "http://local",
+          "openai": "https://api"
+        },
+        "size": 2
+      }
+    },
+    {
+      "id": "empty_catalog",
+      "category": "boundary",
+      "input": {
+        "registrations": []
+      },
+      "expected": {
+        "same_instance": true,
+        "entries": {},
+        "size": 0
+      }
+    },
+    {
+      "id": "conflicting_registration",
+      "category": "failure",
+      "input": {
+        "registrations": [
+          {
+            "name": "openai",
+            "endpoint": "a"
+          },
+          {
+            "name": "openai",
+            "endpoint": "b"
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "registration_conflict"
+      }
+    },
+    {
+      "id": "idempotent_registration",
+      "category": "lifecycle",
+      "input": {
+        "registrations": [
+          {
+            "name": "openai",
+            "endpoint": "a"
+          },
+          {
+            "name": "openai",
+            "endpoint": "a"
+          }
+        ]
+      },
+      "expected": {
+        "same_instance": true,
+        "entries": {
+          "openai": "a"
+        },
+        "size": 1
+      }
+    }
+  ]
+}

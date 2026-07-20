@@ -1,0 +1,64 @@
+{
+  "pattern_id": "gof.structural.proxy",
+  "cases": [
+    {
+      "id": "admin_reads_secret",
+      "category": "nominal",
+      "input": {
+        "role": "admin",
+        "reads": [
+          "secret"
+        ]
+      },
+      "expected": {
+        "values": [
+          "key:rotated"
+        ],
+        "load_count": 1
+      }
+    },
+    {
+      "id": "no_reads_no_load",
+      "category": "boundary",
+      "input": {
+        "role": "viewer",
+        "reads": []
+      },
+      "expected": {
+        "values": [],
+        "load_count": 0
+      }
+    },
+    {
+      "id": "viewer_is_forbidden",
+      "category": "failure",
+      "input": {
+        "role": "viewer",
+        "reads": [
+          "secret"
+        ]
+      },
+      "expected_error": {
+        "code": "forbidden"
+      }
+    },
+    {
+      "id": "subject_is_loaded_once",
+      "category": "lifecycle",
+      "input": {
+        "role": "admin",
+        "reads": [
+          "public",
+          "secret"
+        ]
+      },
+      "expected": {
+        "values": [
+          "status:ok",
+          "key:rotated"
+        ],
+        "load_count": 1
+      }
+    }
+  ]
+}

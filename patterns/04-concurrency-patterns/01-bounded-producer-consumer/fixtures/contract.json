@@ -1,0 +1,153 @@
+{
+  "pattern_id": "concurrency.bounded-producer-consumer",
+  "cases": [
+    {
+      "id": "produce_then_consume_fifo",
+      "category": "nominal",
+      "input": {
+        "capacity": 2,
+        "actions": [
+          {
+            "op": "produce",
+            "item": "a"
+          },
+          {
+            "op": "produce",
+            "item": "b"
+          },
+          {
+            "op": "consume"
+          }
+        ]
+      },
+      "expected": {
+        "receipts": [
+          "queued:a",
+          "queued:b",
+          "consumed:a"
+        ],
+        "consumed": [
+          "a"
+        ],
+        "remaining": [
+          "b"
+        ],
+        "closed": false
+      }
+    },
+    {
+      "id": "zero_capacity_backpressures",
+      "category": "boundary",
+      "input": {
+        "capacity": 0,
+        "actions": [
+          {
+            "op": "produce",
+            "item": "a"
+          }
+        ]
+      },
+      "expected": {
+        "receipts": [
+          "backpressured:a"
+        ],
+        "consumed": [],
+        "remaining": [],
+        "closed": false
+      }
+    },
+    {
+      "id": "produce_after_close_fails",
+      "category": "failure",
+      "input": {
+        "capacity": 1,
+        "actions": [
+          {
+            "op": "close"
+          },
+          {
+            "op": "produce",
+            "item": "a"
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "produce_after_close"
+      }
+    },
+    {
+      "id": "consume_frees_capacity_for_retry",
+      "category": "lifecycle",
+      "input": {
+        "capacity": 1,
+        "actions": [
+          {
+            "op": "produce",
+            "item": "a"
+          },
+          {
+            "op": "produce",
+            "item": "b"
+          },
+          {
+            "op": "consume"
+          },
+          {
+            "op": "produce",
+            "item": "b"
+          }
+        ]
+      },
+      "expected": {
+        "receipts": [
+          "queued:a",
+          "backpressured:b",
+          "consumed:a",
+          "queued:b"
+        ],
+        "consumed": [
+          "a"
+        ],
+        "remaining": [
+          "b"
+        ],
+        "closed": false
+      }
+    },
+    {
+      "id": "close_drains_then_ends",
+      "category": "non-interference",
+      "input": {
+        "capacity": 2,
+        "actions": [
+          {
+            "op": "produce",
+            "item": "a"
+          },
+          {
+            "op": "close"
+          },
+          {
+            "op": "consume"
+          },
+          {
+            "op": "consume"
+          }
+        ]
+      },
+      "expected": {
+        "receipts": [
+          "queued:a",
+          "closed",
+          "consumed:a",
+          "end"
+        ],
+        "consumed": [
+          "a"
+        ],
+        "remaining": [],
+        "closed": true
+      }
+    }
+  ]
+}

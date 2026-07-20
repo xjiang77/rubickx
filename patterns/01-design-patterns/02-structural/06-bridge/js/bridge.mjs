@@ -1,0 +1,4 @@
+export class PatternError extends Error{constructor(code){super(code);this.code=code;}}
+class EmailChannel{send(recipient,message){return`email:${recipient}:${message}`;}}class SlackChannel{send(recipient,message){return`slack:${recipient}:${message}`;}}
+class Alert{constructor(channel,prefix){this.channel=channel;this.prefix=prefix;}deliver(recipient,body){return this.channel.send(recipient,`${this.prefix} ${body}`);}}
+export function evaluate(input){const deliveries=[];for(const item of input.notifications??[]){let channel;if(item.channel==="email")channel=new EmailChannel();else if(item.channel==="slack")channel=new SlackChannel();else throw new PatternError("unsupported_channel");let prefix;if(item.kind==="incident")prefix="[INCIDENT]";else if(item.kind==="reminder")prefix="[REMINDER]";else throw new PatternError("unsupported_alert");deliveries.push(new Alert(channel,prefix).deliver(item.recipient,item.body));}return{deliveries};}

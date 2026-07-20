@@ -1,0 +1,86 @@
+{
+  "pattern_id": "gof.behavioral.mediator",
+  "cases": [
+    {
+      "id": "customer_notifies_team",
+      "category": "nominal",
+      "input": {
+        "events": [
+          {
+            "from": "customer",
+            "message": "need help"
+          }
+        ]
+      },
+      "expected": {
+        "deliveries": [
+          {
+            "from": "customer",
+            "to": "agent",
+            "message": "need help"
+          },
+          {
+            "from": "customer",
+            "to": "bot",
+            "message": "need help"
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_events",
+      "category": "boundary",
+      "input": {
+        "events": []
+      },
+      "expected": {
+        "deliveries": []
+      }
+    },
+    {
+      "id": "unknown_sender",
+      "category": "failure",
+      "input": {
+        "events": [
+          {
+            "from": "system",
+            "message": "hello"
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "unsupported_sender"
+      }
+    },
+    {
+      "id": "routes_remain_event_local",
+      "category": "non-interference",
+      "input": {
+        "events": [
+          {
+            "from": "agent",
+            "message": "resolved"
+          },
+          {
+            "from": "bot",
+            "message": "summary"
+          }
+        ]
+      },
+      "expected": {
+        "deliveries": [
+          {
+            "from": "agent",
+            "to": "customer",
+            "message": "resolved"
+          },
+          {
+            "from": "bot",
+            "to": "agent",
+            "message": "summary"
+          }
+        ]
+      }
+    }
+  ]
+}

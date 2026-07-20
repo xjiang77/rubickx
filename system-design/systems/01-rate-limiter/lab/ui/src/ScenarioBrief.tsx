@@ -1,22 +1,24 @@
+import { useI18n, type Strings } from "./i18n";
 import type { ScenarioBriefViewModel } from "./scenarioBriefModel";
 
 export function ScenarioBrief({ model }: { model: ScenarioBriefViewModel }) {
+  const { t } = useI18n();
   const hasSequence = model.expected.groups.length > 0;
   const hasCases = model.expected.cases.length > 0;
 
   return (
     <section className="scenario-brief" aria-label="Scenario brief">
       <header className="scenario-brief-header">
-        <span className="eyebrow">Scenario</span>
-        <h2>Scenario brief</h2>
+        <span className="eyebrow">{t.tBriefKicker}</span>
+        <h2>{t.tBriefTitle}</h2>
       </header>
 
       <div className="scenario-brief-grid">
-        <BriefField title="Policy" value={model.policy} />
-        <BriefField title="Traffic" value={model.traffic} />
+        <BriefField title={t.tPolicy} value={model.policy} />
+        <BriefField title={t.tTraffic} value={model.traffic} />
 
         <div className="scenario-brief-field scenario-brief-expected">
-          <h3>Expected</h3>
+          <h3>{t.tExpected}</h3>
           <p>{model.expected.summary}</p>
 
           {hasSequence && (
@@ -52,14 +54,14 @@ export function ScenarioBrief({ model }: { model: ScenarioBriefViewModel }) {
         <footer className="scenario-brief-notes">
           {model.lesson && (
             <div className="scenario-brief-note">
-              <strong>{model.lesson.label}</strong>
+              <strong>{localizedLessonLabel(model.lesson.label, t)}</strong>
               <span>{model.lesson.text}</span>
             </div>
           )}
           {model.goPath && (
             <div className="scenario-brief-note go-path-note">
-              <strong>Go path</strong>
-              <span>{model.goPath}</span>
+              <strong>{t.tGoPath}</strong>
+              <span>{model.goPath === "System scenarios run through the Go end-to-end path." ? t.tGoPathNote : model.goPath}</span>
             </div>
           )}
         </footer>
@@ -79,4 +81,10 @@ function BriefField({ title, value }: { title: string; value: string }) {
 
 function decisionLabel(kind: "allow" | "deny" | "observe") {
   return kind.toUpperCase();
+}
+
+function localizedLessonLabel(label: string, t: Strings) {
+  if (label === "Concept") return t.tConcept;
+  if (label === "Lesson") return t.tLesson;
+  return label;
 }

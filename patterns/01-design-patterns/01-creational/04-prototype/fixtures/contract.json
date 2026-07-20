@@ -1,0 +1,103 @@
+{
+  "pattern_id": "gof.creational.prototype",
+  "cases": [
+    {
+      "id": "clone_with_override",
+      "category": "nominal",
+      "input": {
+        "base": {
+          "name": "default",
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "override_primary": "p3"
+      },
+      "expected": {
+        "original": {
+          "name": "default",
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "clone": {
+          "name": "default-copy",
+          "primary": "p3",
+          "fallbacks": [
+            "p2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "empty_fallbacks",
+      "category": "boundary",
+      "input": {
+        "base": {
+          "name": "solo",
+          "primary": "p1",
+          "fallbacks": []
+        }
+      },
+      "expected": {
+        "original": {
+          "name": "solo",
+          "primary": "p1",
+          "fallbacks": []
+        },
+        "clone": {
+          "name": "solo-copy",
+          "primary": "p1",
+          "fallbacks": []
+        }
+      }
+    },
+    {
+      "id": "invalid_prototype",
+      "category": "failure",
+      "input": {
+        "base": {
+          "name": "",
+          "primary": "p1",
+          "fallbacks": []
+        }
+      },
+      "expected_error": {
+        "code": "invalid_prototype"
+      }
+    },
+    {
+      "id": "clone_mutation_is_isolated",
+      "category": "non-interference",
+      "input": {
+        "base": {
+          "name": "default",
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "append_fallback": "p4"
+      },
+      "expected": {
+        "original": {
+          "name": "default",
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "clone": {
+          "name": "default-copy",
+          "primary": "p1",
+          "fallbacks": [
+            "p2",
+            "p4"
+          ]
+        }
+      }
+    }
+  ]
+}

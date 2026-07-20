@@ -1,0 +1,3 @@
+export class PatternError extends Error{constructor(code){super(code);this.code=code;}}
+class Job{run(payload){if(!payload)throw new PatternError("invalid_payload");return{format:this.format,data:this.transform(payload),steps:["validate",`transform:${this.format}`,"persist"]};}}class CsvJob extends Job{format="csv";transform(value){return value.split(",");}}class JsonJob extends Job{format="json";transform(value){return value.split("|");}}
+export function evaluate(input){const results=[];for(const value of input.jobs??[]){let job;if(value.format==="csv")job=new CsvJob();else if(value.format==="json")job=new JsonJob();else throw new PatternError("unsupported_format");results.push(job.run(value.payload??""));}return{results};}

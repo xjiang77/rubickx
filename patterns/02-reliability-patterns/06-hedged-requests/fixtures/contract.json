@@ -1,0 +1,111 @@
+{
+  "pattern_id": "reliability.hedged-requests",
+  "cases": [
+    {
+      "id": "hedge_wins_tail",
+      "category": "nominal",
+      "input": {
+        "idempotent": true,
+        "hedge_delay_ms": 20,
+        "primary": {
+          "latency_ms": 100,
+          "result": "success"
+        },
+        "hedge": {
+          "latency_ms": 30,
+          "result": "success"
+        }
+      },
+      "expected": {
+        "winner": "hedge",
+        "completed_ms": 50,
+        "attempts": 2,
+        "cancelled": [
+          "primary"
+        ]
+      }
+    },
+    {
+      "id": "primary_finishes_before_delay",
+      "category": "boundary",
+      "input": {
+        "idempotent": true,
+        "hedge_delay_ms": 20,
+        "primary": {
+          "latency_ms": 10,
+          "result": "success"
+        },
+        "hedge": {
+          "latency_ms": 1,
+          "result": "success"
+        }
+      },
+      "expected": {
+        "winner": "primary",
+        "completed_ms": 10,
+        "attempts": 1,
+        "cancelled": []
+      }
+    },
+    {
+      "id": "side_effect_is_rejected",
+      "category": "failure",
+      "input": {
+        "idempotent": false,
+        "hedge_delay_ms": 20,
+        "primary": {
+          "latency_ms": 100,
+          "result": "success"
+        },
+        "hedge": {
+          "latency_ms": 30,
+          "result": "success"
+        }
+      },
+      "expected_error": {
+        "code": "hedge_not_allowed"
+      }
+    },
+    {
+      "id": "early_failure_starts_hedge",
+      "category": "lifecycle",
+      "input": {
+        "idempotent": true,
+        "hedge_delay_ms": 20,
+        "primary": {
+          "latency_ms": 15,
+          "result": "failure"
+        },
+        "hedge": {
+          "latency_ms": 20,
+          "result": "success"
+        }
+      },
+      "expected": {
+        "winner": "hedge",
+        "completed_ms": 35,
+        "attempts": 2,
+        "cancelled": []
+      }
+    },
+    {
+      "id": "all_attempts_failed",
+      "category": "failure",
+      "input": {
+        "idempotent": true,
+        "hedge_delay_ms": 20,
+        "primary": {
+          "latency_ms": 15,
+          "result": "failure"
+        },
+        "hedge": {
+          "latency_ms": 25,
+          "result": "failure"
+        }
+      },
+      "expected_error": {
+        "code": "all_attempts_failed"
+      }
+    }
+  ]
+}

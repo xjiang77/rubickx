@@ -1,0 +1,3 @@
+export class PatternError extends Error{constructor(code){super(code);this.code=code;}}
+class MetricStrategy{constructor(field){this.field=field;}select(candidates){const healthy=candidates.filter((v)=>v.healthy===true).sort((a,b)=>a[this.field]-b[this.field]||a.name.localeCompare(b.name));if(healthy.length===0)throw new PatternError("no_healthy_candidate");return healthy[0].name;}}
+export function evaluate(input){const selected=[];for(const value of input.selections??[]){let strategy;if(value.strategy==="cost")strategy=new MetricStrategy("cost");else if(value.strategy==="latency")strategy=new MetricStrategy("latency");else throw new PatternError("unsupported_strategy");selected.push(strategy.select(value.candidates??[]));}return{selected};}

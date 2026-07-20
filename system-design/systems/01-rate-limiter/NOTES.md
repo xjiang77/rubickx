@@ -1,6 +1,6 @@
 # Rate Limiter · 四语言算法与系统链路对比笔记
 
-> 配套理论：vault [[01 - Rate Limiter]]（RESHADED 设计）+ [[Eng - Redis：架构、实现与高阶实战]]（集中式版本）。
+> 配套知识：[Rate Limiting：策略、状态与失败语义](https://github.com/xjiang7712/dragon-vault/blob/main/02_Knowledge/02_Engineering/08%20-%20Components/02%20-%20Eng%20-%20Rate%20Limiting%EF%BC%9A%E7%AD%96%E7%95%A5%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%A4%B1%E8%B4%A5%E8%AF%AD%E4%B9%89.md) + [Redis：契约、状态与运维](https://github.com/xjiang7712/dragon-vault/blob/main/02_Knowledge/02_Engineering/08%20-%20Components/01%20-%20Redis/00%20-%20Eng%20-%20Redis%EF%BC%9A%E5%A5%91%E7%BA%A6%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E8%BF%90%E7%BB%B4.md)。本文件解释四语言表达与 lab 证据，动态完成度只以 [`../../PROGRESS.md`](../../PROGRESS.md) 为准。
 > `python/`、`go/`、`java/` 保留最小 Token Bucket baseline；[`lab/`](lab/) 将学习面扩展为 Python / Go / Java / JavaScript 的五算法真实执行，以及 Go-only HTTP / Redis / Delve 系统链路。
 
 ## 核心思路（语言无关）
@@ -16,7 +16,7 @@ if tokens >= n: tokens -= n; allow
 else:           deny
 ```
 
-这段“读 tokens → 算 → 写 tokens”是**复合操作**，并发下必须保护，否则就是 [[Eng - Redis：架构、实现与高阶实战]] 里那个 check-then-act 竞态。四种语言的差别，主要就在**怎么保护**、**哪里可能交错**和**怎么注入时间**。
+这段“读 tokens → 算 → 写 tokens”是**复合操作**，并发下必须保护；单进程使用语言同步原语，共享 Redis state 使用单 command 或同 slot script/function。四种语言的差别，主要就在**怎么保护**、**哪里可能交错**和**怎么注入时间**。
 
 ## 四语言关键差异
 

@@ -1,0 +1,152 @@
+{
+  "pattern_id": "data-messaging.cqrs",
+  "cases": [
+    {
+      "id": "projection_catches_up",
+      "category": "nominal",
+      "input": {
+        "commands": [
+          {
+            "id": "c1",
+            "delta": 10
+          },
+          {
+            "id": "c2",
+            "delta": 5
+          }
+        ],
+        "projection_targets": [
+          2
+        ]
+      },
+      "expected": {
+        "write_model": {
+          "balance": 15,
+          "version": 2
+        },
+        "projection_snapshots": [
+          {
+            "balance": 15,
+            "version": 2,
+            "lag": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty_models",
+      "category": "boundary",
+      "input": {
+        "commands": [],
+        "projection_targets": [
+          0
+        ]
+      },
+      "expected": {
+        "write_model": {
+          "balance": 0,
+          "version": 0
+        },
+        "projection_snapshots": [
+          {
+            "balance": 0,
+            "version": 0,
+            "lag": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "duplicate_command_is_rejected",
+      "category": "failure",
+      "input": {
+        "commands": [
+          {
+            "id": "c1",
+            "delta": 10
+          },
+          {
+            "id": "c1",
+            "delta": 5
+          }
+        ],
+        "projection_targets": [
+          1
+        ]
+      },
+      "expected_error": {
+        "code": "duplicate_command_id"
+      }
+    },
+    {
+      "id": "projection_lag_then_catchup",
+      "category": "lifecycle",
+      "input": {
+        "commands": [
+          {
+            "id": "c1",
+            "delta": 10
+          },
+          {
+            "id": "c2",
+            "delta": 5
+          },
+          {
+            "id": "c3",
+            "delta": -3
+          }
+        ],
+        "projection_targets": [
+          1,
+          3
+        ]
+      },
+      "expected": {
+        "write_model": {
+          "balance": 12,
+          "version": 3
+        },
+        "projection_snapshots": [
+          {
+            "balance": 10,
+            "version": 1,
+            "lag": 2
+          },
+          {
+            "balance": 12,
+            "version": 3,
+            "lag": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "query_does_not_change_write_model",
+      "category": "non-interference",
+      "input": {
+        "commands": [
+          {
+            "id": "c1",
+            "delta": 7
+          }
+        ],
+        "projection_targets": [
+          0
+        ]
+      },
+      "expected": {
+        "write_model": {
+          "balance": 7,
+          "version": 1
+        },
+        "projection_snapshots": [
+          {
+            "balance": 0,
+            "version": 0,
+            "lag": 1
+          }
+        ]
+      }
+    }
+  ]
+}

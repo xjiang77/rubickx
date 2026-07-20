@@ -1,0 +1,74 @@
+{
+  "pattern_id": "gof.behavioral.state",
+  "cases": [
+    {
+      "id": "job_completes",
+      "category": "nominal",
+      "input": {
+        "initial": "queued",
+        "events": [
+          "start",
+          "complete"
+        ]
+      },
+      "expected": {
+        "final": "completed",
+        "history": [
+          "queued",
+          "running",
+          "completed"
+        ]
+      }
+    },
+    {
+      "id": "no_events",
+      "category": "boundary",
+      "input": {
+        "initial": "queued",
+        "events": []
+      },
+      "expected": {
+        "final": "queued",
+        "history": [
+          "queued"
+        ]
+      }
+    },
+    {
+      "id": "invalid_transition",
+      "category": "failure",
+      "input": {
+        "initial": "queued",
+        "events": [
+          "complete"
+        ]
+      },
+      "expected_error": {
+        "code": "invalid_transition"
+      }
+    },
+    {
+      "id": "failed_job_retries",
+      "category": "lifecycle",
+      "input": {
+        "initial": "queued",
+        "events": [
+          "start",
+          "fail",
+          "retry",
+          "complete"
+        ]
+      },
+      "expected": {
+        "final": "completed",
+        "history": [
+          "queued",
+          "running",
+          "failed",
+          "running",
+          "completed"
+        ]
+      }
+    }
+  ]
+}

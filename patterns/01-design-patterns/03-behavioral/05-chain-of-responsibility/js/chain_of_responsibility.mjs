@@ -1,0 +1,3 @@
+export class PatternError extends Error{constructor(code){super(code);this.code=code;}}
+class Auth{constructor(next){this.next=next;}handle(r,v){v.push("auth");if(r.token!=="valid")throw new PatternError("unauthenticated");return this.next.handle(r,v);}}class Quota{constructor(next){this.next=next;}handle(r,v){v.push("quota");if((r.quota??0)<=0)throw new PatternError("quota_exhausted");return this.next.handle(r,v);}}class Execute{handle(r,v){v.push("execute");return`accepted:${r.payload}`;}}
+export function evaluate(input){const chain=new Auth(new Quota(new Execute()));const responses=(input.requests??[]).map((request)=>{const visited=[];return{decision:chain.handle(request,visited),visited};});return{responses};}

@@ -1,6 +1,7 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
+import { renderWithI18n as render } from "./test/renderWithI18n";
 
 const catalog = {
   algorithms: [
@@ -163,6 +164,61 @@ describe("Rate Limiter Lab", () => {
     expect(within(sequence).getByText("ALLOW")).toBeInTheDocument();
     expect(within(brief).getByText("The initial token is available immediately.")).toBeInTheDocument();
     expect(within(brief).getByText("A token bucket admits a short burst, then exposes refill timing.")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/runs")).toHaveLength(0);
+  });
+
+  it("switches visible chrome to Chinese without fetching or translating catalog data", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse(catalog));
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(await screen.findByRole("button", { name: "中文" }));
+
+    expect(screen.getByRole("heading", { name: "场景简报" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "运行场景" })).toBeInTheDocument();
+    expect(screen.getByText("client-a @ 0 ms")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Scenario" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Scenario brief" })).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/catalog")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/runs")).toHaveLength(0);
+  });
+
+  it("preserves the trace cursor when the interface language changes", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockImplementationOnce(() => jsonResponse(catalog))
+      .mockImplementationOnce(() => jsonResponse(run));
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(await screen.findByRole("button", { name: "Run scenario" }));
+    await screen.findByText("Step 1 / 2");
+    await user.click(screen.getByRole("button", { name: "Step forward" }));
+    expect(screen.getByText("Step 2 / 2")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "中文" }));
+
+    expect(screen.getByText("步骤 2 / 2")).toBeInTheDocument();
+    expect(screen.getByText("consume one token")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/catalog")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/runs")).toHaveLength(1);
+  });
+
+  it("preserves system demo options when the interface language changes", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse(catalog));
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(await screen.findByRole("combobox", { name: "Scenario" }), "local-vs-shared");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Store" }), "redis");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Failure policy" }), "fail-closed");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Replica" }), "b");
+    await user.click(screen.getByRole("button", { name: "中文" }));
+
+    expect(screen.getByRole("combobox", { name: "Store" })).toHaveValue("redis");
+    expect(screen.getByRole("combobox", { name: "Failure policy" })).toHaveValue("fail-closed");
+    expect(screen.getByRole("combobox", { name: "Replica" })).toHaveValue("b");
+    expect(screen.getByText("limit 3 · window 1,000 ms · store Redis · failure fail-closed · replica B")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/catalog")).toHaveLength(1);
     expect(fetchMock.mock.calls.filter(([url]) => url === "/api/runs")).toHaveLength(0);
   });
 
@@ -492,6 +548,52 @@ describe("Rate Limiter Lab", () => {
     await user.click(screen.getByRole("button", { name: "Stop" }));
     expect(await screen.findByText("Delve is ready")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenLastCalledWith("/api/debug/sessions/debug-1", { method: "DELETE" });
+  });
+
+  it("keeps an active debug session and runtime data intact when chrome switches to Chinese", async () => {
+    const paused = {
+      sessionId: "debug-i18n",
+      status: "paused",
+      source: {
+        path: "go/tokenbucket.go",
+        content: "func allow() {\n  tokens := refill()\n  return tokens > 0\n}",
+      },
+      line: 2,
+      stackFrames: [{ id: 1, name: "TokenBucket.Allow", file: "go/tokenbucket.go", line: 2 }],
+      locals: [{ name: "tokens", value: "2.0", type: "float64" }],
+    };
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+      const url = String(input);
+      if (url === "/api/catalog") return jsonResponse(catalog);
+      if (url === "/api/debug/sessions" && init?.method === "POST") return jsonResponse(paused);
+      if (url === "/api/debug/sessions/debug-i18n" && init?.method === "DELETE") {
+        return Promise.resolve(new Response(null, { status: 204 }));
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(await screen.findByRole("combobox", { name: "Mode" }), "debug");
+    await user.click(screen.getByRole("button", { name: "Start debug" }));
+    expect(await screen.findByText("paused")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "中文" }));
+
+    expect(screen.getByRole("heading", { name: "运行时状态" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "下一步" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "局部变量" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "调用栈" })).toBeInTheDocument();
+    expect(screen.getByText("paused")).toBeInTheDocument();
+    expect(screen.getByText("TokenBucket.Allow")).toBeInTheDocument();
+    expect(screen.getByText("tokens")).toBeInTheDocument();
+    expect(screen.getByText("float64")).toBeInTheDocument();
+    expect(screen.getByText("2.0")).toBeInTheDocument();
+    const debugSource = screen.getByLabelText("Debug source");
+    expect(within(debugSource).getByText("go/tokenbucket.go")).toBeInTheDocument();
+    expect(within(debugSource).getByText("行 2", { selector: "span" })).toHaveAttribute("aria-current", "true");
+    expect(within(debugSource).getByText("tokens := refill()")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([, init]) => (init as RequestInit | undefined)?.method === "DELETE")).toHaveLength(0);
   });
 
   it("best-effort deletes an active debug session when leaving debug mode", async () => {

@@ -1,0 +1,110 @@
+{
+  "pattern_id": "gof.structural.composite",
+  "cases": [
+    {
+      "id": "all_matches",
+      "category": "nominal",
+      "input": {
+        "tree": {
+          "type": "all",
+          "children": [
+            {
+              "type": "equals",
+              "field": "role",
+              "value": "admin"
+            },
+            {
+              "type": "equals",
+              "field": "region",
+              "value": "us"
+            }
+          ]
+        },
+        "context": {
+          "role": "admin",
+          "region": "us"
+        }
+      },
+      "expected": {
+        "allowed": true,
+        "evaluated": [
+          "role",
+          "region"
+        ]
+      }
+    },
+    {
+      "id": "empty_all_is_true",
+      "category": "boundary",
+      "input": {
+        "tree": {
+          "type": "all",
+          "children": []
+        },
+        "context": {}
+      },
+      "expected": {
+        "allowed": true,
+        "evaluated": []
+      }
+    },
+    {
+      "id": "unknown_node",
+      "category": "failure",
+      "input": {
+        "tree": {
+          "type": "xor",
+          "children": []
+        },
+        "context": {}
+      },
+      "expected_error": {
+        "code": "unsupported_node"
+      }
+    },
+    {
+      "id": "nested_short_circuit",
+      "category": "lifecycle",
+      "input": {
+        "tree": {
+          "type": "any",
+          "children": [
+            {
+              "type": "equals",
+              "field": "role",
+              "value": "admin"
+            },
+            {
+              "type": "all",
+              "children": [
+                {
+                  "type": "equals",
+                  "field": "tier",
+                  "value": "pro"
+                },
+                {
+                  "type": "equals",
+                  "field": "region",
+                  "value": "eu"
+                }
+              ]
+            }
+          ]
+        },
+        "context": {
+          "role": "viewer",
+          "tier": "pro",
+          "region": "eu"
+        }
+      },
+      "expected": {
+        "allowed": true,
+        "evaluated": [
+          "role",
+          "tier",
+          "region"
+        ]
+      }
+    }
+  ]
+}

@@ -16,8 +16,12 @@ rubickx/
 │   ├── web/                   # Next.js 学习平台
 │   └── skills/                # Skill 文件 (供 s05 使用)
 ├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
+├── algo/                      # 算法与数据结构实现
+├── system-design/             # 可运行的系统设计实现与 Lab
+├── patterns/                  # 四语言工程模式实现与共享 contract tests
 ├── go/                        # Go 实现
 │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 个递进式课程
+│   ├── foundations/           # 可运行的系统机制实验
 │   └── docs/                  # Go walkthrough 文档
 │       ├── zh/                # 中文
 │       └── en/                # English
@@ -47,6 +51,35 @@ Rubickx 首页现在是一个学习 repo / website 索引，入口在 [web/index
 | --- | --- | --- | --- | --- |
 | Learn Claude Code | <https://learn.shareai.run/> | <https://github.com/shareAI-lab/learn-claude-code> | `deps/learn-claude-code` | 已作为上游 submodule 引入 |
 | Learn Harness Engineering | <https://walkinglabs.github.io/learn-harness-engineering/zh/> | fork: <https://github.com/xjiang77/learn-harness-engineering>；upstream: <https://github.com/walkinglabs/learn-harness-engineering> | `deps/learn-harness-engineering` | 已通过 fork submodule 引入，后续修改提交到 fork |
+
+## Engineering Patterns
+
+[`patterns/`](patterns/) 与 `algo/`、`system-design/` 并列，保存 42 项“笔记判断 + 四语言实现 + 共享 fixture + 自动化测试”的 Pattern Library：GoF 23、Reliability 6、Data & Messaging 7、Concurrency 6。
+
+首个 golden path 是 [Adapter Pattern](patterns/01-design-patterns/02-structural/01-adapter/NOTES.md)，完整 catalog 继续使用同一 behavior contract：
+
+- 稳定 target contract：`ChatClient`
+- legacy adaptee：不同的 deployment、prompt、stop code 和错误码
+- 四语言：Python `Protocol`、Go `interface`、Java `interface`、JavaScript structural runtime contract
+- 统一验证 request mapping、response/error normalization 和 unsupported capability fail-explicitly
+
+```bash
+make -C patterns setup
+make -C patterns test-pattern PATTERN=gof.structural.adapter
+make -C patterns verify
+```
+
+完成度只看 [`patterns/PROGRESS.md`](patterns/PROGRESS.md)。
+
+## Go Foundations
+
+[`go/foundations/`](go/foundations/) 把系统机制压缩成 deterministic experiments。L4 Distributed Semantics 验证 session history、majority intersection 和 at-least-once duplicate effect，并明确不把集合实验当作 Raft/Paxos correctness proof。
+
+```bash
+cd go
+go test -race ./foundations/...
+go vet ./foundations/...
+```
 
 ## Go 实现
 

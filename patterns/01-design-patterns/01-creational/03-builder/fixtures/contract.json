@@ -1,0 +1,119 @@
+{
+  "pattern_id": "gof.creational.builder",
+  "cases": [
+    {
+      "id": "builds_valid_request",
+      "category": "nominal",
+      "input": {
+        "builds": [
+          {
+            "model": "chat-pro",
+            "messages": [
+              "hello"
+            ],
+            "max_tokens": 128,
+            "stream": true
+          }
+        ]
+      },
+      "expected": {
+        "requests": [
+          {
+            "model": "chat-pro",
+            "messages": [
+              "hello"
+            ],
+            "max_tokens": 128,
+            "stream": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "minimum_budget",
+      "category": "boundary",
+      "input": {
+        "builds": [
+          {
+            "model": "chat-mini",
+            "messages": [
+              "x"
+            ],
+            "max_tokens": 1
+          }
+        ]
+      },
+      "expected": {
+        "requests": [
+          {
+            "model": "chat-mini",
+            "messages": [
+              "x"
+            ],
+            "max_tokens": 1,
+            "stream": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "rejects_empty_messages",
+      "category": "failure",
+      "input": {
+        "builds": [
+          {
+            "model": "chat-pro",
+            "messages": [],
+            "max_tokens": 32
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "invalid_request"
+      }
+    },
+    {
+      "id": "builder_resets_between_products",
+      "category": "lifecycle",
+      "input": {
+        "builds": [
+          {
+            "model": "chat-pro",
+            "messages": [
+              "one"
+            ],
+            "max_tokens": 10,
+            "stream": true
+          },
+          {
+            "model": "chat-mini",
+            "messages": [
+              "two"
+            ],
+            "max_tokens": 20
+          }
+        ]
+      },
+      "expected": {
+        "requests": [
+          {
+            "model": "chat-pro",
+            "messages": [
+              "one"
+            ],
+            "max_tokens": 10,
+            "stream": true
+          },
+          {
+            "model": "chat-mini",
+            "messages": [
+              "two"
+            ],
+            "max_tokens": 20,
+            "stream": false
+          }
+        ]
+      }
+    }
+  ]
+}

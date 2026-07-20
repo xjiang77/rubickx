@@ -1,0 +1,130 @@
+{
+  "pattern_id": "gof.behavioral.memento",
+  "cases": [
+    {
+      "id": "restores_snapshot",
+      "category": "nominal",
+      "input": {
+        "initial": {
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "operations": [
+          {
+            "op": "snapshot"
+          },
+          {
+            "op": "set_primary",
+            "value": "p3"
+          },
+          {
+            "op": "restore",
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "config": {
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "snapshots": 1,
+        "audit": [
+          "snapshot:0",
+          "set_primary:p3",
+          "restore:0"
+        ]
+      }
+    },
+    {
+      "id": "no_operations",
+      "category": "boundary",
+      "input": {
+        "initial": {
+          "primary": "p1",
+          "fallbacks": []
+        },
+        "operations": []
+      },
+      "expected": {
+        "config": {
+          "primary": "p1",
+          "fallbacks": []
+        },
+        "snapshots": 0,
+        "audit": []
+      }
+    },
+    {
+      "id": "unknown_snapshot",
+      "category": "failure",
+      "input": {
+        "initial": {
+          "primary": "p1",
+          "fallbacks": []
+        },
+        "operations": [
+          {
+            "op": "restore",
+            "index": 0
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "unknown_memento"
+      }
+    },
+    {
+      "id": "snapshots_are_isolated",
+      "category": "lifecycle",
+      "input": {
+        "initial": {
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "operations": [
+          {
+            "op": "snapshot"
+          },
+          {
+            "op": "append_fallback",
+            "value": "p3"
+          },
+          {
+            "op": "snapshot"
+          },
+          {
+            "op": "set_primary",
+            "value": "p4"
+          },
+          {
+            "op": "restore",
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "config": {
+          "primary": "p1",
+          "fallbacks": [
+            "p2"
+          ]
+        },
+        "snapshots": 2,
+        "audit": [
+          "snapshot:0",
+          "append_fallback:p3",
+          "snapshot:1",
+          "set_primary:p4",
+          "restore:0"
+        ]
+      }
+    }
+  ]
+}

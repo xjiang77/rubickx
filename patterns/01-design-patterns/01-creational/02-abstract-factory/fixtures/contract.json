@@ -1,0 +1,73 @@
+{
+  "pattern_id": "gof.creational.abstract-factory",
+  "cases": [
+    {
+      "id": "aws_family",
+      "category": "nominal",
+      "input": {
+        "providers": [
+          "aws"
+        ],
+        "prefix": "orders"
+      },
+      "expected": {
+        "resources": [
+          {
+            "family": "aws",
+            "queue": "sqs:orders",
+            "object_store": "s3:orders"
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty_family_list",
+      "category": "boundary",
+      "input": {
+        "providers": [],
+        "prefix": "empty"
+      },
+      "expected": {
+        "resources": []
+      }
+    },
+    {
+      "id": "unsupported_provider",
+      "category": "failure",
+      "input": {
+        "providers": [
+          "azure"
+        ],
+        "prefix": "orders"
+      },
+      "expected_error": {
+        "code": "unsupported_provider"
+      }
+    },
+    {
+      "id": "families_do_not_mix",
+      "category": "non-interference",
+      "input": {
+        "providers": [
+          "aws",
+          "gcp"
+        ],
+        "prefix": "audit"
+      },
+      "expected": {
+        "resources": [
+          {
+            "family": "aws",
+            "queue": "sqs:audit",
+            "object_store": "s3:audit"
+          },
+          {
+            "family": "gcp",
+            "queue": "pubsub:audit",
+            "object_store": "gcs:audit"
+          }
+        ]
+      }
+    }
+  ]
+}

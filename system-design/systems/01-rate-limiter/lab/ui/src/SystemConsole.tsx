@@ -1,4 +1,5 @@
 import type { DemoExchange, DemoOptions } from "./types";
+import { useI18n } from "./i18n";
 
 interface SystemConsoleProps {
   options: DemoOptions;
@@ -19,18 +20,20 @@ export function SystemConsole({
   onOptions,
   onSend,
 }: SystemConsoleProps) {
+  const { t } = useI18n();
+
   if (conceptual) {
     return (
       <div className="concept-card">
-        <span className="eyebrow">Conceptual scenario</span>
-        <h3>Multi-region quota</h3>
-        <p>Compare regional allocation with a strongly consistent global quota.</p>
+        <span className="eyebrow">{t.tConceptKicker}</span>
+        <h3>{t.tConceptTitle}</h3>
+        <p>{t.tConceptDesc}</p>
         <div className="concept-balance">
-          <span>Low latency</span><i />
-          <span>Global accuracy</span><i />
-          <span>Availability</span>
+          <span>{t.tLowLatency}</span><i />
+          <span>{t.tGlobalAccuracy}</span><i />
+          <span>{t.tAvailability}</span>
         </div>
-        <small>No cluster is simulated. This scenario is a decision exercise.</small>
+        <small>{t.tConceptNote}</small>
       </div>
     );
   }
@@ -38,49 +41,49 @@ export function SystemConsole({
   return (
     <form className="system-console" onSubmit={(event) => { event.preventDefault(); onSend(burstPreferred ? 10 : 1); }}>
       <div className="console-intro">
-        <span className="eyebrow">Real HTTP middleware</span>
-        <h3>Send traffic through the Go path</h3>
-        <p>Inspect the public rate-limit contract one response at a time.</p>
+        <span className="eyebrow">{t.tRealHttp}</span>
+        <h3>{t.tConsoleTitle}</h3>
+        <p>{t.tConsoleDesc}</p>
       </div>
 
       <div className="console-fields">
         <label>
-          <span>Store</span>
+          <span>{t.tStore}</span>
           <select
             aria-label="Store"
             value={options.store}
             onChange={(event) => onOptions({ ...options, store: event.target.value as DemoOptions["store"] })}
           >
-            <option value="memory">Memory</option>
+            <option value="memory">{t.tMemory}</option>
             <option value="redis">Redis</option>
           </select>
         </label>
         <label>
-          <span>Failure</span>
+          <span>{t.tFailure}</span>
           <select
             aria-label="Failure policy"
             value={options.failure}
             onChange={(event) => onOptions({ ...options, failure: event.target.value as DemoOptions["failure"] })}
           >
-            <option value="fail-open">Fail open</option>
-            <option value="fail-closed">Fail closed</option>
+            <option value="fail-open">{t.tFailOpen}</option>
+            <option value="fail-closed">{t.tFailClosed}</option>
           </select>
         </label>
         {showReplica && (
           <label>
-            <span>Replica</span>
+            <span>{t.tReplica}</span>
             <select
               aria-label="Replica"
               value={options.replica}
               onChange={(event) => onOptions({ ...options, replica: event.target.value as DemoOptions["replica"] })}
             >
-              <option value="a">Replica A</option>
-              <option value="b">Replica B</option>
+              <option value="a">{t.tReplicaA}</option>
+              <option value="b">{t.tReplicaB}</option>
             </select>
           </label>
         )}
         <label className="client-key-field">
-          <span>Client key</span>
+          <span>{t.tClientKey}</span>
           <input
             aria-label="Client key"
             value={options.clientKey}
@@ -92,9 +95,9 @@ export function SystemConsole({
       </div>
 
       <dl className="policy-summary">
-        <div><dt>Limit</dt><dd>{options.limit}</dd></div>
-        <div><dt>Window</dt><dd>{options.windowMs} ms</dd></div>
-        <div><dt>Transport</dt><dd>GET</dd></div>
+        <div><dt>{t.tLimit}</dt><dd>{options.limit}</dd></div>
+        <div><dt>{t.tWindow}</dt><dd>{options.windowMs} ms</dd></div>
+        <div><dt>{t.tTransport}</dt><dd>GET</dd></div>
       </dl>
 
       <div className="console-actions">
@@ -104,7 +107,7 @@ export function SystemConsole({
           disabled={busy || options.clientKey.trim() === ""}
           onClick={() => onSend(1)}
         >
-          Send request
+          {t.tSendRequest}
         </button>
         <button
           className={burstPreferred ? "console-primary" : "secondary-action"}
@@ -112,21 +115,23 @@ export function SystemConsole({
           disabled={busy || options.clientKey.trim() === ""}
           onClick={() => onSend(10)}
         >
-          Burst ×10
-          {burstPreferred && <small>default</small>}
+          {t.tBurst}
+          {burstPreferred && <small>{t.tDefaultBadge}</small>}
         </button>
       </div>
-      {busy && <p className="console-progress" role="status">Sending traffic…</p>}
+      {busy && <p className="console-progress" role="status">{t.tSendingTraffic}</p>}
     </form>
   );
 }
 
 export function SystemRequestLog({ exchanges }: { exchanges: DemoExchange[] }) {
+  const { t } = useI18n();
+
   if (exchanges.length === 0) {
     return (
       <div className="empty-state compact">
-        <p>No HTTP requests yet.</p>
-        <span>Use the system console to exercise the middleware.</span>
+        <p>{t.tNoHttp}</p>
+        <span>{t.tNoHttpSub}</span>
       </div>
     );
   }
@@ -156,11 +161,13 @@ function prettyBody(body: string) {
 }
 
 export function SystemExchange({ exchange }: { exchange?: DemoExchange }) {
+  const { lang, t } = useI18n();
+
   if (!exchange) {
     return (
       <div className="empty-state compact" aria-label="HTTP exchange">
-        <p>Response contract appears here</p>
-        <span>Status, quota headers and body come from the real endpoint.</span>
+        <p>{t.tContractHere}</p>
+        <span>{t.tContractSub}</span>
       </div>
     );
   }
@@ -176,12 +183,14 @@ export function SystemExchange({ exchange }: { exchange?: DemoExchange }) {
     <div className="http-exchange" aria-label="HTTP exchange">
       <div className={`http-status ${exchange.status >= 400 ? "rejected" : "accepted"}`}>
         <div>
-          <span>HTTP status</span>
+          <span>{t.tHttpStatus}</span>
           <strong>{exchange.status}</strong>
         </div>
-        <p>{exchange.statusText || (exchange.status < 400 ? "Allowed" : "Limited")}</p>
+        <p>{lang === "zh"
+          ? (exchange.status < 400 ? t.tAllowed : t.tLimited)
+          : (exchange.statusText || (exchange.status < 400 ? t.tAllowed : t.tLimited))}</p>
       </div>
-      {exchange.headers.degraded === "true" && <div className="degraded-note">Store unavailable · degraded response</div>}
+      {exchange.headers.degraded === "true" && <div className="degraded-note">{t.tDegraded}</div>}
       <div className="request-contract">
         <span>{exchange.url}</span>
         <code>X-RateLimit-Key: {exchange.key}</code>
@@ -195,7 +204,7 @@ export function SystemExchange({ exchange }: { exchange?: DemoExchange }) {
         ))}
       </dl>
       <section className="response-body">
-        <h3>Response body</h3>
+        <h3>{t.tRespBody}</h3>
         <pre>{prettyBody(exchange.body)}</pre>
       </section>
     </div>

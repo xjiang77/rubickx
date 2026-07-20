@@ -1,0 +1,140 @@
+{
+  "pattern_id": "concurrency.pipeline",
+  "cases": [
+    {
+      "id": "items_cross_ordered_stages",
+      "category": "nominal",
+      "input": {
+        "items": [
+          1,
+          2
+        ],
+        "stages": [
+          "double",
+          "increment"
+        ]
+      },
+      "expected": {
+        "outputs": [
+          3,
+          5
+        ],
+        "status": "completed",
+        "failed_stage": "none",
+        "cancelled_items": [],
+        "stage_receipts": [
+          "double:1->2",
+          "increment:2->3",
+          "double:2->4",
+          "increment:4->5"
+        ],
+        "upstream_cancelled": false
+      }
+    },
+    {
+      "id": "empty_source",
+      "category": "boundary",
+      "input": {
+        "items": [],
+        "stages": [
+          "double"
+        ]
+      },
+      "expected": {
+        "outputs": [],
+        "status": "completed",
+        "failed_stage": "none",
+        "cancelled_items": [],
+        "stage_receipts": [],
+        "upstream_cancelled": false
+      }
+    },
+    {
+      "id": "validation_failure_cancels_remaining",
+      "category": "failure",
+      "input": {
+        "items": [
+          1,
+          -1,
+          2
+        ],
+        "stages": [
+          "reject_negative",
+          "double"
+        ]
+      },
+      "expected": {
+        "outputs": [
+          2
+        ],
+        "status": "failed",
+        "failed_stage": "reject_negative",
+        "cancelled_items": [
+          2
+        ],
+        "stage_receipts": [
+          "reject_negative:1->1",
+          "double:1->2",
+          "failed:reject_negative:-1"
+        ],
+        "upstream_cancelled": true
+      }
+    },
+    {
+      "id": "consumer_stop_cancels_upstream",
+      "category": "lifecycle",
+      "input": {
+        "items": [
+          1,
+          2,
+          3
+        ],
+        "stages": [
+          "double"
+        ],
+        "consumer_limit": 1
+      },
+      "expected": {
+        "outputs": [
+          2
+        ],
+        "status": "cancelled",
+        "failed_stage": "none",
+        "cancelled_items": [
+          2,
+          3
+        ],
+        "stage_receipts": [
+          "double:1->2"
+        ],
+        "upstream_cancelled": true
+      }
+    },
+    {
+      "id": "stage_order_is_not_interchangeable",
+      "category": "non-interference",
+      "input": {
+        "items": [
+          1
+        ],
+        "stages": [
+          "increment",
+          "double"
+        ]
+      },
+      "expected": {
+        "outputs": [
+          4
+        ],
+        "status": "completed",
+        "failed_stage": "none",
+        "cancelled_items": [],
+        "stage_receipts": [
+          "increment:1->2",
+          "double:2->4"
+        ],
+        "upstream_cancelled": false
+      }
+    }
+  ]
+}

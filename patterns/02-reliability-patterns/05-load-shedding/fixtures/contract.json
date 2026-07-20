@@ -1,0 +1,117 @@
+{
+  "pattern_id": "reliability.load-shedding",
+  "cases": [
+    {
+      "id": "within_capacity",
+      "category": "nominal",
+      "input": {
+        "capacity": 2,
+        "requests": [
+          {
+            "id": "a",
+            "priority": "normal"
+          },
+          {
+            "id": "b",
+            "priority": "high"
+          }
+        ]
+      },
+      "expected": {
+        "accepted": [
+          "b",
+          "a"
+        ],
+        "shed": [],
+        "goodput": 2
+      }
+    },
+    {
+      "id": "zero_capacity",
+      "category": "boundary",
+      "input": {
+        "capacity": 0,
+        "requests": [
+          {
+            "id": "a",
+            "priority": "high"
+          }
+        ]
+      },
+      "expected": {
+        "accepted": [],
+        "shed": [
+          "a"
+        ],
+        "goodput": 0
+      }
+    },
+    {
+      "id": "overload_sheds_low_priority",
+      "category": "failure",
+      "input": {
+        "capacity": 2,
+        "requests": [
+          {
+            "id": "l1",
+            "priority": "low"
+          },
+          {
+            "id": "h1",
+            "priority": "high"
+          },
+          {
+            "id": "n1",
+            "priority": "normal"
+          },
+          {
+            "id": "l2",
+            "priority": "low"
+          }
+        ]
+      },
+      "expected": {
+        "accepted": [
+          "h1",
+          "n1"
+        ],
+        "shed": [
+          "l1",
+          "l2"
+        ],
+        "goodput": 2
+      }
+    },
+    {
+      "id": "ties_keep_arrival_order",
+      "category": "non-interference",
+      "input": {
+        "capacity": 2,
+        "requests": [
+          {
+            "id": "a",
+            "priority": "normal"
+          },
+          {
+            "id": "b",
+            "priority": "normal"
+          },
+          {
+            "id": "c",
+            "priority": "normal"
+          }
+        ]
+      },
+      "expected": {
+        "accepted": [
+          "a",
+          "b"
+        ],
+        "shed": [
+          "c"
+        ],
+        "goodput": 2
+      }
+    }
+  ]
+}

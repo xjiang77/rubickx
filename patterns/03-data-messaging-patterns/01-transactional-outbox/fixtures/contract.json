@@ -1,0 +1,104 @@
+{
+  "pattern_id": "data-messaging.transactional-outbox",
+  "cases": [
+    {
+      "id": "commit_and_publish",
+      "category": "nominal",
+      "input": {
+        "commit": true,
+        "new_state": "confirmed",
+        "message_id": "m1",
+        "relay_attempts": [
+          "success"
+        ]
+      },
+      "expected": {
+        "aggregate_state": "confirmed",
+        "outbox_status": "sent",
+        "deliveries": [
+          "m1"
+        ],
+        "relay_receipts": [
+          "published:m1"
+        ]
+      }
+    },
+    {
+      "id": "commit_waits_for_relay",
+      "category": "boundary",
+      "input": {
+        "commit": true,
+        "new_state": "confirmed",
+        "message_id": "m1",
+        "relay_attempts": []
+      },
+      "expected": {
+        "aggregate_state": "confirmed",
+        "outbox_status": "pending",
+        "deliveries": [],
+        "relay_receipts": []
+      }
+    },
+    {
+      "id": "crash_before_publish_keeps_pending",
+      "category": "failure",
+      "input": {
+        "commit": true,
+        "new_state": "confirmed",
+        "message_id": "m1",
+        "relay_attempts": [
+          "crash_before_publish"
+        ]
+      },
+      "expected": {
+        "aggregate_state": "confirmed",
+        "outbox_status": "pending",
+        "deliveries": [],
+        "relay_receipts": [
+          "crash_before_publish:m1"
+        ]
+      }
+    },
+    {
+      "id": "crash_after_publish_duplicates_on_retry",
+      "category": "lifecycle",
+      "input": {
+        "commit": true,
+        "new_state": "confirmed",
+        "message_id": "m1",
+        "relay_attempts": [
+          "crash_after_publish",
+          "success"
+        ]
+      },
+      "expected": {
+        "aggregate_state": "confirmed",
+        "outbox_status": "sent",
+        "deliveries": [
+          "m1",
+          "m1"
+        ],
+        "relay_receipts": [
+          "crash_after_publish:m1",
+          "published:m1"
+        ]
+      }
+    },
+    {
+      "id": "aborted_transaction_has_no_outbox",
+      "category": "non-interference",
+      "input": {
+        "commit": false,
+        "new_state": "confirmed",
+        "message_id": "m1",
+        "relay_attempts": []
+      },
+      "expected": {
+        "aggregate_state": "absent",
+        "outbox_status": "absent",
+        "deliveries": [],
+        "relay_receipts": []
+      }
+    }
+  ]
+}

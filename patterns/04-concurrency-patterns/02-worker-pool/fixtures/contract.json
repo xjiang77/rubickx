@@ -1,0 +1,203 @@
+{
+  "pattern_id": "concurrency.worker-pool",
+  "cases": [
+    {
+      "id": "jobs_reuse_earliest_worker",
+      "category": "nominal",
+      "input": {
+        "worker_count": 2,
+        "jobs": [
+          {
+            "id": "a",
+            "duration": 3,
+            "outcome": "success"
+          },
+          {
+            "id": "b",
+            "duration": 1,
+            "outcome": "success"
+          },
+          {
+            "id": "c",
+            "duration": 1,
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "executions": [
+          {
+            "id": "a",
+            "worker": 0,
+            "start": 0,
+            "finish": 3,
+            "status": "completed"
+          },
+          {
+            "id": "b",
+            "worker": 1,
+            "start": 0,
+            "finish": 1,
+            "status": "completed"
+          },
+          {
+            "id": "c",
+            "worker": 1,
+            "start": 1,
+            "finish": 2,
+            "status": "completed"
+          }
+        ],
+        "workers_used": 2,
+        "makespan": 3,
+        "joined": true
+      }
+    },
+    {
+      "id": "single_worker_boundary",
+      "category": "boundary",
+      "input": {
+        "worker_count": 1,
+        "jobs": [
+          {
+            "id": "a",
+            "duration": 1,
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "executions": [
+          {
+            "id": "a",
+            "worker": 0,
+            "start": 0,
+            "finish": 1,
+            "status": "completed"
+          }
+        ],
+        "workers_used": 1,
+        "makespan": 1,
+        "joined": true
+      }
+    },
+    {
+      "id": "failed_job_is_terminal",
+      "category": "failure",
+      "input": {
+        "worker_count": 2,
+        "jobs": [
+          {
+            "id": "bad",
+            "duration": 1,
+            "outcome": "failure"
+          },
+          {
+            "id": "good",
+            "duration": 1,
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "executions": [
+          {
+            "id": "bad",
+            "worker": 0,
+            "start": 0,
+            "finish": 1,
+            "status": "failed"
+          },
+          {
+            "id": "good",
+            "worker": 1,
+            "start": 0,
+            "finish": 1,
+            "status": "completed"
+          }
+        ],
+        "workers_used": 2,
+        "makespan": 1,
+        "joined": true
+      }
+    },
+    {
+      "id": "workers_are_reused_after_finish",
+      "category": "lifecycle",
+      "input": {
+        "worker_count": 2,
+        "jobs": [
+          {
+            "id": "a",
+            "duration": 2,
+            "outcome": "success"
+          },
+          {
+            "id": "b",
+            "duration": 2,
+            "outcome": "success"
+          },
+          {
+            "id": "c",
+            "duration": 1,
+            "outcome": "success"
+          },
+          {
+            "id": "d",
+            "duration": 1,
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "executions": [
+          {
+            "id": "a",
+            "worker": 0,
+            "start": 0,
+            "finish": 2,
+            "status": "completed"
+          },
+          {
+            "id": "b",
+            "worker": 1,
+            "start": 0,
+            "finish": 2,
+            "status": "completed"
+          },
+          {
+            "id": "c",
+            "worker": 0,
+            "start": 2,
+            "finish": 3,
+            "status": "completed"
+          },
+          {
+            "id": "d",
+            "worker": 1,
+            "start": 2,
+            "finish": 3,
+            "status": "completed"
+          }
+        ],
+        "workers_used": 2,
+        "makespan": 3,
+        "joined": true
+      }
+    },
+    {
+      "id": "empty_job_set_joins",
+      "category": "non-interference",
+      "input": {
+        "worker_count": 2,
+        "jobs": []
+      },
+      "expected": {
+        "executions": [],
+        "workers_used": 0,
+        "makespan": 0,
+        "joined": true
+      }
+    }
+  ]
+}

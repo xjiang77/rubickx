@@ -16,8 +16,12 @@ rubickx/
 │   ├── web/                   # Next.js learning platform
 │   └── skills/                # Skill files for s05
 ├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
+├── algo/                      # Algorithms and data structures
+├── system-design/             # Runnable system-design implementations and labs
+├── patterns/                  # Four-language engineering patterns with shared contract tests
 ├── go/                        # Go implementation
 │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 progressive sessions
+│   ├── foundations/           # Runnable systems-mechanism experiments
 │   └── docs/                  # Go walkthrough docs
 │       ├── zh/                # 中文
 │       └── en/                # English
@@ -47,6 +51,35 @@ Current source-backed learning resources:
 | --- | --- | --- | --- | --- |
 | Learn Claude Code | <https://learn.shareai.run/> | <https://github.com/shareAI-lab/learn-claude-code> | `deps/learn-claude-code` | Already referenced as an upstream submodule |
 | Learn Harness Engineering | <https://walkinglabs.github.io/learn-harness-engineering/zh/> | fork: <https://github.com/xjiang77/learn-harness-engineering>; upstream: <https://github.com/walkinglabs/learn-harness-engineering> | `deps/learn-harness-engineering` | Added as a fork submodule for future local changes |
+
+## Engineering Patterns
+
+[`patterns/`](patterns/) sits beside `algo/` and `system-design/`. Its 42-entry library contains 23 GoF, 6 reliability, 7 data and messaging, and 6 concurrency patterns. Each entry closes the loop from design judgment to four-language implementation, a shared fixture, and automated tests.
+
+The first golden path is the [Adapter Pattern](patterns/01-design-patterns/02-structural/01-adapter/NOTES.md); the full catalog follows the same behavior contract:
+
+- stable target contract: `ChatClient`
+- legacy adaptee with different deployment, prompt, stop-code, and error semantics
+- Python `Protocol`, Go `interface`, Java `interface`, and a JavaScript structural runtime contract
+- shared verification for request mapping, response/error normalization, and explicit unsupported-capability failures
+
+```bash
+make -C patterns setup
+make -C patterns test-pattern PATTERN=gof.structural.adapter
+make -C patterns verify
+```
+
+[`patterns/PROGRESS.md`](patterns/PROGRESS.md) is the completion-status SSOT.
+
+## Go Foundations
+
+[`go/foundations/`](go/foundations/) turns systems mechanisms into deterministic experiments. L4 Distributed Semantics checks session histories, majority intersection, and at-least-once duplicate effects while explicitly avoiding claims that the set model proves Raft or Paxos correctness.
+
+```bash
+cd go
+go test -race ./foundations/...
+go vet ./foundations/...
+```
 
 ## Go Implementation
 

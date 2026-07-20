@@ -6,8 +6,8 @@ import (
 )
 
 // 三种计数器，演示并发下"读-改-写"的正确性。
-// 对照 [[Eng - Redis：架构、实现与高阶实战]] §7：Redis 用"单线程服务端"消除竞态，
-// Go 单机进程内则靠 Mutex 或 atomic 消除竞态。
+// 对照 Vault `Redis：契约、状态与运维`：Redis 的单 shard execution owner
+// 串行执行单条 command；Go 单机进程内则靠 Mutex 或 atomic 保护临界区。
 
 // UnsafeCounter：无任何同步的计数器。
 // Inc() 的 c.n++ 实际是 load → +1 → store 三步，多个 goroutine 交叉执行会丢更新。

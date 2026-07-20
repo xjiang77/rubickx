@@ -1,0 +1,71 @@
+{
+  "pattern_id": "gof.creational.factory-method",
+  "cases": [
+    {
+      "id": "csv_export",
+      "category": "nominal",
+      "input": {
+        "format": "csv",
+        "records": [
+          {
+            "id": "1",
+            "name": "Ada"
+          },
+          {
+            "id": "2",
+            "name": "Linus"
+          }
+        ]
+      },
+      "expected": {
+        "media_type": "text/csv",
+        "body": "id,name\n1,Ada\n2,Linus"
+      }
+    },
+    {
+      "id": "empty_json",
+      "category": "boundary",
+      "input": {
+        "format": "json",
+        "records": []
+      },
+      "expected": {
+        "media_type": "application/json",
+        "body": []
+      }
+    },
+    {
+      "id": "unknown_format",
+      "category": "failure",
+      "input": {
+        "format": "xml",
+        "records": []
+      },
+      "expected_error": {
+        "code": "unsupported_format"
+      }
+    },
+    {
+      "id": "json_isolated_from_csv",
+      "category": "non-interference",
+      "input": {
+        "format": "json",
+        "records": [
+          {
+            "id": "3",
+            "name": "Grace"
+          }
+        ]
+      },
+      "expected": {
+        "media_type": "application/json",
+        "body": [
+          {
+            "id": "3",
+            "name": "Grace"
+          }
+        ]
+      }
+    }
+  ]
+}

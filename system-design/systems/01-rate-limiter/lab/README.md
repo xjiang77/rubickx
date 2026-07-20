@@ -19,6 +19,14 @@ docker compose up -d redis  # interactive UI
 make verify-redis           # isolated end-to-end verification
 ```
 
+页头的 `EN / 中文` 只切换 UI chrome；scenario catalog、trace、源码、HTTP 数据、状态 token 与既有 ARIA 文案始终保持英文。选择会持久化到 `localStorage["rl-lab-uiLang"]`，合法值仅为 `en | zh`，无效值或 storage 不可用时安全回退英文。
+
+默认视觉保持全直角。需要对比 soft-lines 圆角方案时，用同一开发入口显式开启；该开关不进入 UI，也不会持久化：
+
+```bash
+VITE_SOFT_LINES=true make dev
+```
+
 ## Mental model
 
 ```text

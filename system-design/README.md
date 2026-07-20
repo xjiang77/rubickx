@@ -5,7 +5,7 @@
 > 设计理念与 rubickx 一致：**同一组件多语言重写，在差异里吃透每种语言的设计取向。**
 > 四种语言给出四种并发视角：Go 的 goroutine、Java 的 JVM 并发体系、Python 的 GIL 与显式锁、JavaScript 的 event loop 与跨 `await` 竞态。算法相同，正确性边界不同。
 
-配套 vault：`dragon-vault/01_Projects/Interview_Prep/`（设计文档 [[01 - Rate Limiter]] + 笔记 [[Eng - Redis：架构、实现与高阶实战]]）。理论在 vault，四语言实现与可运行 Lab 在这里。
+配套 Vault 知识层：[Rate Limiting：策略、状态与失败语义](https://github.com/xjiang7712/dragon-vault/blob/main/02_Knowledge/02_Engineering/08%20-%20Components/02%20-%20Eng%20-%20Rate%20Limiting%EF%BC%9A%E7%AD%96%E7%95%A5%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%A4%B1%E8%B4%A5%E8%AF%AD%E4%B9%89.md) 与 [Redis：契约、状态与运维](https://github.com/xjiang7712/dragon-vault/blob/main/02_Knowledge/02_Engineering/08%20-%20Components/01%20-%20Redis/00%20-%20Eng%20-%20Redis%EF%BC%9A%E5%A5%91%E7%BA%A6%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E8%BF%90%E7%BB%B4.md)。稳定判断在 Vault，四语言实现、动态完成度与可运行 Lab 在本仓库；进度只以 [`PROGRESS.md`](PROGRESS.md) 为准。
 
 ## Rate Limiter Lab
 

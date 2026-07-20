@@ -1,0 +1,109 @@
+{
+  "pattern_id": "reliability.circuit-breaker",
+  "cases": [
+    {
+      "id": "failure_below_threshold",
+      "category": "nominal",
+      "input": {
+        "threshold": 2,
+        "cooldown": 2,
+        "events": [
+          {
+            "result": "failure"
+          },
+          {
+            "result": "success"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "failure",
+          "success"
+        ],
+        "final": "closed",
+        "forwarded": 2
+      }
+    },
+    {
+      "id": "threshold_one_opens",
+      "category": "boundary",
+      "input": {
+        "threshold": 1,
+        "cooldown": 2,
+        "events": [
+          {
+            "result": "failure"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "opened"
+        ],
+        "final": "open",
+        "forwarded": 1
+      }
+    },
+    {
+      "id": "open_rejects",
+      "category": "failure",
+      "input": {
+        "threshold": 2,
+        "cooldown": 2,
+        "events": [
+          {
+            "result": "failure"
+          },
+          {
+            "result": "failure"
+          },
+          {
+            "result": "success"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "failure",
+          "opened",
+          "rejected"
+        ],
+        "final": "open",
+        "forwarded": 2
+      }
+    },
+    {
+      "id": "probe_closes",
+      "category": "lifecycle",
+      "input": {
+        "threshold": 2,
+        "cooldown": 2,
+        "events": [
+          {
+            "result": "failure"
+          },
+          {
+            "result": "failure"
+          },
+          {
+            "advance": 2
+          },
+          {
+            "result": "success"
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          "failure",
+          "opened",
+          "advanced",
+          "probe_success"
+        ],
+        "final": "closed",
+        "forwarded": 3
+      }
+    }
+  ]
+}

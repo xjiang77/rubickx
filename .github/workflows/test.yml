@@ -134,3 +134,53 @@ jobs:
         run: |
           make -C system-design test-ui
           make -C system-design build-lab
+
+  patterns:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.24"
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install test dependencies
+        run: pip install pytest
+
+      - name: Verify 42-pattern catalog and implementations
+        run: make -C patterns verify
+
+  go-foundations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.24"
+
+      - name: Test Go foundations with race detector
+        working-directory: go
+        run: go test -race ./foundations/...
+
+      - name: Vet Go foundations
+        working-directory: go
+        run: go vet ./foundations/...

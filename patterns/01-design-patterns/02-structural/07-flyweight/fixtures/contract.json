@@ -1,0 +1,127 @@
+{
+  "pattern_id": "gof.structural.flyweight",
+  "cases": [
+    {
+      "id": "metadata_is_reused",
+      "category": "nominal",
+      "input": {
+        "definitions": [
+          {
+            "model": "chat-pro",
+            "provider": "openai",
+            "context_window": 128000
+          }
+        ],
+        "routes": [
+          {
+            "model": "chat-pro",
+            "tenant": "t1"
+          },
+          {
+            "model": "chat-pro",
+            "tenant": "t2"
+          }
+        ]
+      },
+      "expected": {
+        "routes": [
+          {
+            "model": "chat-pro",
+            "provider": "openai",
+            "context_window": 128000,
+            "tenant": "t1"
+          },
+          {
+            "model": "chat-pro",
+            "provider": "openai",
+            "context_window": 128000,
+            "tenant": "t2"
+          }
+        ],
+        "flyweight_count": 1,
+        "reused": true
+      }
+    },
+    {
+      "id": "empty_factory",
+      "category": "boundary",
+      "input": {
+        "definitions": [],
+        "routes": []
+      },
+      "expected": {
+        "routes": [],
+        "flyweight_count": 0,
+        "reused": false
+      }
+    },
+    {
+      "id": "conflicting_definition",
+      "category": "failure",
+      "input": {
+        "definitions": [
+          {
+            "model": "chat-pro",
+            "provider": "openai",
+            "context_window": 128000
+          },
+          {
+            "model": "chat-pro",
+            "provider": "local",
+            "context_window": 8192
+          }
+        ],
+        "routes": []
+      },
+      "expected_error": {
+        "code": "intrinsic_conflict"
+      }
+    },
+    {
+      "id": "models_are_isolated",
+      "category": "non-interference",
+      "input": {
+        "definitions": [
+          {
+            "model": "chat-pro",
+            "provider": "openai",
+            "context_window": 128000
+          },
+          {
+            "model": "embed-small",
+            "provider": "local",
+            "context_window": 8192
+          }
+        ],
+        "routes": [
+          {
+            "model": "chat-pro",
+            "tenant": "t1"
+          },
+          {
+            "model": "embed-small",
+            "tenant": "t1"
+          }
+        ]
+      },
+      "expected": {
+        "routes": [
+          {
+            "model": "chat-pro",
+            "provider": "openai",
+            "context_window": 128000,
+            "tenant": "t1"
+          },
+          {
+            "model": "embed-small",
+            "provider": "local",
+            "context_window": 8192,
+            "tenant": "t1"
+          }
+        ],
+        "flyweight_count": 2,
+        "reused": false
+      }
+    }
+  ]
+}

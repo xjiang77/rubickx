@@ -1,0 +1,122 @@
+{
+  "pattern_id": "gof.behavioral.strategy",
+  "cases": [
+    {
+      "id": "lowest_cost",
+      "category": "nominal",
+      "input": {
+        "selections": [
+          {
+            "strategy": "cost",
+            "candidates": [
+              {
+                "name": "a",
+                "healthy": true,
+                "cost": 3,
+                "latency": 20
+              },
+              {
+                "name": "b",
+                "healthy": true,
+                "cost": 1,
+                "latency": 40
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "selected": [
+          "b"
+        ]
+      }
+    },
+    {
+      "id": "single_candidate",
+      "category": "boundary",
+      "input": {
+        "selections": [
+          {
+            "strategy": "latency",
+            "candidates": [
+              {
+                "name": "only",
+                "healthy": true,
+                "cost": 9,
+                "latency": 10
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "selected": [
+          "only"
+        ]
+      }
+    },
+    {
+      "id": "unknown_strategy",
+      "category": "failure",
+      "input": {
+        "selections": [
+          {
+            "strategy": "random",
+            "candidates": []
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "unsupported_strategy"
+      }
+    },
+    {
+      "id": "selections_are_isolated",
+      "category": "non-interference",
+      "input": {
+        "selections": [
+          {
+            "strategy": "latency",
+            "candidates": [
+              {
+                "name": "slow",
+                "healthy": true,
+                "cost": 1,
+                "latency": 50
+              },
+              {
+                "name": "fast",
+                "healthy": true,
+                "cost": 5,
+                "latency": 5
+              }
+            ]
+          },
+          {
+            "strategy": "cost",
+            "candidates": [
+              {
+                "name": "z",
+                "healthy": false,
+                "cost": 0,
+                "latency": 1
+              },
+              {
+                "name": "a",
+                "healthy": true,
+                "cost": 2,
+                "latency": 20
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "selected": [
+          "fast",
+          "a"
+        ]
+      }
+    }
+  ]
+}

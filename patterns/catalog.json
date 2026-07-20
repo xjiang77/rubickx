@@ -1,0 +1,422 @@
+[
+  {
+    "id": "gof.creational.factory-method",
+    "family": "design.creational",
+    "order": 1,
+    "name": "Factory Method",
+    "slug": "factory-method",
+    "path": "patterns/01-design-patterns/01-creational/01-factory-method",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/01 - Creational Patterns/01 - Eng - Factory Method：延迟具体创建.md",
+    "contract": "patterns/01-design-patterns/01-creational/01-factory-method/fixtures/contract.json"
+  },
+  {
+    "id": "gof.creational.abstract-factory",
+    "family": "design.creational",
+    "order": 2,
+    "name": "Abstract Factory",
+    "slug": "abstract-factory",
+    "path": "patterns/01-design-patterns/01-creational/02-abstract-factory",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/01 - Creational Patterns/02 - Eng - Abstract Factory：一致对象族.md",
+    "contract": "patterns/01-design-patterns/01-creational/02-abstract-factory/fixtures/contract.json"
+  },
+  {
+    "id": "gof.creational.builder",
+    "family": "design.creational",
+    "order": 3,
+    "name": "Builder",
+    "slug": "builder",
+    "path": "patterns/01-design-patterns/01-creational/03-builder",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/01 - Creational Patterns/03 - Eng - Builder：分步构建与验证.md",
+    "contract": "patterns/01-design-patterns/01-creational/03-builder/fixtures/contract.json"
+  },
+  {
+    "id": "gof.creational.prototype",
+    "family": "design.creational",
+    "order": 4,
+    "name": "Prototype",
+    "slug": "prototype",
+    "path": "patterns/01-design-patterns/01-creational/04-prototype",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/01 - Creational Patterns/04 - Eng - Prototype：配置克隆与隔离.md",
+    "contract": "patterns/01-design-patterns/01-creational/04-prototype/fixtures/contract.json"
+  },
+  {
+    "id": "gof.creational.singleton",
+    "family": "design.creational",
+    "order": 5,
+    "name": "Singleton",
+    "slug": "singleton",
+    "path": "patterns/01-design-patterns/01-creational/05-singleton",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/01 - Creational Patterns/05 - Eng - Singleton：进程内唯一实例.md",
+    "contract": "patterns/01-design-patterns/01-creational/05-singleton/fixtures/contract.json"
+  },
+  {
+    "id": "gof.structural.adapter",
+    "family": "design.structural",
+    "order": 6,
+    "name": "Adapter",
+    "slug": "adapter",
+    "path": "patterns/01-design-patterns/02-structural/01-adapter",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/02 - Structural Patterns/01 - Eng - Adapter：边界转换与契约隔离.md",
+    "contract": "patterns/01-design-patterns/02-structural/01-adapter/fixtures/contract.json"
+  },
+  {
+    "id": "gof.structural.facade",
+    "family": "design.structural",
+    "order": 7,
+    "name": "Facade",
+    "slug": "facade",
+    "path": "patterns/01-design-patterns/02-structural/02-facade",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/02 - Structural Patterns/02 - Eng - Facade：子系统入口与编排边界.md",
+    "contract": "patterns/01-design-patterns/02-structural/02-facade/fixtures/contract.json"
+  },
+  {
+    "id": "gof.structural.decorator",
+    "family": "design.structural",
+    "order": 8,
+    "name": "Decorator",
+    "slug": "decorator",
+    "path": "patterns/01-design-patterns/02-structural/03-decorator",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/02 - Structural Patterns/03 - Eng - Decorator：可组合横切行为.md",
+    "contract": "patterns/01-design-patterns/02-structural/03-decorator/fixtures/contract.json"
+  },
+  {
+    "id": "gof.structural.proxy",
+    "family": "design.structural",
+    "order": 9,
+    "name": "Proxy",
+    "slug": "proxy",
+    "path": "patterns/01-design-patterns/02-structural/04-proxy",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/02 - Structural Patterns/04 - Eng - Proxy：访问控制与延迟加载.md",
+    "contract": "patterns/01-design-patterns/02-structural/04-proxy/fixtures/contract.json"
+  },
+  {
+    "id": "gof.structural.composite",
+    "family": "design.structural",
+    "order": 10,
+    "name": "Composite",
+    "slug": "composite",
+    "path": "patterns/01-design-patterns/02-structural/05-composite",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/02 - Structural Patterns/05 - Eng - Composite：树形结构与一致操作.md",
+    "contract": "patterns/01-design-patterns/02-structural/05-composite/fixtures/contract.json"
+  },
+  {
+    "id": "gof.structural.bridge",
+    "family": "design.structural",
+    "order": 11,
+    "name": "Bridge",
+    "slug": "bridge",
+    "path": "patterns/01-design-patterns/02-structural/06-bridge",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/02 - Structural Patterns/06 - Eng - Bridge：抽象与实现独立演化.md",
+    "contract": "patterns/01-design-patterns/02-structural/06-bridge/fixtures/contract.json"
+  },
+  {
+    "id": "gof.structural.flyweight",
+    "family": "design.structural",
+    "order": 12,
+    "name": "Flyweight",
+    "slug": "flyweight",
+    "path": "patterns/01-design-patterns/02-structural/07-flyweight",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/02 - Structural Patterns/07 - Eng - Flyweight：共享内在状态.md",
+    "contract": "patterns/01-design-patterns/02-structural/07-flyweight/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.strategy",
+    "family": "design.behavioral",
+    "order": 13,
+    "name": "Strategy",
+    "slug": "strategy",
+    "path": "patterns/01-design-patterns/03-behavioral/01-strategy",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/01 - Eng - Strategy：可替换决策算法.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/01-strategy/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.state",
+    "family": "design.behavioral",
+    "order": 14,
+    "name": "State",
+    "slug": "state",
+    "path": "patterns/01-design-patterns/03-behavioral/02-state",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/02 - Eng - State：状态驱动行为与转移.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/02-state/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.template-method",
+    "family": "design.behavioral",
+    "order": 15,
+    "name": "Template Method",
+    "slug": "template-method",
+    "path": "patterns/01-design-patterns/03-behavioral/03-template-method",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/03 - Eng - Template Method：固定骨架与可变步骤.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/03-template-method/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.command",
+    "family": "design.behavioral",
+    "order": 16,
+    "name": "Command",
+    "slug": "command",
+    "path": "patterns/01-design-patterns/03-behavioral/04-command",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/04 - Eng - Command：请求对象化与可逆执行.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/04-command/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.chain-of-responsibility",
+    "family": "design.behavioral",
+    "order": 17,
+    "name": "Chain of Responsibility",
+    "slug": "chain-of-responsibility",
+    "path": "patterns/01-design-patterns/03-behavioral/05-chain-of-responsibility",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/05 - Eng - Chain of Responsibility：有序处理链.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/05-chain-of-responsibility/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.observer",
+    "family": "design.behavioral",
+    "order": 18,
+    "name": "Observer",
+    "slug": "observer",
+    "path": "patterns/01-design-patterns/03-behavioral/06-observer",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/06 - Eng - Observer：状态通知与订阅生命周期.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/06-observer/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.mediator",
+    "family": "design.behavioral",
+    "order": 19,
+    "name": "Mediator",
+    "slug": "mediator",
+    "path": "patterns/01-design-patterns/03-behavioral/07-mediator",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/07 - Eng - Mediator：集中协作协议.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/07-mediator/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.iterator",
+    "family": "design.behavioral",
+    "order": 20,
+    "name": "Iterator",
+    "slug": "iterator",
+    "path": "patterns/01-design-patterns/03-behavioral/08-iterator",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/08 - Eng - Iterator：遍历协议与游标边界.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/08-iterator/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.memento",
+    "family": "design.behavioral",
+    "order": 21,
+    "name": "Memento",
+    "slug": "memento",
+    "path": "patterns/01-design-patterns/03-behavioral/09-memento",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/09 - Eng - Memento：快照与封装恢复.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/09-memento/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.visitor",
+    "family": "design.behavioral",
+    "order": 22,
+    "name": "Visitor",
+    "slug": "visitor",
+    "path": "patterns/01-design-patterns/03-behavioral/10-visitor",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/10 - Eng - Visitor：稳定结构上的新操作.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/10-visitor/fixtures/contract.json"
+  },
+  {
+    "id": "gof.behavioral.interpreter",
+    "family": "design.behavioral",
+    "order": 23,
+    "name": "Interpreter",
+    "slug": "interpreter",
+    "path": "patterns/01-design-patterns/03-behavioral/11-interpreter",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/01 - Design Patterns/03 - Behavioral Patterns/11 - Eng - Interpreter：小型语言与语法树.md",
+    "contract": "patterns/01-design-patterns/03-behavioral/11-interpreter/fixtures/contract.json"
+  },
+  {
+    "id": "reliability.timeout",
+    "family": "reliability",
+    "order": 24,
+    "name": "Timeout",
+    "slug": "timeout",
+    "path": "patterns/02-reliability-patterns/01-timeout",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/02 - Reliability Patterns/01 - Eng - Timeout：截止时间与未知结果.md",
+    "contract": "patterns/02-reliability-patterns/01-timeout/fixtures/contract.json"
+  },
+  {
+    "id": "reliability.retry",
+    "family": "reliability",
+    "order": 25,
+    "name": "Retry",
+    "slug": "retry",
+    "path": "patterns/02-reliability-patterns/02-retry",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/02 - Reliability Patterns/02 - Eng - Retry：重试预算与退避.md",
+    "contract": "patterns/02-reliability-patterns/02-retry/fixtures/contract.json"
+  },
+  {
+    "id": "reliability.circuit-breaker",
+    "family": "reliability",
+    "order": 26,
+    "name": "Circuit Breaker",
+    "slug": "circuit-breaker",
+    "path": "patterns/02-reliability-patterns/03-circuit-breaker",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/02 - Reliability Patterns/03 - Eng - Circuit Breaker：失败隔离与恢复探测.md",
+    "contract": "patterns/02-reliability-patterns/03-circuit-breaker/fixtures/contract.json"
+  },
+  {
+    "id": "reliability.bulkhead",
+    "family": "reliability",
+    "order": 27,
+    "name": "Bulkhead",
+    "slug": "bulkhead",
+    "path": "patterns/02-reliability-patterns/04-bulkhead",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/02 - Reliability Patterns/04 - Eng - Bulkhead：资源分区与故障 containment.md",
+    "contract": "patterns/02-reliability-patterns/04-bulkhead/fixtures/contract.json"
+  },
+  {
+    "id": "reliability.load-shedding",
+    "family": "reliability",
+    "order": 28,
+    "name": "Load Shedding",
+    "slug": "load-shedding",
+    "path": "patterns/02-reliability-patterns/05-load-shedding",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/02 - Reliability Patterns/05 - Eng - Load Shedding：过载拒绝与 Goodput.md",
+    "contract": "patterns/02-reliability-patterns/05-load-shedding/fixtures/contract.json"
+  },
+  {
+    "id": "reliability.hedged-requests",
+    "family": "reliability",
+    "order": 29,
+    "name": "Hedged Requests",
+    "slug": "hedged-requests",
+    "path": "patterns/02-reliability-patterns/06-hedged-requests",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/02 - Reliability Patterns/06 - Eng - Hedged Requests：尾延迟与冗余请求.md",
+    "contract": "patterns/02-reliability-patterns/06-hedged-requests/fixtures/contract.json"
+  },
+  {
+    "id": "data-messaging.transactional-outbox",
+    "family": "data-messaging",
+    "order": 30,
+    "name": "Transactional Outbox",
+    "slug": "transactional-outbox",
+    "path": "patterns/03-data-messaging-patterns/01-transactional-outbox",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/03 - Data & Messaging Patterns/01 - Eng - Transactional Outbox：提交与发布.md",
+    "contract": "patterns/03-data-messaging-patterns/01-transactional-outbox/fixtures/contract.json"
+  },
+  {
+    "id": "data-messaging.idempotent-consumer-inbox",
+    "family": "data-messaging",
+    "order": 31,
+    "name": "Idempotent Consumer and Inbox",
+    "slug": "idempotent-consumer-inbox",
+    "path": "patterns/03-data-messaging-patterns/02-idempotent-consumer-inbox",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/03 - Data & Messaging Patterns/02 - Eng - Idempotent Consumer & Inbox：重复投递与效果去重.md",
+    "contract": "patterns/03-data-messaging-patterns/02-idempotent-consumer-inbox/fixtures/contract.json"
+  },
+  {
+    "id": "data-messaging.saga",
+    "family": "data-messaging",
+    "order": 32,
+    "name": "Saga",
+    "slug": "saga",
+    "path": "patterns/03-data-messaging-patterns/03-saga",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/03 - Data & Messaging Patterns/03 - Eng - Saga：跨边界补偿与恢复.md",
+    "contract": "patterns/03-data-messaging-patterns/03-saga/fixtures/contract.json"
+  },
+  {
+    "id": "data-messaging.publisher-subscriber",
+    "family": "data-messaging",
+    "order": 33,
+    "name": "Publisher-Subscriber",
+    "slug": "publisher-subscriber",
+    "path": "patterns/03-data-messaging-patterns/04-publisher-subscriber",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/03 - Data & Messaging Patterns/04 - Eng - Publisher-Subscriber：一对多事件分发.md",
+    "contract": "patterns/03-data-messaging-patterns/04-publisher-subscriber/fixtures/contract.json"
+  },
+  {
+    "id": "data-messaging.dead-letter-channel",
+    "family": "data-messaging",
+    "order": 34,
+    "name": "Dead Letter Channel",
+    "slug": "dead-letter-channel",
+    "path": "patterns/03-data-messaging-patterns/05-dead-letter-channel",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/03 - Data & Messaging Patterns/05 - Eng - Dead Letter Channel：隔离、诊断与重放.md",
+    "contract": "patterns/03-data-messaging-patterns/05-dead-letter-channel/fixtures/contract.json"
+  },
+  {
+    "id": "data-messaging.cqrs",
+    "family": "data-messaging",
+    "order": 35,
+    "name": "CQRS",
+    "slug": "cqrs",
+    "path": "patterns/03-data-messaging-patterns/06-cqrs",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/03 - Data & Messaging Patterns/06 - Eng - CQRS：写模型与读投影.md",
+    "contract": "patterns/03-data-messaging-patterns/06-cqrs/fixtures/contract.json"
+  },
+  {
+    "id": "data-messaging.event-sourcing",
+    "family": "data-messaging",
+    "order": 36,
+    "name": "Event Sourcing",
+    "slug": "event-sourcing",
+    "path": "patterns/03-data-messaging-patterns/07-event-sourcing",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/03 - Data & Messaging Patterns/07 - Eng - Event Sourcing：事件事实与状态重建.md",
+    "contract": "patterns/03-data-messaging-patterns/07-event-sourcing/fixtures/contract.json"
+  },
+  {
+    "id": "concurrency.bounded-producer-consumer",
+    "family": "concurrency",
+    "order": 37,
+    "name": "Bounded Producer-Consumer",
+    "slug": "bounded-producer-consumer",
+    "path": "patterns/04-concurrency-patterns/01-bounded-producer-consumer",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/04 - Concurrency Patterns/01 - Eng - Bounded Producer-Consumer：容量与背压.md",
+    "contract": "patterns/04-concurrency-patterns/01-bounded-producer-consumer/fixtures/contract.json"
+  },
+  {
+    "id": "concurrency.worker-pool",
+    "family": "concurrency",
+    "order": 38,
+    "name": "Worker Pool",
+    "slug": "worker-pool",
+    "path": "patterns/04-concurrency-patterns/02-worker-pool",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/04 - Concurrency Patterns/02 - Eng - Worker Pool：受控并行与收口.md",
+    "contract": "patterns/04-concurrency-patterns/02-worker-pool/fixtures/contract.json"
+  },
+  {
+    "id": "concurrency.pipeline",
+    "family": "concurrency",
+    "order": 39,
+    "name": "Pipeline",
+    "slug": "pipeline",
+    "path": "patterns/04-concurrency-patterns/03-pipeline",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/04 - Concurrency Patterns/03 - Eng - Pipeline：分阶段处理与取消.md",
+    "contract": "patterns/04-concurrency-patterns/03-pipeline/fixtures/contract.json"
+  },
+  {
+    "id": "concurrency.fan-out-fan-in",
+    "family": "concurrency",
+    "order": 40,
+    "name": "Fan-out and Fan-in",
+    "slug": "fan-out-fan-in",
+    "path": "patterns/04-concurrency-patterns/04-fan-out-fan-in",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/04 - Concurrency Patterns/04 - Eng - Fan-out & Fan-in：并行分发与结果合并.md",
+    "contract": "patterns/04-concurrency-patterns/04-fan-out-fan-in/fixtures/contract.json"
+  },
+  {
+    "id": "concurrency.future-promise",
+    "family": "concurrency",
+    "order": 41,
+    "name": "Future and Promise",
+    "slug": "future-promise",
+    "path": "patterns/04-concurrency-patterns/05-future-promise",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/04 - Concurrency Patterns/05 - Eng - Future & Promise：结果句柄与完成语义.md",
+    "contract": "patterns/04-concurrency-patterns/05-future-promise/fixtures/contract.json"
+  },
+  {
+    "id": "concurrency.structured-concurrency-cancellation",
+    "family": "concurrency",
+    "order": 42,
+    "name": "Structured Concurrency and Cancellation",
+    "slug": "structured-concurrency-cancellation",
+    "path": "patterns/04-concurrency-patterns/06-structured-concurrency-cancellation",
+    "vault_note": "02_Knowledge/02_Engineering/06 - Patterns/04 - Concurrency Patterns/06 - Eng - Structured Concurrency & Cancellation：任务所有权.md",
+    "contract": "patterns/04-concurrency-patterns/06-structured-concurrency-cancellation/fixtures/contract.json"
+  }
+]

@@ -1,0 +1,111 @@
+{
+  "pattern_id": "reliability.timeout",
+  "cases": [
+    {
+      "id": "operation_completes",
+      "category": "nominal",
+      "input": {
+        "deadline_ms": 20,
+        "operations": [
+          {
+            "name": "read",
+            "duration_ms": 10,
+            "side_effecting": false
+          }
+        ]
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "name": "read",
+            "status": "completed",
+            "outcome": "success"
+          }
+        ],
+        "now_ms": 10
+      }
+    },
+    {
+      "id": "deadline_is_inclusive",
+      "category": "boundary",
+      "input": {
+        "deadline_ms": 10,
+        "operations": [
+          {
+            "name": "read",
+            "duration_ms": 10,
+            "side_effecting": false
+          }
+        ]
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "name": "read",
+            "status": "completed",
+            "outcome": "success"
+          }
+        ],
+        "now_ms": 10
+      }
+    },
+    {
+      "id": "side_effect_timeout_is_unknown",
+      "category": "failure",
+      "input": {
+        "deadline_ms": 10,
+        "operations": [
+          {
+            "name": "charge",
+            "duration_ms": 15,
+            "side_effecting": true
+          }
+        ]
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "name": "charge",
+            "status": "timed_out",
+            "outcome": "unknown"
+          }
+        ],
+        "now_ms": 10
+      }
+    },
+    {
+      "id": "deadline_is_shared",
+      "category": "lifecycle",
+      "input": {
+        "deadline_ms": 50,
+        "operations": [
+          {
+            "name": "lookup",
+            "duration_ms": 20,
+            "side_effecting": false
+          },
+          {
+            "name": "write",
+            "duration_ms": 40,
+            "side_effecting": true
+          }
+        ]
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "name": "lookup",
+            "status": "completed",
+            "outcome": "success"
+          },
+          {
+            "name": "write",
+            "status": "timed_out",
+            "outcome": "unknown"
+          }
+        ],
+        "now_ms": 50
+      }
+    }
+  ]
+}

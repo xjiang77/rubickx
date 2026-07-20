@@ -1,0 +1,98 @@
+{
+  "pattern_id": "gof.behavioral.visitor",
+  "cases": [
+    {
+      "id": "evaluates_policy",
+      "category": "nominal",
+      "input": {
+        "operation": "evaluate",
+        "tree": {
+          "type": "and",
+          "children": [
+            {
+              "type": "equals",
+              "field": "role",
+              "value": "admin"
+            },
+            {
+              "type": "equals",
+              "field": "region",
+              "value": "us"
+            }
+          ]
+        },
+        "context": {
+          "role": "admin",
+          "region": "us"
+        }
+      },
+      "expected": {
+        "result": true
+      }
+    },
+    {
+      "id": "collects_no_fields",
+      "category": "boundary",
+      "input": {
+        "operation": "collect_fields",
+        "tree": {
+          "type": "and",
+          "children": []
+        },
+        "context": {}
+      },
+      "expected": {
+        "fields": []
+      }
+    },
+    {
+      "id": "unknown_operation",
+      "category": "failure",
+      "input": {
+        "operation": "delete",
+        "tree": {
+          "type": "and",
+          "children": []
+        },
+        "context": {}
+      },
+      "expected_error": {
+        "code": "unsupported_operation"
+      }
+    },
+    {
+      "id": "collects_nested_fields",
+      "category": "non-interference",
+      "input": {
+        "operation": "collect_fields",
+        "tree": {
+          "type": "and",
+          "children": [
+            {
+              "type": "equals",
+              "field": "role",
+              "value": "admin"
+            },
+            {
+              "type": "and",
+              "children": [
+                {
+                  "type": "equals",
+                  "field": "region",
+                  "value": "eu"
+                }
+              ]
+            }
+          ]
+        },
+        "context": {}
+      },
+      "expected": {
+        "fields": [
+          "role",
+          "region"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "pattern_id": "gof.structural.bridge",
+  "cases": [
+    {
+      "id": "incident_email",
+      "category": "nominal",
+      "input": {
+        "notifications": [
+          {
+            "kind": "incident",
+            "channel": "email",
+            "recipient": "ops@example",
+            "body": "db down"
+          }
+        ]
+      },
+      "expected": {
+        "deliveries": [
+          "email:ops@example:[INCIDENT] db down"
+        ]
+      }
+    },
+    {
+      "id": "empty_notifications",
+      "category": "boundary",
+      "input": {
+        "notifications": []
+      },
+      "expected": {
+        "deliveries": []
+      }
+    },
+    {
+      "id": "unsupported_channel",
+      "category": "failure",
+      "input": {
+        "notifications": [
+          {
+            "kind": "incident",
+            "channel": "sms",
+            "recipient": "oncall",
+            "body": "down"
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "unsupported_channel"
+      }
+    },
+    {
+      "id": "axes_compose_independently",
+      "category": "non-interference",
+      "input": {
+        "notifications": [
+          {
+            "kind": "incident",
+            "channel": "slack",
+            "recipient": "#ops",
+            "body": "latency"
+          },
+          {
+            "kind": "reminder",
+            "channel": "email",
+            "recipient": "owner@example",
+            "body": "rotate key"
+          }
+        ]
+      },
+      "expected": {
+        "deliveries": [
+          "slack:#ops:[INCIDENT] latency",
+          "email:owner@example:[REMINDER] rotate key"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "pattern_id": "concurrency.future-promise",
+  "cases": [
+    {
+      "id": "complete_then_observe",
+      "category": "nominal",
+      "input": {
+        "actions": [
+          {
+            "op": "observe"
+          },
+          {
+            "op": "complete",
+            "value": "report"
+          },
+          {
+            "op": "observe"
+          }
+        ]
+      },
+      "expected": {
+        "state": "fulfilled",
+        "observations": [
+          "pending",
+          "value:report"
+        ],
+        "value": "report",
+        "error": "none",
+        "terminal_count": 1
+      }
+    },
+    {
+      "id": "unresolved_is_pending",
+      "category": "boundary",
+      "input": {
+        "actions": []
+      },
+      "expected": {
+        "state": "pending",
+        "observations": [],
+        "value": "none",
+        "error": "none",
+        "terminal_count": 0
+      }
+    },
+    {
+      "id": "second_completion_rejected",
+      "category": "failure",
+      "input": {
+        "actions": [
+          {
+            "op": "complete",
+            "value": "a"
+          },
+          {
+            "op": "complete",
+            "value": "b"
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "already_completed"
+      }
+    },
+    {
+      "id": "failure_is_observable",
+      "category": "lifecycle",
+      "input": {
+        "actions": [
+          {
+            "op": "fail",
+            "code": "declined"
+          },
+          {
+            "op": "observe"
+          }
+        ]
+      },
+      "expected": {
+        "state": "rejected",
+        "observations": [
+          "error:declined"
+        ],
+        "value": "none",
+        "error": "declined",
+        "terminal_count": 1
+      }
+    },
+    {
+      "id": "cancel_is_terminal",
+      "category": "lifecycle",
+      "input": {
+        "actions": [
+          {
+            "op": "cancel"
+          },
+          {
+            "op": "observe"
+          }
+        ]
+      },
+      "expected": {
+        "state": "cancelled",
+        "observations": [
+          "cancelled"
+        ],
+        "value": "none",
+        "error": "none",
+        "terminal_count": 1
+      }
+    },
+    {
+      "id": "repeated_observe_is_non_consuming",
+      "category": "non-interference",
+      "input": {
+        "actions": [
+          {
+            "op": "complete",
+            "value": "x"
+          },
+          {
+            "op": "observe"
+          },
+          {
+            "op": "observe"
+          }
+        ]
+      },
+      "expected": {
+        "state": "fulfilled",
+        "observations": [
+          "value:x",
+          "value:x"
+        ],
+        "value": "x",
+        "error": "none",
+        "terminal_count": 1
+      }
+    }
+  ]
+}

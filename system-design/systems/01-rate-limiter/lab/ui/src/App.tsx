@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./api";
 import { AlgorithmVisualizer } from "./AlgorithmVisualizer";
 import { deriveAlgorithmVisualState } from "./algorithmVisualState";
+import { LangToggle, useI18n } from "./i18n";
 import { ScenarioBrief } from "./ScenarioBrief";
 import { deriveScenarioBriefModel } from "./scenarioBriefModel";
 import { SystemConsole, SystemExchange, SystemRequestLog } from "./SystemConsole";
@@ -104,13 +105,14 @@ function Toolbar({
   onMode: (value: Mode) => void;
   onRun: () => void;
 }) {
+  const { t } = useI18n();
   const selectedScenario = catalog.scenarios.find((item) => item.id === scenarioId);
   const goOnly = mode === "debug" || isSystemScenario(selectedScenario);
 
   return (
     <section className={`toolbar${showAction ? "" : " compact-toolbar"}`} aria-label="Lab controls">
       <label>
-        <span>Scenario</span>
+        <span>{t.tScenario}</span>
         <select aria-label="Scenario" value={scenarioId} onChange={(event) => onScenario(event.target.value)}>
           {catalog.scenarios.map((scenario) => (
             <option key={scenario.id} value={scenario.id}>{scenario.label}</option>
@@ -118,7 +120,7 @@ function Toolbar({
         </select>
       </label>
       <label>
-        <span>Algorithm</span>
+        <span>{t.tAlgorithm}</span>
         <select
           aria-label="Algorithm"
           value={algorithm}
@@ -131,7 +133,7 @@ function Toolbar({
         </select>
       </label>
       <label>
-        <span>Language</span>
+        <span>{t.tLanguage}</span>
         <select aria-label="Language" value={language} onChange={(event) => onLanguage(event.target.value)}>
           {catalog.languages.map((item) => (
             <option key={item.id} value={item.id} disabled={goOnly && item.id !== "go"}>{item.label}</option>
@@ -139,16 +141,16 @@ function Toolbar({
         </select>
       </label>
       <label>
-        <span>Mode</span>
+        <span>{t.tMode}</span>
         <select aria-label="Mode" value={mode} onChange={(event) => onMode(event.target.value as Mode)}>
           {catalog.modes.map((item) => (
-            <option key={item} value={item}>{item === "debug" ? "Go Debug" : "Semantic Trace"}</option>
+            <option key={item} value={item}>{item === "debug" ? t.tModeDebug : t.tModeSemantic}</option>
           ))}
         </select>
       </label>
       {showAction && (
         <button className="primary-action" type="button" onClick={onRun} disabled={busy}>
-          {busy ? "Working…" : mode === "debug" ? "Start debug" : "Run scenario"}
+          {busy ? t.tWorking : mode === "debug" ? t.tStartDebug : t.tRunScenario}
         </button>
       )}
     </section>
@@ -156,11 +158,12 @@ function Toolbar({
 }
 
 function RequestTimeline({ events, cursor }: { events: TraceEvent[]; cursor: number }) {
+  const { t } = useI18n();
   if (events.length === 0) {
     return (
       <div className="empty-state compact">
-        <p>No trace yet.</p>
-        <span>Run the scenario to observe each request.</span>
+        <p>{t.tNoTrace}</p>
+        <span>{t.tNoTraceSub}</span>
       </div>
     );
   }
@@ -194,12 +197,13 @@ function AlgorithmState({
   config: Record<string, number>;
   event?: TraceEvent;
 }) {
+  const { t } = useI18n();
   if (!event) {
     return (
       <div className="empty-state visual-empty">
         <div className="empty-glyph" aria-hidden="true">○</div>
-        <p>State appears here</p>
-        <span>Each trace step exposes its before and after snapshots.</span>
+        <p>{t.tStateHere}</p>
+        <span>{t.tStateSub}</span>
       </div>
     );
   }
@@ -210,7 +214,7 @@ function AlgorithmState({
     <div className="state-view">
       <div className="state-heading">
         <div>
-          <span className="eyebrow">Current step</span>
+          <span className="eyebrow">{t.tCurrentStep}</span>
           <h3>{event.stepId}</h3>
         </div>
       </div>
@@ -220,16 +224,16 @@ function AlgorithmState({
       <p className="reason-text">{event.reason}</p>
       {event.decision && (
         <dl className="decision-facts">
-          <div><dt>Remaining</dt><dd>{event.decision.remaining}</dd></div>
-          <div><dt>Retry after</dt><dd>{event.decision.retryAfterMs} ms</dd></div>
-          <div><dt>Reset at</dt><dd>{event.decision.resetAtMs} ms</dd></div>
+          <div><dt>{t.tRemaining}</dt><dd>{event.decision.remaining}</dd></div>
+          <div><dt>{t.tRetryAfter}</dt><dd>{event.decision.retryAfterMs} ms</dd></div>
+          <div><dt>{t.tResetAt}</dt><dd>{event.decision.resetAtMs} ms</dd></div>
         </dl>
       )}
       <details className="raw-state-disclosure">
-        <summary>Raw trace state</summary>
+        <summary>{t.tRawTrace}</summary>
         <div className="state-columns">
-          <StateBlock label="Before" state={event.before} />
-          <StateBlock label="After" state={event.after} />
+          <StateBlock label={t.tBefore} state={event.before} />
+          <StateBlock label={t.tAfter} state={event.after} />
         </div>
       </details>
     </div>
@@ -246,6 +250,7 @@ function StateBlock({ label, state }: { label: string; state: StateSnapshot }) {
 }
 
 function SourceViewer({ run, event }: { run?: RunResponse; event?: TraceEvent }) {
+  const { t } = useI18n();
   const activeLineRef = useRef<HTMLElement | null>(null);
   const activeLine = run && event
     ? (run.source.anchors ?? run.source.stepLines ?? {})[event.stepId] ?? event.source?.line
@@ -258,8 +263,8 @@ function SourceViewer({ run, event }: { run?: RunResponse; event?: TraceEvent })
   if (!run) {
     return (
       <div className="empty-state compact">
-        <p>Source follows execution</p>
-        <span>Run a scenario to load the selected implementation.</span>
+        <p>{t.tSourceFollows}</p>
+        <span>{t.tSourceSub}</span>
       </div>
     );
   }
@@ -275,7 +280,7 @@ function SourceViewer({ run, event }: { run?: RunResponse; event?: TraceEvent })
           const active = lineNumber === activeLine;
           return (
             <code key={lineNumber} ref={active ? activeLineRef : undefined} className={active ? "active-line" : ""}>
-              <span className="line-number" aria-current={active ? "true" : undefined}>Line {lineNumber}</span>
+              <span className="line-number" aria-current={active ? "true" : undefined}>{t.tLine} {lineNumber}</span>
               <span className="line-content">{line || " "}</span>
             </code>
           );
@@ -286,6 +291,7 @@ function SourceViewer({ run, event }: { run?: RunResponse; event?: TraceEvent })
 }
 
 function DebugSourceViewer({ snapshot }: { snapshot: DebugSnapshot }) {
+  const { t } = useI18n();
   const activeLineRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -297,8 +303,8 @@ function DebugSourceViewer({ snapshot }: { snapshot: DebugSnapshot }) {
     return (
       <div className="debug-source-summary" aria-label="Debug source">
         <span>{typeof snapshot.source === "string" ? snapshot.source : source?.path}</span>
-        <strong>Paused at line {snapshot.line}</strong>
-        <p>Source content is unavailable for this stop. Use the stack and locals to inspect the runtime state.</p>
+        <strong>{t.tPausedAtLine} {snapshot.line}</strong>
+        <p>{t.tDebugSrcUnavailable}</p>
       </div>
     );
   }
@@ -312,7 +318,7 @@ function DebugSourceViewer({ snapshot }: { snapshot: DebugSnapshot }) {
           const active = lineNumber === snapshot.line;
           return (
             <code key={lineNumber} ref={active ? activeLineRef : undefined} className={active ? "active-line" : ""}>
-              <span className="line-number" aria-current={active ? "true" : undefined}>Line {lineNumber}</span>
+              <span className="line-number" aria-current={active ? "true" : undefined}>{t.tLine} {lineNumber}</span>
               <span className="line-content">{line || " "}</span>
             </code>
           );
@@ -339,6 +345,7 @@ function TraceControls({
   onRestart: () => void;
   onPlay: () => void;
 }) {
+  const { t } = useI18n();
   if (total === 0) return null;
   return (
     <div className="trace-controls" aria-label="Trace playback">
@@ -348,7 +355,7 @@ function TraceControls({
         {playing ? "Ⅱ" : "▶"}
       </button>
       <button type="button" onClick={onStep} disabled={cursor >= total - 1} aria-label="Step forward">→</button>
-      <span>Step {cursor + 1} / {total}</span>
+      <span>{t.tStepWord} {cursor + 1} / {total}</span>
     </div>
   );
 }
@@ -362,12 +369,13 @@ function DebugPanel({
   busy: boolean;
   onCommand: (command: DebugCommand) => void;
 }) {
+  const { t } = useI18n();
   if (!snapshot) {
     return (
       <div className="empty-state visual-empty">
         <div className="empty-glyph debug" aria-hidden="true">›_</div>
-        <p>Delve is ready</p>
-        <span>Start a Go debug session to inspect its real stack and locals.</span>
+        <p>{t.tDelveReady}</p>
+        <span>{t.tDelveSub}</span>
       </div>
     );
   }
@@ -381,16 +389,16 @@ function DebugPanel({
       <div className="debug-status">
         <span className={`status-dot ${snapshot.status}`} />
         <strong>{snapshot.status}</strong>
-        <span>Line {snapshot.line}</span>
+        <span>{t.tLine} {snapshot.line}</span>
       </div>
       <div className="debug-actions">
-        <button type="button" disabled={busy} onClick={() => onCommand("next")}>Next</button>
-        <button type="button" disabled={busy} onClick={() => onCommand("continue")}>Continue</button>
-        <button type="button" disabled={busy} onClick={() => onCommand("restart")}>Restart</button>
-        <button className="danger-quiet" type="button" disabled={busy} onClick={() => onCommand("stop")}>Stop</button>
+        <button type="button" disabled={busy} onClick={() => onCommand("next")}>{t.tNext}</button>
+        <button type="button" disabled={busy} onClick={() => onCommand("continue")}>{t.tContinue}</button>
+        <button type="button" disabled={busy} onClick={() => onCommand("restart")}>{t.tRestart}</button>
+        <button className="danger-quiet" type="button" disabled={busy} onClick={() => onCommand("stop")}>{t.tStop}</button>
       </div>
       <section>
-        <h3>Locals</h3>
+        <h3>{t.tLocals}</h3>
         {locals.length ? (
           <dl className="locals-list">
             {locals.map((item) => (
@@ -400,10 +408,10 @@ function DebugPanel({
               </div>
             ))}
           </dl>
-        ) : <p className="muted">No locals at this stop.</p>}
+        ) : <p className="muted">{t.tNoLocals}</p>}
       </section>
       <section>
-        <h3>Call stack</h3>
+        <h3>{t.tCallStack}</h3>
         <ol className="stack-list">
           {snapshot.stackFrames.map((frame, index) => (
             <li key={frame.id ?? `${frame.name}-${index}`}>
@@ -418,6 +426,7 @@ function DebugPanel({
 }
 
 export function App() {
+  const { t } = useI18n();
   const [catalog, setCatalog] = useState<Catalog>();
   const [catalogError, setCatalogError] = useState("");
   const [scenarioId, setScenarioId] = useState("");
@@ -687,7 +696,7 @@ export function App() {
     return (
       <main className="shell loading-shell">
         <div className="loading-mark" />
-        <p>Loading the lab…</p>
+        <p>{t.tLoadingLab}</p>
       </main>
     );
   }
@@ -696,22 +705,25 @@ export function App() {
     return (
       <main className="shell loading-shell">
         <div className="empty-glyph error" aria-hidden="true">!</div>
-        <h1>Could not load the lab</h1>
+        <h1>{t.tLoadFailed}</h1>
         <p role="alert">{catalogError}</p>
-        <button className="primary-action" type="button" onClick={() => void loadCatalog()}>Try again</button>
+        <button className="primary-action" type="button" onClick={() => void loadCatalog()}>{t.tTryAgain}</button>
       </main>
     );
   }
 
   return (
-    <main className="shell">
+    <main className="shell" data-has-error={error ? "true" : undefined}>
       <header className="page-header">
         <div>
           <span className="kicker">SYSTEM DESIGN · 01</span>
           <h1>Rate Limiter Lab</h1>
-          <p>Run the algorithm. Inspect the state. Follow the source.</p>
+          <p>{t.tTagline}</p>
         </div>
-        <div className="server-state"><span /> Local lab</div>
+        <div className="header-meta">
+          <LangToggle />
+          <div className="server-state"><span /> {t.tLocalLab}</div>
+        </div>
       </header>
 
       <Toolbar
@@ -734,18 +746,18 @@ export function App() {
           model={{
             ...scenarioBrief,
             goPath: mode === "debug"
-              ? "Delve DAP is available for Go only."
+              ? t.tDelveGoOnly
               : scenarioBrief.goPath,
           }}
         />
       )}
-      {error && <div className="error-banner" role="alert"><strong>Request failed</strong><span>{error}</span></div>}
+      {error && <div className="error-banner" role="alert"><strong>{t.tRequestFailed}</strong><span>{error}</span></div>}
 
       <div className="workspace-grid">
         <section className="panel timeline-panel">
           <div className="panel-heading">
-            <div><span className="panel-index">01</span><h2>Request timeline</h2></div>
-            <span>{systemWorkspace ? `${demoExchanges.length} requests` : `${run?.events.length ?? 0} events`}</span>
+            <div><span className="panel-index">01</span><h2>{t.tPanel1Title}</h2></div>
+            <span>{systemWorkspace ? `${demoExchanges.length} ${t.tRequestsUnit}` : `${run?.events.length ?? 0} ${t.tEventsUnit}`}</span>
           </div>
           {systemWorkspace
             ? <SystemRequestLog exchanges={demoExchanges} />
@@ -754,7 +766,7 @@ export function App() {
 
         <section className="panel state-panel">
           <div className="panel-heading">
-            <div><span className="panel-index">02</span><h2>{mode === "debug" ? "Runtime state" : systemWorkspace ? "System console" : "Algorithm state"}</h2></div>
+            <div><span className="panel-index">02</span><h2>{mode === "debug" ? t.tRuntimeState : systemWorkspace ? t.tSystemConsole : t.tAlgorithmState}</h2></div>
             <span>{systemWorkspace ? selectedScenario?.label : catalog.algorithms.find((item) => item.id === algorithm)?.label}</span>
           </div>
           {systemWorkspace
@@ -776,7 +788,7 @@ export function App() {
 
         <section className="panel source-panel">
           <div className="panel-heading">
-            <div><span className="panel-index">03</span><h2>{systemWorkspace ? "HTTP exchange" : "Source & decision"}</h2></div>
+            <div><span className="panel-index">03</span><h2>{systemWorkspace ? t.tHttpExchange : t.tSourceDecision}</h2></div>
             <span>{systemWorkspace ? demoOptions.store : language}</span>
           </div>
           {systemWorkspace ? (
@@ -803,7 +815,7 @@ export function App() {
       )}
 
       <footer className="page-footer">
-        <span>Deterministic clock · trace replay · real source anchors</span>
+        <span>{t.tFooterLeft}</span>
         <span>Python · Go · Java · JavaScript</span>
       </footer>
     </main>

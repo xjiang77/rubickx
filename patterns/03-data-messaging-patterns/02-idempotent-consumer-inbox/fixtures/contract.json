@@ -1,0 +1,121 @@
+{
+  "pattern_id": "data-messaging.idempotent-consumer-inbox",
+  "cases": [
+    {
+      "id": "unique_messages_apply",
+      "category": "nominal",
+      "input": {
+        "messages": [
+          {
+            "id": "m1",
+            "amount": 10
+          },
+          {
+            "id": "m2",
+            "amount": 5
+          }
+        ]
+      },
+      "expected": {
+        "receipts": [
+          "applied:m1",
+          "applied:m2"
+        ],
+        "balance": 15,
+        "inbox_ids": [
+          "m1",
+          "m2"
+        ]
+      }
+    },
+    {
+      "id": "empty_delivery",
+      "category": "boundary",
+      "input": {
+        "messages": []
+      },
+      "expected": {
+        "receipts": [],
+        "balance": 0,
+        "inbox_ids": []
+      }
+    },
+    {
+      "id": "same_id_different_payload_conflicts",
+      "category": "failure",
+      "input": {
+        "messages": [
+          {
+            "id": "m1",
+            "amount": 10
+          },
+          {
+            "id": "m1",
+            "amount": 12
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "message_identity_conflict"
+      }
+    },
+    {
+      "id": "duplicate_applies_once",
+      "category": "lifecycle",
+      "input": {
+        "messages": [
+          {
+            "id": "m1",
+            "amount": 10
+          },
+          {
+            "id": "m1",
+            "amount": 10
+          }
+        ]
+      },
+      "expected": {
+        "receipts": [
+          "applied:m1",
+          "duplicate:m1"
+        ],
+        "balance": 10,
+        "inbox_ids": [
+          "m1"
+        ]
+      }
+    },
+    {
+      "id": "duplicate_does_not_block_new_message",
+      "category": "non-interference",
+      "input": {
+        "messages": [
+          {
+            "id": "m1",
+            "amount": 10
+          },
+          {
+            "id": "m1",
+            "amount": 10
+          },
+          {
+            "id": "m2",
+            "amount": 7
+          }
+        ]
+      },
+      "expected": {
+        "receipts": [
+          "applied:m1",
+          "duplicate:m1",
+          "applied:m2"
+        ],
+        "balance": 17,
+        "inbox_ids": [
+          "m1",
+          "m2"
+        ]
+      }
+    }
+  ]
+}

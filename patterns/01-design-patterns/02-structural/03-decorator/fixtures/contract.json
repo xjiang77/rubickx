@@ -1,0 +1,127 @@
+{
+  "pattern_id": "gof.structural.decorator",
+  "cases": [
+    {
+      "id": "auth_and_trace",
+      "category": "nominal",
+      "input": {
+        "decorators": [
+          "auth",
+          "trace"
+        ],
+        "token": "secret",
+        "requests": [
+          {
+            "path": "/orders",
+            "trace_id": "t1",
+            "headers": {
+              "Accept": "json"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "responses": [
+          {
+            "path": "/orders",
+            "headers": {
+              "Accept": "json",
+              "Authorization": "Bearer secret",
+              "X-Trace-Id": "t1"
+            },
+            "applied": [
+              "auth",
+              "trace"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_decorators",
+      "category": "boundary",
+      "input": {
+        "decorators": [],
+        "requests": [
+          {
+            "path": "/health",
+            "headers": {}
+          }
+        ]
+      },
+      "expected": {
+        "responses": [
+          {
+            "path": "/health",
+            "headers": {},
+            "applied": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "missing_token",
+      "category": "failure",
+      "input": {
+        "decorators": [
+          "auth"
+        ],
+        "requests": [
+          {
+            "path": "/orders",
+            "headers": {}
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "missing_token"
+      }
+    },
+    {
+      "id": "requests_do_not_share_headers",
+      "category": "non-interference",
+      "input": {
+        "decorators": [
+          "trace"
+        ],
+        "requests": [
+          {
+            "path": "/a",
+            "trace_id": "ta",
+            "headers": {
+              "X-Client": "a"
+            }
+          },
+          {
+            "path": "/b",
+            "trace_id": "tb",
+            "headers": {}
+          }
+        ]
+      },
+      "expected": {
+        "responses": [
+          {
+            "path": "/a",
+            "headers": {
+              "X-Client": "a",
+              "X-Trace-Id": "ta"
+            },
+            "applied": [
+              "trace"
+            ]
+          },
+          {
+            "path": "/b",
+            "headers": {
+              "X-Trace-Id": "tb"
+            },
+            "applied": [
+              "trace"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

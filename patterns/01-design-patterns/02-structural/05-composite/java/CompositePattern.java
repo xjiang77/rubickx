@@ -1,0 +1,8 @@
+import java.util.ArrayList;import java.util.List;import java.util.Map;
+final class CompositePattern{static final class PatternException extends RuntimeException{private final String code;PatternException(String c){super(c);code=c;}String code(){return code;}}
+  interface Component{boolean evaluate(Map<String,Object>context,List<String>trace);}
+  record Equals(String field,Object value)implements Component{public boolean evaluate(Map<String,Object>c,List<String>t){t.add(field);return java.util.Objects.equals(c.get(field),value);}}
+  record All(List<Component>children)implements Component{public boolean evaluate(Map<String,Object>c,List<String>t){for(Component child:children)if(!child.evaluate(c,t))return false;return true;}}
+  record AnyOf(List<Component>children)implements Component{public boolean evaluate(Map<String,Object>c,List<String>t){for(Component child:children)if(child.evaluate(c,t))return true;return false;}}
+  @SuppressWarnings("unchecked")static Component build(Map<String,Object>v){String kind=String.valueOf(v.get("type"));if(kind.equals("equals"))return new Equals(String.valueOf(v.get("field")),v.get("value"));if(kind.equals("all")||kind.equals("any")){List<Component>children=new ArrayList<>();for(Map<String,Object>child:(List<Map<String,Object>>)v.getOrDefault("children",List.of()))children.add(build(child));return kind.equals("all")?new All(children):new AnyOf(children);}throw new PatternException("unsupported_node");}
+  @SuppressWarnings("unchecked")static Object evaluate(Map<String,Object>input){List<String>trace=new ArrayList<>();boolean allowed=build((Map<String,Object>)input.get("tree")).evaluate((Map<String,Object>)input.getOrDefault("context",Map.of()),trace);return Map.of("allowed",allowed,"evaluated",trace);}}

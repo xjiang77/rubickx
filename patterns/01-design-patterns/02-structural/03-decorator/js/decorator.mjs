@@ -1,0 +1,6 @@
+export class PatternError extends Error{constructor(code){super(code);this.code=code;}}
+const copy=(request)=>({...request,headers:{...(request.headers??{})},applied:[...(request.applied??[])]});
+class BaseClient{send(request){const value=copy(request);return{path:value.path,headers:value.headers,applied:value.applied};}}
+class AuthDecorator{constructor(next,token){this.next=next;this.token=token;}send(request){if(!this.token)throw new PatternError("missing_token");const value=copy(request);value.headers.Authorization=`Bearer ${this.token}`;value.applied.push("auth");return this.next.send(value);}}
+class TraceDecorator{constructor(next){this.next=next;}send(request){if(!request.trace_id)throw new PatternError("missing_trace");const value=copy(request);value.headers["X-Trace-Id"]=request.trace_id;value.applied.push("trace");return this.next.send(value);}}
+export function evaluate(input){let client=new BaseClient();for(const name of [...(input.decorators??[])].reverse()){if(name==="auth")client=new AuthDecorator(client,input.token);else if(name==="trace")client=new TraceDecorator(client);else throw new PatternError("unsupported_decorator");}return{responses:(input.requests??[]).map((request)=>client.send(request))};}

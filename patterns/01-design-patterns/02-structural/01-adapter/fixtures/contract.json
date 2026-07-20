@@ -1,0 +1,66 @@
+{
+  "pattern_id": "gof.structural.adapter",
+  "cases": [
+    {
+      "id": "maps_request_and_response",
+      "category": "nominal",
+      "input": {
+        "request": {
+          "model": "chat-pro",
+          "messages": [
+            {"role": "system", "content": "Be concise."},
+            {"role": "user", "content": "hello"}
+          ],
+          "requires_tools": false
+        },
+        "provider_response": {"output": "hi", "stop_code": "stop"}
+      },
+      "expected": {
+        "mapped_request": {
+          "deployment": "legacy-chat-pro",
+          "prompt": "system: Be concise.\nuser: hello"
+        },
+        "response": {"content": "hi", "finish_reason": "stop"}
+      }
+    },
+    {
+      "id": "rejects_unknown_model",
+      "category": "boundary",
+      "input": {
+        "request": {
+          "model": "unknown",
+          "messages": [{"role": "user", "content": "hello"}],
+          "requires_tools": false
+        }
+      },
+      "expected_error": {"code": "invalid_request", "retryable": false}
+    },
+    {
+      "id": "normalizes_provider_error",
+      "category": "failure",
+      "input": {
+        "request": {
+          "model": "chat-pro",
+          "messages": [{"role": "user", "content": "hello"}],
+          "requires_tools": false
+        },
+        "provider_error": {"code": "OVER_QUOTA", "message": "quota exceeded"}
+      },
+      "expected_error": {"code": "rate_limited", "retryable": true}
+    },
+    {
+      "id": "rejects_unsupported_before_provider_call",
+      "category": "lifecycle",
+      "input": {
+        "request": {
+          "model": "chat-pro",
+          "messages": [{"role": "user", "content": "use a tool"}],
+          "requires_tools": true
+        }
+      },
+      "expected_error": {"code": "unsupported_capability", "retryable": false},
+      "expected": {"provider_calls": 0}
+    }
+  ]
+}
+

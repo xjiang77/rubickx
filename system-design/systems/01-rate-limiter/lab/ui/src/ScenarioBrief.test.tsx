@@ -1,7 +1,8 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ScenarioBrief } from "./ScenarioBrief";
 import type { ScenarioBriefViewModel } from "./scenarioBriefModel";
+import { renderWithI18n as render } from "./test/renderWithI18n";
 
 describe("ScenarioBrief", () => {
   it("makes a core scenario policy, traffic, expected admissions, and lesson visible before a run", () => {
@@ -92,5 +93,36 @@ describe("ScenarioBrief", () => {
     expect(screen.getByText("Custom comparison · Run to observe this algorithm")).toBeInTheDocument();
     expect(screen.queryByRole("list", { name: "Expected admission sequence" })).not.toBeInTheDocument();
     expect(screen.queryByRole("list", { name: "Expected behavior cases" })).not.toBeInTheDocument();
+  });
+
+  it("translates chrome while preserving scenario content and decision tokens", () => {
+    localStorage.setItem("rl-lab-uiLang", "zh");
+    const model: ScenarioBriefViewModel = {
+      policy: "limit 3 · window 1,000 ms",
+      traffic: "alice @ 0/100/200 ms",
+      expected: {
+        summary: "The first three requests are allowed.",
+        groups: [{ kind: "allow", label: "#1–3" }],
+        cases: [],
+      },
+      lesson: { label: "Concept", text: "Catalog lesson stays English." },
+      goPath: "System scenarios run through the Go end-to-end path.",
+    };
+
+    render(<ScenarioBrief model={model} />);
+
+    const brief = screen.getByRole("region", { name: "Scenario brief" });
+    expect(within(brief).getByRole("heading", { name: "场景简报" })).toBeInTheDocument();
+    expect(within(brief).getByRole("heading", { name: "策略" })).toBeInTheDocument();
+    expect(within(brief).getByRole("heading", { name: "流量" })).toBeInTheDocument();
+    expect(within(brief).getByRole("heading", { name: "预期" })).toBeInTheDocument();
+    expect(within(brief).getByText("概念")).toBeInTheDocument();
+    expect(within(brief).getByText("Go 链路")).toBeInTheDocument();
+    expect(within(brief).getByText("System 场景通过 Go 端到端链路运行。")).toBeInTheDocument();
+    expect(within(brief).getByText(model.policy)).toBeInTheDocument();
+    expect(within(brief).getByText(model.traffic)).toBeInTheDocument();
+    expect(within(brief).getByText(model.expected.summary)).toBeInTheDocument();
+    expect(within(brief).getByText(model.lesson!.text)).toBeInTheDocument();
+    expect(within(brief).getByText("ALLOW")).toBeInTheDocument();
   });
 });

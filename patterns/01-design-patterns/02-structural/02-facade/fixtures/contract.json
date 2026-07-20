@@ -1,0 +1,93 @@
+{
+  "pattern_id": "gof.structural.facade",
+  "cases": [
+    {
+      "id": "release_service",
+      "category": "nominal",
+      "input": {
+        "releases": [
+          {
+            "artifact": "app:v2",
+            "healthy": true
+          }
+        ]
+      },
+      "expected": {
+        "releases": [
+          {
+            "artifact": "app:v2",
+            "status": "released",
+            "steps": [
+              "validate:app:v2",
+              "deploy:app:v2",
+              "verify:app:v2"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty_batch",
+      "category": "boundary",
+      "input": {
+        "releases": []
+      },
+      "expected": {
+        "releases": []
+      }
+    },
+    {
+      "id": "health_failure",
+      "category": "failure",
+      "input": {
+        "releases": [
+          {
+            "artifact": "app:v3",
+            "healthy": false
+          }
+        ]
+      },
+      "expected_error": {
+        "code": "health_check_failed"
+      }
+    },
+    {
+      "id": "dry_run_and_release_are_isolated",
+      "category": "lifecycle",
+      "input": {
+        "releases": [
+          {
+            "artifact": "app:v4",
+            "dry_run": true,
+            "healthy": false
+          },
+          {
+            "artifact": "app:v5",
+            "healthy": true
+          }
+        ]
+      },
+      "expected": {
+        "releases": [
+          {
+            "artifact": "app:v4",
+            "status": "planned",
+            "steps": [
+              "validate:app:v4",
+              "plan:app:v4"
+            ]
+          },
+          {
+            "artifact": "app:v5",
+            "status": "released",
+            "steps": [
+              "validate:app:v5",
+              "deploy:app:v5",
+              "verify:app:v5"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "pattern_id": "data-messaging.saga",
+  "cases": [
+    {
+      "id": "all_steps_complete",
+      "category": "nominal",
+      "input": {
+        "steps": [
+          {
+            "name": "inventory",
+            "result": "success",
+            "compensation": "success"
+          },
+          {
+            "name": "payment",
+            "result": "success",
+            "compensation": "success"
+          }
+        ]
+      },
+      "expected": {
+        "status": "completed",
+        "completed": [
+          "inventory",
+          "payment"
+        ],
+        "failed_step": "none",
+        "failed_compensations": [],
+        "actions": [
+          "execute:inventory",
+          "execute:payment"
+        ]
+      }
+    },
+    {
+      "id": "first_step_fails",
+      "category": "boundary",
+      "input": {
+        "steps": [
+          {
+            "name": "inventory",
+            "result": "failure",
+            "compensation": "success"
+          }
+        ]
+      },
+      "expected": {
+        "status": "compensated",
+        "completed": [],
+        "failed_step": "inventory",
+        "failed_compensations": [],
+        "actions": [
+          "execute:inventory",
+          "failed:inventory"
+        ]
+      }
+    },
+    {
+      "id": "compensation_failure_requires_recovery",
+      "category": "failure",
+      "input": {
+        "steps": [
+          {
+            "name": "workspace",
+            "result": "success",
+            "compensation": "failure"
+          },
+          {
+            "name": "policy",
+            "result": "failure",
+            "compensation": "success"
+          }
+        ]
+      },
+      "expected": {
+        "status": "recovery_required",
+        "completed": [
+          "workspace"
+        ],
+        "failed_step": "policy",
+        "failed_compensations": [
+          "workspace"
+        ],
+        "actions": [
+          "execute:workspace",
+          "execute:policy",
+          "failed:policy",
+          "compensate:workspace:failure"
+        ]
+      }
+    },
+    {
+      "id": "successful_compensation_closes_failure",
+      "category": "lifecycle",
+      "input": {
+        "steps": [
+          {
+            "name": "inventory",
+            "result": "success",
+            "compensation": "success"
+          },
+          {
+            "name": "payment",
+            "result": "failure",
+            "compensation": "success"
+          }
+        ]
+      },
+      "expected": {
+        "status": "compensated",
+        "completed": [
+          "inventory"
+        ],
+        "failed_step": "payment",
+        "failed_compensations": [],
+        "actions": [
+          "execute:inventory",
+          "execute:payment",
+          "failed:payment",
+          "compensate:inventory:success"
+        ]
+      }
+    },
+    {
+      "id": "compensations_are_reverse_ordered",
+      "category": "non-interference",
+      "input": {
+        "steps": [
+          {
+            "name": "workspace",
+            "result": "success",
+            "compensation": "success"
+          },
+          {
+            "name": "license",
+            "result": "success",
+            "compensation": "success"
+          },
+          {
+            "name": "policy",
+            "result": "failure",
+            "compensation": "success"
+          }
+        ]
+      },
+      "expected": {
+        "status": "compensated",
+        "completed": [
+          "workspace",
+          "license"
+        ],
+        "failed_step": "policy",
+        "failed_compensations": [],
+        "actions": [
+          "execute:workspace",
+          "execute:license",
+          "execute:policy",
+          "failed:policy",
+          "compensate:license:success",
+          "compensate:workspace:success"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "pattern_id": "data-messaging.publisher-subscriber",
+  "cases": [
+    {
+      "id": "event_fans_out",
+      "category": "nominal",
+      "input": {
+        "events": [
+          {
+            "id": "e1",
+            "topic": "order"
+          }
+        ],
+        "subscribers": [
+          {
+            "name": "audit",
+            "topics": [
+              "order"
+            ],
+            "outcome": "success"
+          },
+          {
+            "name": "email",
+            "topics": [
+              "order"
+            ],
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "published": 1,
+        "deliveries": [
+          {
+            "event_id": "e1",
+            "subscriber": "audit",
+            "status": "delivered"
+          },
+          {
+            "event_id": "e1",
+            "subscriber": "email",
+            "status": "delivered"
+          }
+        ]
+      }
+    },
+    {
+      "id": "no_subscribers",
+      "category": "boundary",
+      "input": {
+        "events": [
+          {
+            "id": "e1",
+            "topic": "order"
+          }
+        ],
+        "subscribers": []
+      },
+      "expected": {
+        "published": 1,
+        "deliveries": []
+      }
+    },
+    {
+      "id": "one_failure_does_not_block_another",
+      "category": "failure",
+      "input": {
+        "events": [
+          {
+            "id": "e1",
+            "topic": "payment"
+          }
+        ],
+        "subscribers": [
+          {
+            "name": "analytics",
+            "topics": [
+              "payment"
+            ],
+            "outcome": "failure"
+          },
+          {
+            "name": "ledger",
+            "topics": [
+              "payment"
+            ],
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "published": 1,
+        "deliveries": [
+          {
+            "event_id": "e1",
+            "subscriber": "analytics",
+            "status": "failed"
+          },
+          {
+            "event_id": "e1",
+            "subscriber": "ledger",
+            "status": "delivered"
+          }
+        ]
+      }
+    },
+    {
+      "id": "multiple_events_preserve_pair_order",
+      "category": "lifecycle",
+      "input": {
+        "events": [
+          {
+            "id": "e1",
+            "topic": "order"
+          },
+          {
+            "id": "e2",
+            "topic": "usage"
+          }
+        ],
+        "subscribers": [
+          {
+            "name": "audit",
+            "topics": [
+              "order",
+              "usage"
+            ],
+            "outcome": "success"
+          },
+          {
+            "name": "billing",
+            "topics": [
+              "usage"
+            ],
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "published": 2,
+        "deliveries": [
+          {
+            "event_id": "e1",
+            "subscriber": "audit",
+            "status": "delivered"
+          },
+          {
+            "event_id": "e2",
+            "subscriber": "audit",
+            "status": "delivered"
+          },
+          {
+            "event_id": "e2",
+            "subscriber": "billing",
+            "status": "delivered"
+          }
+        ]
+      }
+    },
+    {
+      "id": "unmatched_topic_is_isolated",
+      "category": "non-interference",
+      "input": {
+        "events": [
+          {
+            "id": "e1",
+            "topic": "inventory"
+          }
+        ],
+        "subscribers": [
+          {
+            "name": "billing",
+            "topics": [
+              "usage"
+            ],
+            "outcome": "success"
+          }
+        ]
+      },
+      "expected": {
+        "published": 1,
+        "deliveries": []
+      }
+    }
+  ]
+}

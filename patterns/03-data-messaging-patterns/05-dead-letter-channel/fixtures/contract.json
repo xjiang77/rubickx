@@ -1,0 +1,153 @@
+{
+  "pattern_id": "data-messaging.dead-letter-channel",
+  "cases": [
+    {
+      "id": "transient_then_success",
+      "category": "nominal",
+      "input": {
+        "max_attempts": 2,
+        "messages": [
+          {
+            "id": "m1",
+            "outcomes": [
+              "transient",
+              "success"
+            ]
+          }
+        ],
+        "replay_ids": []
+      },
+      "expected": {
+        "processed": [
+          "m1"
+        ],
+        "dead_letters": [],
+        "receipts": [
+          "retry:m1:1",
+          "processed:m1:2"
+        ]
+      }
+    },
+    {
+      "id": "empty_queue",
+      "category": "boundary",
+      "input": {
+        "max_attempts": 2,
+        "messages": [],
+        "replay_ids": []
+      },
+      "expected": {
+        "processed": [],
+        "dead_letters": [],
+        "receipts": []
+      }
+    },
+    {
+      "id": "permanent_failure_is_isolated",
+      "category": "failure",
+      "input": {
+        "max_attempts": 3,
+        "messages": [
+          {
+            "id": "m1",
+            "outcomes": [
+              "permanent"
+            ]
+          }
+        ],
+        "replay_ids": []
+      },
+      "expected": {
+        "processed": [],
+        "dead_letters": [
+          {
+            "id": "m1",
+            "reason": "permanent",
+            "attempts": 1,
+            "status": "dead"
+          }
+        ],
+        "receipts": [
+          "dead:m1:permanent:1"
+        ]
+      }
+    },
+    {
+      "id": "exhausted_message_can_be_replayed",
+      "category": "lifecycle",
+      "input": {
+        "max_attempts": 2,
+        "messages": [
+          {
+            "id": "m1",
+            "outcomes": [
+              "transient",
+              "transient"
+            ],
+            "replay_outcome": "success"
+          }
+        ],
+        "replay_ids": [
+          "m1"
+        ]
+      },
+      "expected": {
+        "processed": [
+          "m1"
+        ],
+        "dead_letters": [
+          {
+            "id": "m1",
+            "reason": "transient_exhausted",
+            "attempts": 2,
+            "status": "replayed"
+          }
+        ],
+        "receipts": [
+          "retry:m1:1",
+          "dead:m1:transient_exhausted:2",
+          "replayed:m1"
+        ]
+      }
+    },
+    {
+      "id": "poison_message_does_not_block_next",
+      "category": "non-interference",
+      "input": {
+        "max_attempts": 1,
+        "messages": [
+          {
+            "id": "bad",
+            "outcomes": [
+              "permanent"
+            ]
+          },
+          {
+            "id": "good",
+            "outcomes": [
+              "success"
+            ]
+          }
+        ],
+        "replay_ids": []
+      },
+      "expected": {
+        "processed": [
+          "good"
+        ],
+        "dead_letters": [
+          {
+            "id": "bad",
+            "reason": "permanent",
+            "attempts": 1,
+            "status": "dead"
+          }
+        ],
+        "receipts": [
+          "dead:bad:permanent:1",
+          "processed:good:1"
+        ]
+      }
+    }
+  ]
+}

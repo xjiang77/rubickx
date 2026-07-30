@@ -23,6 +23,9 @@ algo/
         └── scala/   TwoSum.scala      + TwoSumTest.scala      (scala-cli + munit)
 ```
 
+Go 和 Java 目录里还各有一份**留空的练习**(`*_practice.go` / `*Practice.java`),
+签名和示例测试给好、核心算法留空,见 [PRACTICE.md](PRACTICE.md)。
+
 每题文件夹里 5 种实现并排,`NOTES.md` 是核心——讲清这道题在 5 种语言里**怎么写、为什么这么写、最近实践是什么**。
 
 ## 怎么跑测试
@@ -37,7 +40,14 @@ make test-js      # jest
 make test-go      # go test ./...
 make test-java    # javac + JUnit 5 console
 make test-scala   # scala-cli test 每个 problems/*/scala
+
+# 练习模式(自己手写的那一份,详见 PRACTICE.md)
+make practice     # Go + Java 练习
+make practice-go  # go test -tags practice ./...
+make practice-java
 ```
+
+> `make test` 只反映参考解,不会被没写完的练习拖红;`make practice` 只跑练习,拿到手时是全红的。
 
 ### 工具链版本(最近实践)
 

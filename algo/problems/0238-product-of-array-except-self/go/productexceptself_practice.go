@@ -1,0 +1,24 @@
+//go:build practice
+
+package productexceptself
+
+// ============================================================
+// 练习：Product of Array Except Self (LC 238)
+// 目标复杂度：时间 O(n)，除返回值外空间 O(1)
+//
+// 思路提示（想不起来再看，先自己憋一憋）：
+//   1. 题目禁止用除法（而且有 0 时除法本来就会炸）。
+//   2. 答案 = 左边所有数的积 × 右边所有数的积。
+//   3. 第一遍从左往右，把「前缀积」直接写进结果数组。
+//   4. 第二遍从右往左，用一个滚动变量累乘「后缀积」，乘到结果数组上，这样不额外开数组。
+//   5. 注意两遍都是「不含自己」：更新滚动变量的时机要在写结果之后。
+//
+// 跑测试： make practice-go
+//     或： go test -tags practice ./problems/0238-product-of-array-except-self/go/
+// 参考解在同目录的 productexceptself.go —— 卡死了再翻。
+// ============================================================
+
+func ProductExceptSelfPractice(nums []int) []int {
+	// TODO: 你来实现
+	return nil
+}

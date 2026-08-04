@@ -1,5 +1,27 @@
 # Valid Anagram(LC 242)· 五语言对比笔记
 
+## 题目
+
+> **LC 242. Valid Anagram（有效的字母异位词）· Easy** · <https://leetcode.cn/problems/valid-anagram/>
+
+给定两个字符串 s 和 t，判断 t 是否是 s 的**字母异位词**。
+字母异位词：t 由 s 的所有字母重新排列组成（每个字符出现次数完全相同）。
+
+**示例**
+
+```
+s = "anagram", t = "nagaram"  ->  true
+s = "rat",     t = "car"      ->  false
+```
+
+**约束**
+
+- 1 <= s.length, t.length <= 5 * 10^4
+- s 和 t 仅包含小写字母
+
+**进阶**：如果输入字符串包含 Unicode 字符怎么办？你的解法能否适配这种情况？
+
+
 ## 核心思路
 
 互为字母异位词 ⇔ **每个字符出现次数相同**。两条主流写法:

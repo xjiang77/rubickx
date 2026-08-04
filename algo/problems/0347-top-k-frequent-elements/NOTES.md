@@ -1,5 +1,29 @@
 # Top K Frequent Elements(LC 347)· 五语言对比笔记
 
+## 题目
+
+> **LC 347. Top K Frequent Elements（前 K 个高频元素）· Medium** · <https://leetcode.cn/problems/top-k-frequent-elements/>
+
+给定一个整数数组 nums 和一个整数 k，返回其中**出现频率前 k 高**的元素。
+可以按任意顺序返回答案。
+
+**示例**
+
+```
+nums = [1,1,1,2,2,3], k = 2   ->  [1,2]
+nums = [1],           k = 1   ->  [1]
+```
+
+**约束**
+
+- 1 <= nums.length <= 10^5
+- -10^4 <= nums[i] <= 10^4
+- k 的取值范围是 [1, 数组中不相同的元素的个数]
+- 题目数据保证答案唯一
+
+**进阶**：所设计算法的时间复杂度必须优于 O(n log n)。
+
+
 ## 核心思路(语言无关)
 
 两步:**计数** → **按频次取前 k**。取前 k 有三档方案:

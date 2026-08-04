@@ -6,6 +6,23 @@ package groupanagrams
 // 练习：Group Anagrams (LC 49)
 // 目标复杂度：时间 O(n·k·log k)（排序做 key）或 O(n·k)（计数做 key），空间 O(n·k)
 //
+// 题目 · LC 49. Group Anagrams（字母异位词分组）· Medium
+// https://leetcode.cn/problems/group-anagrams/
+//
+//   给定一个字符串数组 strs，把互为字母异位词的字符串组合在一起。
+//   可以按任意顺序返回结果列表，组内顺序也不做要求。
+//   字母异位词：由重新排列源单词的所有字母得到的新单词。
+//
+//   示例：
+//     strs = ["eat","tea","tan","ate","nat","bat"]
+//       ->  [["bat"],["nat","tan"],["ate","eat","tea"]]
+//     strs = [""]     ->  [[""]]
+//     strs = ["a"]    ->  [["a"]]
+//   约束：
+//     - 1 <= strs.length <= 10^4
+//     - 0 <= strs[i].length <= 100
+//     - strs[i] 仅包含小写英文字母
+//
 // 思路提示（想不起来再看，先自己憋一憋）：
 //   1. 核心是给每个字符串算一个「异位词之间相同」的规范 key。
 //   2. 最直白的 key：把字符排序后的字符串。

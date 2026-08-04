@@ -24,4 +24,14 @@ func TestTwoSumPractice(t *testing.T) {
 	//   - 负数 / 0 参与求和
 	//   - 无解时你的实现返回什么？（nil？空切片？）测试应该把这个约定钉死
 	//   - 返回的下标顺序有没有要求
+	nums, target = []int{3, 2, 4}, 6
+	want = []int{1, 2}
+	if got := TwoSumPractice(nums, target); !reflect.DeepEqual(got, want) {
+		t.Errorf("TwoSumPractice(%v, %d) = %v, want %v", nums, target, got, want)
+	}
+	nums, target = []int{3, 3}, 6
+	want = []int{0, 1}
+	if got := TwoSumPractice(nums, target); !reflect.DeepEqual(got, want) {
+		t.Errorf("TwoSumPractice(%v, %d) = %v, want %v", nums, target, got, want)
+	}
 }

@@ -1,0 +1,28 @@
+{
+  // 练习文件（*_practice.go / *_practice_test.go）都带 //go:build practice，
+  // 不加这个 tag 编辑器会把它们当成排除文件，Run test 也会「no tests to run」。
+  "go.buildTags": "practice",
+  "go.testTags": "practice",
+  "gopls": {
+    "build.buildFlags": ["-tags=practice"]
+  },
+  "java.project.sourcePaths": [
+    "algo/problems/0001-two-sum/java",
+    "algo/problems/0036-valid-sudoku/java",
+    "algo/problems/0049-group-anagrams/java",
+    "algo/problems/0128-longest-consecutive-sequence/java",
+    "algo/problems/0217-contains-duplicate/java",
+    "algo/problems/0238-product-of-array-except-self/java",
+    "algo/problems/0242-valid-anagram/java",
+    "algo/problems/0347-top-k-frequent-elements/java",
+    "system-design/systems/01-rate-limiter/java",
+    "system-design/systems/01-rate-limiter/lab/runners/java"
+  ],
+  "java.project.outputPath": "out/cursor-java",
+  "java.project.referencedLibraries": {
+    "include": [
+      "algo/.cache/junit-platform-console-standalone-*.jar",
+      "system-design/.cache/junit-platform-console-standalone-*.jar"
+    ]
+  }
+}

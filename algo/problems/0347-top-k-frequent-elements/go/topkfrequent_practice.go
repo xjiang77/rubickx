@@ -35,6 +35,20 @@ package topkfrequent
 // ============================================================
 
 func TopKFrequentPractice(nums []int, k int) []int {
-	// TODO: 你来实现
-	return nil
+	// 1. 计数
+	freqMap := make(map[int]int, len(nums))
+	for _, num := range nums {
+		freqMap[num]++
+	}
+	// 2. 桶排序
+	buckets := make([][]int, len(nums)+1)
+	for num, freq := range freqMap {
+		buckets[freq] = append(buckets[freq], num)
+	}
+	// 3. 从高频桶往低频桶倒着扫，收满 k 个就停
+	res := make([]int, 0, k)
+	for i := len(buckets) - 1; i >= 0 && len(res) < k; i-- {
+		res = append(res, buckets[i]...)
+	}
+	return res[:k]
 }

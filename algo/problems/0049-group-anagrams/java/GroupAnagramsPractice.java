@@ -38,7 +38,31 @@ import java.util.Map;
 public class GroupAnagramsPractice {
 
     public static List<List<String>> groupAnagrams(String[] strs) {
-        // TODO: 你来实现
-        return new ArrayList<>();
+        Map<String, List<String>> map = new HashMap<>();
+        for (String str : strs) {
+            String normalized = normalizeCountString(str);
+            map.computeIfAbsent(normalized, k -> new ArrayList<>()).add(str);
+        }
+        return new ArrayList<>(map.values());
+    }
+
+    private static String normalizeSortedString(String str) {
+        char[] chars = str.toCharArray();
+        Arrays.sort(chars);
+        return new String(chars);
+    }
+
+    private static String normalizeCountString(String str) {
+        int[] count = new int[26];
+        for (char c : str.toCharArray()) {
+            count[c - 'a']++;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 26; i++) {
+            if (count[i] > 0) {
+                sb.append((char) (i + 'a')).append(count[i]);
+            }
+        }
+        return sb.toString();
     }
 }

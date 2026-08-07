@@ -18,6 +18,30 @@ public class TopKFrequentPracticeTest {
         assertArrayEquals(new int[] {1, 2}, got);
     }
 
+    @Test
+    void testK1() {
+        int[] got = TopKFrequentPractice.topKFrequent(new int[] {1}, 1);
+        assertArrayEquals(new int[] {1}, got);
+    }
+
+
+    @Test
+    void testSingleElementArray() {
+        int[] got = TopKFrequentPractice.topKFrequent(new int[] {1}, 1);
+        assertArrayEquals(new int[] {1}, got);
+    }
+
+    @Test
+    void testBoundaryCase() {
+        int[] got = TopKFrequentPractice.topKFrequent(new int[] {1, 1, 2, 2, 3}, 2);
+        assertArrayEquals(new int[] {1, 2}, got);
+    }
+
+    @Test
+    void testMultipleElementsWithSameFrequency() {
+        int[] got = TopKFrequentPractice.topKFrequent(new int[] {1, 1, 2, 2, 3}, 2);
+        assertArrayEquals(new int[] {1, 2}, got);
+    }
     // TODO: 补充更多场景
     //   - k=1，只取最高频
     //   - k 等于不同元素的个数（等于全取）

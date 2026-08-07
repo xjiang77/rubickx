@@ -1,5 +1,5 @@
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -10,10 +10,59 @@ public class ContainsDuplicatePracticeTest {
 
     // 示例测试。
     @Test
-    void example() {
+    void testExample() {
         assertTrue(ContainsDuplicatePractice.containsDuplicate(new int[] {1, 2, 3, 1}));
     }
 
+    @Test
+    void testAllDifferent() {
+        assertFalse(ContainsDuplicatePractice.containsDuplicate(new int[] {1, 2, 3, 4}));
+    }
+
+    @Test
+    void testAdjacentDuplicate() {
+        assertTrue(ContainsDuplicatePractice.containsDuplicate(new int[] {1, 1, 2, 3}));
+    }
+
+    @Test
+    void testDuplicateAtEnd() {
+        assertTrue(ContainsDuplicatePractice.containsDuplicate(new int[] {1, 2, 3, 1}));
+    }
+
+    @Test
+    void testEmptyArray() {
+        assertFalse(ContainsDuplicatePractice.containsDuplicate(new int[] {}));
+    }
+
+    @Test
+    void testSingleElement() {
+        assertFalse(ContainsDuplicatePractice.containsDuplicate(new int[] {1}));
+    }
+
+    @Test
+    void testNegativeNumbers() {
+        assertFalse(ContainsDuplicatePractice.containsDuplicate(new int[] {-1, -2, -3, -4}));
+    }
+
+    @Test
+    void testZero() {
+        assertTrue(ContainsDuplicatePractice.containsDuplicate(new int[] {0, 0, 0, 0}));
+    }
+
+    @Test
+    void testAllSameValue() {
+        assertTrue(ContainsDuplicatePractice.containsDuplicate(new int[] {1, 1, 1, 1}));
+    }
+
+    @Test
+    void testLargeArray() {
+        assertFalse(ContainsDuplicatePractice.containsDuplicate(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}));
+    }
+
+    @Test
+    void testLargeArrayWithDuplicate() {
+        assertTrue(ContainsDuplicatePractice.containsDuplicate(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1}));
+    }
     // TODO: 补充更多场景
     //   - 全不重复：[1,2,3,4] -> false
     //   - 相邻重复：[1,1] -> true

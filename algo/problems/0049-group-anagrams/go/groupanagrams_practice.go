@@ -2,6 +2,11 @@
 
 package groupanagrams
 
+import (
+	"strconv"
+	"strings"
+)
+
 // ============================================================
 // 练习：Group Anagrams (LC 49)
 // 目标复杂度：时间 O(n·k·log k)（排序做 key）或 O(n·k)（计数做 key），空间 O(n·k)
@@ -36,6 +41,29 @@ package groupanagrams
 // ============================================================
 
 func GroupAnagramsPractice(strs []string) [][]string {
-	// TODO: 你来实现
-	return nil
+	normalizedMap := make(map[string][]string)
+	for _, str := range strs {
+		normalizedKey := normalizeCountString(str)
+		normalizedMap[normalizedKey] = append(normalizedMap[normalizedKey], str)
+	}
+	result := make([][]string, 0, len(normalizedMap))
+	for _, group := range normalizedMap {
+		result = append(result, group)
+	}
+	return result
+}
+
+func normalizeCountString(str string) string {
+	count := make([]int, 26)
+	for _, c := range str {
+		count[c-'a']++
+	}
+	sb := strings.Builder{}
+	for i := 0; i < 26; i++ {
+		if count[i] > 0 {
+			sb.WriteByte(byte(i + 'a'))
+			sb.WriteString(strconv.Itoa(count[i]))
+		}
+	}
+	return sb.String()
 }

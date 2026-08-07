@@ -2,7 +2,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
 // ============================================================
 // 练习：Top K Frequent Elements (LC 347)
 // 目标复杂度：时间 O(n)，空间 O(n)
@@ -36,7 +37,42 @@ import java.util.Map;
 public class TopKFrequentPractice {
 
     public static int[] topKFrequent(int[] nums, int k) {
-        // TODO: 你来实现
-        return new int[0];
+        // 1. 计数
+        Map<Integer, Integer> freqMap = new HashMap<>();
+        for (int num : nums) {
+            freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
+        }
+        // 2. 桶排序：下标=频次
+        @SuppressWarnings("unchecked")
+        List<Integer>[] buckets = new List[nums.length + 1];
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = new ArrayList<>();
+        }
+        for (Entry<Integer, Integer> entry : freqMap.entrySet()) {
+            buckets[entry.getValue()].add(entry.getKey());
+        }
+        // 3. 从高频桶向低频收集 k 个。
+        int[] result = new int[k];
+        int idx = 0;
+        for (int c = nums.length; c > 0 && idx < k; c--) {
+            for (int num : buckets[c]) {
+                result[idx++] = num;
+                if (idx == k) {
+                    return result;
+                }
+            }
+        }
+        return result;
     }
+    //PriorityQueue<Entry<Integer, Integer>> minHeap = new PriorityQueue<>((a, b) -> a.getValue() - b.getValue());
+    // for (Entry<Integer, Integer> entry : freqMap.entrySet()) {
+    //     minHeap.offer(entry);
+    //     if (minHeap.size() > k) {
+    //         minHeap.poll();
+    //     }
+    // }
+    // int[] result = new int[k];
+    // for (int i = 0; i < k; i++) {
+    //     result[i] = minHeap.poll().getKey();
+    // }
 }

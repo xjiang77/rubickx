@@ -31,6 +31,8 @@ public class GroupAnagramsPracticeTest {
                         new String[] {"eat", "tea", "tan", "ate", "nat", "bat"});
         List<List<String>> want =
                 List.of(List.of("bat"), List.of("nat", "tan"), List.of("ate", "eat", "tea"));
+        System.out.println("got: " + got);
+        System.out.println("want: " + want);
         assertEquals(norm(want), norm(got));
     }
 

@@ -8,7 +8,7 @@ The upstream project provides Python reference implementations and trilingual do
 
 ## Project Structure
 
-The top level follows the four skills in Andrew Ng's [AI Engineering Skills Map](https://www.deeplearning.ai/the-batch/the-ai-engineering-skills-map) (Aug 2026); `deps/`, `web/`, `learning/`, and `tests/` are supporting surfaces, not skills.
+The top level follows the four skills in Andrew Ng's [AI Engineering Skills Map](https://www.deeplearning.ai/the-batch/the-ai-engineering-skills-map) (Aug 2026); `deps/`, `web/`, and `tests/` are supporting surfaces, not skills.
 
 ```
 rubickx/
@@ -19,6 +19,7 @@ rubickx/
 │   ├── agent-loop-trpc/       #   Same 12 sessions on trpc-agent-go
 │   └── nanochat/              #   LLM systems rewritten from scratch + micrograd
 ├── 02-se-fundamentals/        # Software engineering fundamentals
+│   ├── git-course/            # Interactive Git fundamentals (Vite + React)
 │   ├── algo/                  #   Algorithms and data structures in five languages
 │   ├── patterns/              #   42 engineering patterns, four languages + shared contract tests
 │   ├── system-design/         #   Runnable system-design components and labs
@@ -29,12 +30,27 @@ rubickx/
 │   └── harness/               #   Content-curation decision harness: cases + grader
 ├── deps/learn-claude-code/    # Upstream course (git submodule)
 ├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
-├── learning/                  # Interactive course app (Vite + React)
 ├── web/                       # GitHub Pages landing page
 ├── tests/                     # Root-level tests
 ├── skills -> deps/.../skills  # symlink (runtime compatibility)
 └── .github/workflows/         # CI
 ```
+
+## Skills Map
+
+| Ng skill | Track directory | Content | Verification |
+| --- | --- | --- | --- |
+| Building and deploying AI applications | [`01-ai-applications/agent-loop/`](01-ai-applications/agent-loop/) | 12 Go agent sessions | `make check` |
+| Building and deploying AI applications | [`01-ai-applications/agent-loop-trpc/`](01-ai-applications/agent-loop-trpc/) | The same 12 sessions on trpc-agent-go | `make check-trpc` |
+| Building and deploying AI applications | [`01-ai-applications/nanochat/`](01-ai-applications/nanochat/) | LLM systems from scratch + micrograd | Per-system `test_impl.py` and `parity.py` (includes TODO scaffolds) |
+| Software engineering fundamentals | [`02-se-fundamentals/git-course/`](02-se-fundamentals/git-course/) | Working tree, index, commits, and HEAD | `make verify-learning-git-gate1` |
+| Software engineering fundamentals | [`02-se-fundamentals/algo/`](02-se-fundamentals/algo/) | Algorithms and data structures in five languages | `make -C 02-se-fundamentals/algo test` |
+| Software engineering fundamentals | [`02-se-fundamentals/patterns/`](02-se-fundamentals/patterns/) | 42 engineering patterns with four-language contract tests | `make -C 02-se-fundamentals/patterns verify` |
+| Software engineering fundamentals | [`02-se-fundamentals/system-design/`](02-se-fundamentals/system-design/) | System-design components and HTTP / Redis lab | `make -C 02-se-fundamentals/system-design test` |
+| Software engineering fundamentals | [`02-se-fundamentals/network-security/`](02-se-fundamentals/network-security/) | 10 loopback network-security labs | `make -C 02-se-fundamentals/network-security verify` |
+| Software engineering fundamentals | [`02-se-fundamentals/systems-foundations/`](02-se-fundamentals/systems-foundations/) | Go execution-model and distributed-semantics experiments | `cd 02-se-fundamentals/systems-foundations && go test -race ./... && go vet ./...` |
+| Using coding agents | [`03-coding-agents/`](03-coding-agents/) | Agent workflow, configuration, and verifier inventory | See the README verifier inventory |
+| Shaping the build | [`04-shaping-the-build/harness/`](04-shaping-the-build/harness/) | Content-curation decisions: cases and grader | `make test-harness` |
 
 ## Getting Started
 
@@ -49,7 +65,7 @@ git submodule update --init --recursive
 
 ## Learning Source Repos
 
-The Rubickx homepage is now a learning repo / website index, implemented in [web/index.html](web/index.html).
+The Rubickx homepage groups tracks and reference resources by the four skills, implemented in [web/index.html](web/index.html).
 
 Current source-backed learning resources:
 

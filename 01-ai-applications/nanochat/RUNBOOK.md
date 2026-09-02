@@ -1,12 +1,16 @@
 # RUNBOOK — 跑参考实现 nanochat-mlx
 
-> 参考实现(只读对照):`../deps/nanochat-mlx/`(submodule)。
+> 参考实现（只读对照）：[scasella/nanochat-mlx](https://github.com/scasella/nanochat-mlx)。它未作为 submodule 引入本仓库；需要运行时，在仓库外单独 clone，并记录所用 commit。
 > 命令名取自上游 README 的 2026-06 快照(implementation-notes #8)。**以仓库内实际 README 为准**;若脚本名变了,在 vault implementation-notes 记一笔。
 
 ## 0. 环境(M2 Ultra · MLX)
 
+将 `/path/to/nanochat-mlx` 替换为仓库外的实际路径；已有 checkout 时跳过 clone。
+
 ```bash
-cd deps/nanochat-mlx
+git clone https://github.com/scasella/nanochat-mlx.git /path/to/nanochat-mlx
+cd /path/to/nanochat-mlx
+git rev-parse HEAD       # 写入 vault Experiment Log，便于复现
 uv sync                 # 或按其 README 装依赖
 ```
 

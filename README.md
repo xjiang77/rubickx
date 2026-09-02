@@ -8,7 +8,7 @@
 
 ## 项目结构
 
-顶层按 Andrew Ng 的 [AI Engineering Skills Map](https://www.deeplearning.ai/the-batch/the-ai-engineering-skills-map)（2026-08）四项技能组织；`deps/`、`web/`、`learning/`、`tests/` 是支撑面，不表达技能。
+顶层按 Andrew Ng 的 [AI Engineering Skills Map](https://www.deeplearning.ai/the-batch/the-ai-engineering-skills-map)（2026-08）四项技能组织；`deps/`、`web/`、`tests/` 是支撑面，不表达技能。
 
 ```
 rubickx/
@@ -19,6 +19,7 @@ rubickx/
 │   ├── agent-loop-trpc/       #   同 12 课的 trpc-agent-go 实现
 │   └── nanochat/              #   LLM 十系统从零重写 + micrograd
 ├── 02-se-fundamentals/        # Software engineering fundamentals
+│   ├── git-course/            # 交互式 Git 基础课程（Vite + React）
 │   ├── algo/                  #   算法与数据结构，五语言
 │   ├── patterns/              #   42 项工程模式，四语言 + 共享 contract tests
 │   ├── system-design/         #   可运行的系统设计组件与 Lab
@@ -29,7 +30,6 @@ rubickx/
 │   └── harness/               #   内容策展决策 harness：cases + grader
 ├── deps/learn-claude-code/    # Learn Claude Code 上游课程 (git submodule)
 ├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
-├── learning/                  # 交互式课程 app（Vite + React）
 ├── web/                       # GitHub Pages 静态首页
 ├── tests/                     # 根级测试
 ├── skills -> deps/.../skills  # symlink (运行时兼容)
@@ -38,13 +38,19 @@ rubickx/
 
 ## Skills Map
 
-| Ng 技能 | 目录 | 内容 | 验证 |
+| Ng 技能 | Track 目录 | 内容 | 验证（仓库根目录执行） |
 | --- | --- | --- | --- |
-| Building and deploying AI applications | `01-ai-applications/` | nanochat；agent-loop、agent-loop-trpc | `make check check-trpc`；各 system 的 `test_impl.py` |
-| Software engineering fundamentals | `02-se-fundamentals/` | algo、patterns、system-design、network-security；systems-foundations | `make -C 02-se-fundamentals/<track> test` 或 `verify` |
-| Using coding agents | `03-coding-agents/` | 本仓库的 agent 配置、hook、verifier 清单与 spec 约定 | 见其 README |
-| Shaping the build | `04-shaping-the-build/` | harness：判断材料值不值得沉淀、转成什么 | `make test-harness` |
-
+| Building and deploying AI applications | [`01-ai-applications/agent-loop/`](01-ai-applications/agent-loop/) | 12 课 Go agent 机制 | `make check` |
+| Building and deploying AI applications | [`01-ai-applications/agent-loop-trpc/`](01-ai-applications/agent-loop-trpc/) | 同 12 课的 trpc-agent-go 实现 | `make check-trpc` |
+| Building and deploying AI applications | [`01-ai-applications/nanochat/`](01-ai-applications/nanochat/) | LLM 十系统重写 + micrograd | 各 system 的 `test_impl.py` 与 `parity.py`（含待实现骨架） |
+| Software engineering fundamentals | [`02-se-fundamentals/git-course/`](02-se-fundamentals/git-course/) | Working tree、index、commit graph 与 HEAD | `make verify-learning-git-gate1` |
+| Software engineering fundamentals | [`02-se-fundamentals/algo/`](02-se-fundamentals/algo/) | 五语言算法与数据结构 | `make -C 02-se-fundamentals/algo test` |
+| Software engineering fundamentals | [`02-se-fundamentals/patterns/`](02-se-fundamentals/patterns/) | 42 项四语言工程模式与 contract tests | `make -C 02-se-fundamentals/patterns verify` |
+| Software engineering fundamentals | [`02-se-fundamentals/system-design/`](02-se-fundamentals/system-design/) | 系统设计组件与 HTTP / Redis lab | `make -C 02-se-fundamentals/system-design test` |
+| Software engineering fundamentals | [`02-se-fundamentals/network-security/`](02-se-fundamentals/network-security/) | 10 个 loopback 网络安全 labs | `make -C 02-se-fundamentals/network-security verify` |
+| Software engineering fundamentals | [`02-se-fundamentals/systems-foundations/`](02-se-fundamentals/systems-foundations/) | Go 执行模型与分布式语义实验 | `cd 02-se-fundamentals/systems-foundations && go test -race ./... && go vet ./...` |
+| Using coding agents | [`03-coding-agents/`](03-coding-agents/) | 本仓库的 agent 工作流、配置与 verifier 清单 | 见 README 的 verifier 清单 |
+| Shaping the build | [`04-shaping-the-build/harness/`](04-shaping-the-build/harness/) | 内容策展决策：cases + grader | `make test-harness` |
 
 ## 快速开始
 
@@ -59,7 +65,7 @@ git submodule update --init --recursive
 
 ## 学习资源源码
 
-Rubickx 首页现在是一个学习 repo / website 索引，入口在 [web/index.html](web/index.html)。
+Rubickx 首页按四项技能组织 track 与参考资源，入口在 [web/index.html](web/index.html)。
 
 当前收录的源码资源：
 

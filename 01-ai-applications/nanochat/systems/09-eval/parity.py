@@ -4,7 +4,7 @@
 用法:同一输入分别喂给 你的 impl 和参考(评测 harness / CORE),比较输出/数值。
 """
 # from impl import ...
-# import sys; sys.path.insert(0, "../../deps/nanochat-mlx")  # 参考实现
+# 参考实现未内置；对拍前按 ../../RUNBOOK.md 配置外部 checkout 并记录版本。
 
 TOL = 1e-4  # 数值对齐容差(按系统调整)
 

@@ -199,12 +199,12 @@ out/
 .tasks/
 .teams/
 04-shaping-the-build/harness/runs/
-learning/node_modules/
-learning/dist/
-learning/test-results/
-learning/playwright-report/
-learning/.playwright-cli/
-learning/*.tsbuildinfo
+02-se-fundamentals/git-course/node_modules/
+02-se-fundamentals/git-course/dist/
+02-se-fundamentals/git-course/test-results/
+02-se-fundamentals/git-course/playwright-report/
+02-se-fundamentals/git-course/.playwright-cli/
+02-se-fundamentals/git-course/*.tsbuildinfo
 .pages-site/
 
 # Ruff stuff:

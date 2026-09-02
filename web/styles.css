@@ -78,6 +78,25 @@ h1 {
   line-height: 1.75;
 }
 
+.pillar-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 24px;
+  line-height: 1.6;
+}
+
+.tracks {
+  padding-left: 22px;
+  margin: 18px 0 0;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.tracks li + li {
+  margin-top: 8px;
+}
+
 .resources {
   margin-top: 42px;
   border-top: 1px solid var(--line);

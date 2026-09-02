@@ -8,17 +8,17 @@
 | rubickx 约定 | agent-loop/ track | nanochat/ track |
 |---|---|---|
 | 同级 track 目录 | `agent-loop/` | `nanochat/`(本目录) |
-| 参考上游 submodule | `deps/learn-claude-code` | `deps/nanochat-mlx` |
+| 参考上游 | 根目录 `deps/learn-claude-code`（submodule） | [scasella/nanochat-mlx](https://github.com/scasella/nanochat-mlx)（外部参考，未纳入本仓库） |
 | 编号课程/系统 | `agent-loop/s01…s12` | `nanochat/systems/01…10` |
 | walkthrough 文档 | `agent-loop/docs/zh` | `nanochat/docs/zh` |
 
 ## 权威文档(canonical 在 vault)
 
-规范 / 计划 / 决策日志维持在 Obsidian vault(项目不变量 C2:知识·计划·规范进 vault,源码进 rubickx)。本 track 的代码与代码邻接产物在这里;走读结论的 durable insight 晋升 vault `03_Slipbox/01_AI/`。
+规范 / 计划 / 决策日志维持在 Obsidian vault(项目不变量 C2:知识·计划·规范进 vault,源码进 rubickx)。本 track 的代码与代码邻接产物在这里;走读结论的 durable insight 晋升 vault `02_Knowledge/01_AI/`。
 
-- SPEC(权威契约):vault `01_Projects/Nanochat/SPEC - nanochat Foundations Learning Plan.md`
-- 实现决策日志:vault `01_Projects/Nanochat/implementation-notes.md`
-- 实验记录(每个实验必落):vault `01_Projects/Nanochat/nanochat - Experiment Log.md`
+- SPEC(权威契约):vault `04_Projects/Rubickx/01 - Nanochat/SPEC - nanochat Foundations Learning Plan.md`
+- 实现决策日志:vault `04_Projects/Rubickx/01 - Nanochat/implementation-notes.md`
+- 实验记录(每个实验必落):vault `04_Projects/Rubickx/01 - Nanochat/nanochat - Experiment Log.md`
 - 母计划 04 / 地基课 05:同目录
 
 ## 目录结构
@@ -36,8 +36,6 @@ nanochat/
 ├── docs/zh/             # walkthrough 文档(对齐 agent-loop/docs/zh)
 ├── experiments/         # 临时脚本/结果(结论回写 vault Log)
 └── shared/              # 跨系统复用(保持薄)
-
-../deps/nanochat-mlx/    # 参考实现(submodule,只读对照)
 ```
 
 ## 重写顺序(按依赖)→ SPEC 需求
@@ -56,6 +54,6 @@ nanochat/
 
 ## 每个系统的工作流
 
-`学/复习 → 走读(deps/nanochat-mlx) → 实践(impl.py 本人手写) → 验证(test_impl + parity 对拍) → 落 vault Log`。
+`学/复习 → 走读(外部 nanochat-mlx checkout) → 实践(impl.py 本人手写) → 验证(test_impl + parity 对拍) → 落 vault Log`。
 
 > C5 学习诚实:`systems/*/impl.py` 与 `from-scratch/*` 必须本人手写,agent 不代写;agent 可讲概念、review、帮搭 parity 对拍框架。

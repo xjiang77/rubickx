@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rubickx | 学习资源</title>
+    <title>rubickx | Skills Map</title>
     <meta
       name="description"
-      content="rubickx 收录值得系统学习和改造的 AI coding、agent engineering 与 learning engineering repo / website。"
+      content="rubickx Skills Map：四项 AI Engineering 技能、学习 track、参考课程与源码入口。"
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./styles.css" />
@@ -19,146 +19,77 @@
           <a href="https://github.com/xjiang77/rubickx" target="_blank" rel="noreferrer">GitHub</a>
         </nav>
 
-        <p class="eyebrow">Learning repo / website index</p>
-        <h1>学习资源</h1>
+        <p class="eyebrow">AI Engineering / Skills Map</p>
+        <h1>四项技能，一张学习地图</h1>
         <p class="intro">
-          收录值得持续学习、复刻和改造的 repo / website。每个条目保留学习入口、
-          上游源码、本地源码位置和源码状态。
+          按 AI Engineering Skills Map 浏览学习 track，进入源码、实验与验证说明。
+          参考课程保留网站、上游与本地源码入口。
         </p>
       </header>
 
-      <main class="resources" aria-label="Learning resources">
-        <article class="resource">
-          <div class="resource-title">
-            <h2>Engineering Patterns</h2>
-            <span>42 code-backed patterns</span>
-          </div>
-          <p>
-            用共享 contract fixture 对齐 Python、Go、Java 与 JavaScript 实现。
-            Catalog 覆盖 GoF、Reliability、Data &amp; Messaging 与 Concurrency，
-            每项都包含失败和生命周期证据。
-          </p>
-          <p class="why">
-            价值：把设计模式从概念和类图推进到可运行、可比较、可回归的工程证据。
-          </p>
-          <dl class="meta">
-            <div>
-              <dt>Topics</dt>
-              <dd>GoF, Reliability, Messaging, Concurrency, Four-language Tests</dd>
-            </div>
-            <div>
-              <dt>Source</dt>
-              <dd>
-                <a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/patterns" target="_blank" rel="noreferrer">
-                  02-se-fundamentals/patterns/
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt>Local Source</dt>
-              <dd><code>02-se-fundamentals/patterns/</code></dd>
-            </div>
-            <div>
-              <dt>Verification</dt>
-              <dd><code>make -C 02-se-fundamentals/patterns verify</code></dd>
-            </div>
-          </dl>
-        </article>
+      <nav class="pillar-nav" aria-label="Skills Map">
+        <a href="#01-ai-applications">01 构建 AI 应用</a>
+        <a href="#02-se-fundamentals">02 软件工程基础</a>
+        <a href="#03-coding-agents">03 使用 coding agents</a>
+        <a href="#04-shaping-the-build">04 决定构建什么</a>
+      </nav>
 
-        <article class="resource">
+      <main class="resources" aria-label="Skills Map tracks">
+        <section class="resource" id="01-ai-applications" aria-labelledby="01-ai-applications-title">
           <div class="resource-title">
-            <h2>Learn Claude Code</h2>
-            <span>已引入</span>
+            <h2 id="01-ai-applications-title">01 · 构建 AI 应用</h2>
           </div>
-          <p>
-            Rubickx 当前 Go 课程实现的上游来源。重点学习 agent loop、tool use、
-            skill loading、context compact、task system、team protocols、
-            worktree isolation 等 agent harness 机制。
-          </p>
-          <p class="why">
-            价值：把 coding agent 的核心能力拆成 12 个递进 session，适合作为理解
-            terminal-native agent workflow 的基础教材。
-          </p>
+          <p>Building and deploying AI applications — 从 agent loop 到 LLM 构件，通过实现、测试与对拍理解系统。</p>
+          <ul class="tracks">
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/agent-loop" target="_blank" rel="noreferrer">agent-loop</a> — 12 课 Go agent 机制</li>
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/agent-loop-trpc" target="_blank" rel="noreferrer">agent-loop-trpc</a> — 同 12 课的 trpc-agent-go 实现</li>
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/nanochat" target="_blank" rel="noreferrer">nanochat</a> — LLM 十系统重写 + micrograd</li>
+          </ul>
           <dl class="meta">
             <div>
-              <dt>Topics</dt>
-              <dd>Agent Loop, Tool Use, Skill Loading, Context Compact, Worktree Isolation</dd>
-            </div>
-            <div>
-              <dt>Website</dt>
-              <dd><a href="https://learn.shareai.run/" target="_blank" rel="noreferrer">learn.shareai.run</a></dd>
-            </div>
-            <div>
-              <dt>Upstream</dt>
-              <dd>
-                <a href="https://github.com/shareAI-lab/learn-claude-code" target="_blank" rel="noreferrer">
-                  shareAI-lab/learn-claude-code
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt>Local Source</dt>
-              <dd><code>deps/learn-claude-code</code></dd>
-            </div>
-            <div>
-              <dt>Source Status</dt>
-              <dd>已作为 submodule 引入，保持现有上游引用。</dd>
+              <dt>参考课程</dt>
+              <dd><a href="https://learn.shareai.run/" target="_blank" rel="noreferrer">Learn Claude Code</a> · <a href="https://github.com/shareAI-lab/learn-claude-code" target="_blank" rel="noreferrer">上游源码</a><br /><code>deps/learn-claude-code</code>（已引入 submodule）</dd>
             </div>
           </dl>
-        </article>
-
-        <article class="resource">
+        </section>
+        <section class="resource" id="02-se-fundamentals" aria-labelledby="02-se-fundamentals-title">
           <div class="resource-title">
-            <h2>Learn Harness Engineering</h2>
-            <span>fork submodule 已引入</span>
+            <h2 id="02-se-fundamentals-title">02 · 软件工程基础</h2>
           </div>
-          <p>
-            系统学习 coding agent 的 instructions、state、verification、scope、
-            session lifecycle 等 harness 子系统。后续可基于本地 fork 源码继续改造。
-          </p>
-          <p class="why">
-            价值：把“如何稳定使用 coding agent”拆成可执行的工程问题，适合建立 Rubickx
-            后续课程、评测和源码改造的基础框架。
-          </p>
+          <p>Software engineering fundamentals — 用算法、工程模式与系统实验练习实现、验证和技术取舍。</p>
+          <ul class="tracks">
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/git-course" target="_blank" rel="noreferrer">git-course</a> — 交互式 Git 基础：working tree、index、commit graph 与 HEAD</li>
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/algo" target="_blank" rel="noreferrer">algo</a> — 五语言算法与数据结构</li>
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/patterns" target="_blank" rel="noreferrer">patterns</a> — 42 项四语言工程模式与 contract tests</li>
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/system-design" target="_blank" rel="noreferrer">system-design</a> — 系统设计组件与 HTTP / Redis lab</li>
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/network-security" target="_blank" rel="noreferrer">network-security</a> — 10 个 loopback 网络安全 labs</li>
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/systems-foundations" target="_blank" rel="noreferrer">systems-foundations</a> — Go 执行模型与分布式语义实验</li>
+          </ul>
+        </section>
+        <section class="resource" id="03-coding-agents" aria-labelledby="03-coding-agents-title">
+          <div class="resource-title">
+            <h2 id="03-coding-agents-title">03 · 使用 coding agents</h2>
+          </div>
+          <p>Using coding agents — 本仓库的 agent 配置、hook、spec 约定与验证命令入口。</p>
+          <ul class="tracks">
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/03-coding-agents" target="_blank" rel="noreferrer">Agent 工作流与 verifier 清单</a> — 本仓库的 agent 工作流、配置与 verifier 清单</li>
+          </ul>
           <dl class="meta">
             <div>
-              <dt>Topics</dt>
-              <dd>Harness Engineering, AI Coding Agent, Instructions, Verification, Session Lifecycle</dd>
-            </div>
-            <div>
-              <dt>Website</dt>
-              <dd>
-                <a href="https://walkinglabs.github.io/learn-harness-engineering/zh/" target="_blank" rel="noreferrer">
-                  walkinglabs.github.io/learn-harness-engineering/zh
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt>Fork</dt>
-              <dd>
-                <a href="https://github.com/xjiang77/learn-harness-engineering" target="_blank" rel="noreferrer">
-                  xjiang77/learn-harness-engineering
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt>Upstream</dt>
-              <dd>
-                <a href="https://github.com/walkinglabs/learn-harness-engineering" target="_blank" rel="noreferrer">
-                  walkinglabs/learn-harness-engineering
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt>Local Source</dt>
-              <dd><code>deps/learn-harness-engineering</code></dd>
-            </div>
-            <div>
-              <dt>Source Status</dt>
-              <dd>已通过 fork submodule 引入，后续修改提交到 fork。</dd>
+              <dt>参考课程</dt>
+              <dd><a href="https://walkinglabs.github.io/learn-harness-engineering/zh/" target="_blank" rel="noreferrer">Learn Harness Engineering</a> · <a href="https://github.com/xjiang77/learn-harness-engineering" target="_blank" rel="noreferrer">Fork</a> · <a href="https://github.com/walkinglabs/learn-harness-engineering" target="_blank" rel="noreferrer">上游源码</a><br /><code>deps/learn-harness-engineering</code>（已引入 fork submodule）</dd>
             </div>
           </dl>
-        </article>
+        </section>
+        <section class="resource" id="04-shaping-the-build" aria-labelledby="04-shaping-the-build-title">
+          <div class="resource-title">
+            <h2 id="04-shaping-the-build-title">04 · 决定构建什么</h2>
+          </div>
+          <p>Shaping the build — 用明确的任务契约与评估标准，判断材料是否值得沉淀、应交付什么。</p>
+          <ul class="tracks">
+            <li><a href="https://github.com/xjiang77/rubickx/tree/main/04-shaping-the-build/harness" target="_blank" rel="noreferrer">harness</a> — 内容策展决策：cases + grader</li>
+          </ul>
+        </section>
       </main>
     </div>
   </body>

@@ -6,6 +6,7 @@
 
 | Track | 内容 | 验证（在仓库根目录执行） |
 | --- | --- | --- |
+| `git-course/` | 交互式 Git 基础课程：working tree、index、commit graph 与 HEAD；内部 runtime 随课程保留 | `make verify-learning-git-gate1` |
 | `algo/` | NeetCode 题目，Python / Go / JavaScript / Java / Scala 五语言并排，每题 `NOTES.md` 讲写法差异 | `make -C 02-se-fundamentals/algo test` |
 | `patterns/` | 42 项工程模式（GoF 23、Reliability 6、Data & Messaging 7、Concurrency 6），四语言实现 + 共享 fixture + contract tests | `make -C 02-se-fundamentals/patterns verify` |
 | `system-design/` | 系统设计核心组件四语言实现（Rate Limiter 五种算法）+ Go HTTP / Redis / UI lab | `make -C 02-se-fundamentals/system-design test` |

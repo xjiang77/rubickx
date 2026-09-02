@@ -50,13 +50,13 @@ web-install:  ## Install web app dependencies
 	cd deps/learn-claude-code/web && npm install
 
 learning-dev:  ## Start the interactive learning app
-	cd learning && npm run dev
+	cd 02-se-fundamentals/git-course && npm run dev
 
 test-learning-git:  ## Run interactive Git course unit and component tests
-	cd learning && npm test
+	cd 02-se-fundamentals/git-course && npm test
 
 verify-learning-git-gate1:  ## Verify the Fundamentals sequence locally
-	cd learning && npm run verify:gate1
+	cd 02-se-fundamentals/git-course && npm run verify:gate1
 
 setup:  ## Initial project setup (submodule + deps)
 	git submodule update --init --recursive

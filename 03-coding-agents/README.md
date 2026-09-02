@@ -24,7 +24,7 @@ agent 改完代码后能自己跑、自己判断对错的命令。给 agent 的�
 | --- | --- | --- |
 | Go agent 课程 | `make check`、`make check-trpc` | 全部 session 可编译且 `go vet` 通过 |
 | 根级 Python | `make test-unit`、`make test-harness` | 退出码 0 |
-| 交互式课程 app | `make test-learning-git`、`make verify-learning-git-gate1` | vitest / Playwright 全绿 |
+| Git 课程（`02-se-fundamentals/git-course/`） | `make test-learning-git`、`make verify-learning-git-gate1` | vitest / Playwright 全绿 |
 | SE fundamentals | `make -C 02-se-fundamentals/<track> test` 或 `verify` | 见 `02-se-fundamentals/README.md` |
 | nanochat | 各系统目录 `pytest test_impl.py` 与 `python parity.py` | 测试通过，parity 在容差内 |
 | 发布面 | `bash .github/scripts/check-pages.sh` | Pages basic gate passed |

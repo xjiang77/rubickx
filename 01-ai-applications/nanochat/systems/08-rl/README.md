@@ -7,7 +7,7 @@
 
 ## 参考代码(只读对照)
 - 参考实现:chat_rl
-- 位置:`../../deps/nanochat-mlx/`(submodule)
+- 位置：[外部参考源码](https://github.com/scasella/nanochat-mlx)；本仓库未内置，checkout 与版本记录见 [RUNBOOK](../../RUNBOOK.md)。
 
 ## 设计要点
 - (走读后填:核心数据流、关键不变量、易错点)
@@ -16,4 +16,4 @@
 `spec.md`(子契约) · `impl.py`(你的实现) · `test_impl.py`(单测) · `parity.py`(与参考对拍) · `notes.md`(走读+实现笔记)
 
 ## 完成判定
-`test_impl.py` 通过 + `parity.py` 与参考数值对齐。durable insight 晋升 vault `03_Slipbox/01_AI/`。
+`test_impl.py` 通过 + `parity.py` 与参考数值对齐。durable insight 晋升 vault `02_Knowledge/01_AI/`。

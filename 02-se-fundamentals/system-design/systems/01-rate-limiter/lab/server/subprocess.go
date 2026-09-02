@@ -44,6 +44,15 @@ func (r *SubprocessRunner) Run(ctx context.Context, request RunRequest) (RunResp
 	if err != nil {
 		return RunResponse{}, err
 	}
+	if r.Language == LanguageJava {
+		// 冷编译不占用 runner 的执行预算，但仍受独立上限与调用方取消约束。
+		buildContext, cancelBuild := context.WithTimeout(ctx, 20*time.Second)
+		err := r.compileJava(buildContext)
+		cancelBuild()
+		if err != nil {
+			return RunResponse{}, err
+		}
+	}
 	timeout := r.Timeout
 	if timeout <= 0 {
 		timeout = 5 * time.Second
@@ -132,9 +141,6 @@ func (r *SubprocessRunner) command(ctx context.Context) (*exec.Cmd, error) {
 	case LanguageJavaScript:
 		return exec.CommandContext(ctx, "node", filepath.Join(r.Root, "runners", "js", "runner.mjs")), nil
 	case LanguageJava:
-		if err := r.compileJava(ctx); err != nil {
-			return nil, err
-		}
 		return exec.CommandContext(ctx, "java", "-cp", filepath.Join(r.Root, ".build", "java"), "RateLimiterRunner"), nil
 	default:
 		return nil, fmt.Errorf("unsupported subprocess language %q", r.Language)
@@ -161,6 +167,10 @@ func (r *SubprocessRunner) compileJava(ctx context.Context) error {
 	command.Dir = r.Root
 	output, err := command.CombinedOutput()
 	if err != nil {
+		// CommandContext 杀进程只返回 signal: killed，保留 context 错误才能识别超时或取消。
+		if ctx.Err() != nil {
+			return fmt.Errorf("compile Java runner: %w", ctx.Err())
+		}
 		return fmt.Errorf("compile Java runner: %w: %s", err, strings.TrimSpace(string(output)))
 	}
 	return nil

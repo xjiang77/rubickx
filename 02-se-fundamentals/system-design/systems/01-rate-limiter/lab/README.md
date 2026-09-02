@@ -86,6 +86,8 @@ Semantic runners intentionally use a deterministic event order so traces can rew
 
 The server accepts only catalogued algorithms and a bounded request timeline. It never compiles or executes user-supplied source code. The debugger launches a fixed controlled harness with the validated selection, then pauses inside the real `server/algorithms.go` implementation.
 
+Java runner 冷编译有独立的 20 秒上限；编译成功后，才开始计算默认 5 秒的运行预算。两阶段都遵守调用方的取消与 deadline。编译阶段若超时，错误保留 `context deadline exceeded`，避免只显示 `signal: killed` 而无法区分取消与编译失败。这样首次请求不再因冷编译占用运行预算而失败；已有 class 缓存的请求仍跳过编译。
+
 ## Verification
 
 ```bash
@@ -96,6 +98,8 @@ make verify           # start local binary and exercise public HTTP paths
 make verify-redis     # starts an ephemeral real local redis-server
 make verify-debug     # requires dlv
 ```
+
+`TestJavaRunnerCompileAndRunDeadlines` 用受控慢编译验证预算隔离、调用方 deadline 和运行超时。CI 验证还需在无 Java class 缓存时运行 `make -C 02-se-fundamentals/system-design test`，确认首个 `TestLanguageRunnersHaveDecisionAndTraceParity` 用例通过；更新后检查 `system-design` job 及后续 race、UI build 步骤均通过。
 
 The strongest completion check is the real browser workflow: switch the same burst fixture through four languages, step and rewind its trace, enter Go Debug and inspect a real local variable, then exercise Memory and Redis `/demo` paths including outage policy.
 

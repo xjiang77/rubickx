@@ -1,16 +1,16 @@
 # nanochat — LLM from scratch (学习 track)
 
-> rubickx 的第二条学习 track,与 `go/`(learn-claude-code 重写)平行。
+> rubickx 的第二条学习 track,与 `agent-loop/`(learn-claude-code 重写)平行。
 > **方法论**:把 nanochat 全栈的每个系统**自己从零重写一遍**,再与参考实现(`scasella/nanochat-mlx`)对拍(parity),不照抄。
 
 ## 在 rubickx 里的位置(对齐既有约定)
 
-| rubickx 约定 | go/ track | nanochat/ track |
+| rubickx 约定 | agent-loop/ track | nanochat/ track |
 |---|---|---|
-| 顶层 track 目录 | `go/` | `nanochat/`(本目录) |
+| 同级 track 目录 | `agent-loop/` | `nanochat/`(本目录) |
 | 参考上游 submodule | `deps/learn-claude-code` | `deps/nanochat-mlx` |
-| 编号课程/系统 | `go/s01…s12` | `nanochat/systems/01…10` |
-| walkthrough 文档 | `go/docs/zh` | `nanochat/docs/zh` |
+| 编号课程/系统 | `agent-loop/s01…s12` | `nanochat/systems/01…10` |
+| walkthrough 文档 | `agent-loop/docs/zh` | `nanochat/docs/zh` |
 
 ## 权威文档(canonical 在 vault)
 
@@ -33,7 +33,7 @@ nanochat/
 ├── from-scratch/        # 地基热身(纯打基础,非 nanochat 系统)
 │   ├── micrograd/             # D2 / R3
 │   └── addition-transformer/  # D3 / R6
-├── docs/zh/             # walkthrough 文档(对齐 go/docs/zh)
+├── docs/zh/             # walkthrough 文档(对齐 agent-loop/docs/zh)
 ├── experiments/         # 临时脚本/结果(结论回写 vault Log)
 └── shared/              # 跨系统复用(保持薄)
 

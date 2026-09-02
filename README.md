@@ -13,20 +13,20 @@
 ```
 rubickx/
 ├── 01-ai-applications/        # Building and deploying AI applications
+│   ├── agent-loop/            #   Go 递进式 agent 课程
+│   │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/
+│   │   └── docs/zh|en/         #   Go walkthrough 文档
+│   ├── agent-loop-trpc/       #   同 12 课的 trpc-agent-go 实现
 │   └── nanochat/              #   LLM 十系统从零重写 + micrograd
 ├── 02-se-fundamentals/        # Software engineering fundamentals
 │   ├── algo/                  #   算法与数据结构，五语言
 │   ├── patterns/              #   42 项工程模式，四语言 + 共享 contract tests
 │   ├── system-design/         #   可运行的系统设计组件与 Lab
-│   └── network-security/      #   10 个 loopback 网络安全 labs + evidence
+│   ├── network-security/      #   10 个 loopback 网络安全 labs + evidence
+│   └── systems-foundations/   #   Go 系统机制实验（独立 module）
 ├── 03-coding-agents/          # Using coding agents：本仓库的 agent 工作流与 verifier 清单
 ├── 04-shaping-the-build/      # Shaping the build
 │   └── harness/               #   内容策展决策 harness：cases + grader
-├── go/                        # Go 实现（迁往 01-ai-applications/agent-loop，进行中）
-│   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 个递进式课程
-│   ├── foundations/           # 可运行的系统机制实验（迁往 02-se-fundamentals/systems-foundations）
-│   └── docs/zh|en/            # Go walkthrough 文档
-├── trpc-agent-go/             # 同 12 课的 trpc-agent-go 实现（迁往 01-ai-applications/agent-loop-trpc）
 ├── deps/learn-claude-code/    # Learn Claude Code 上游课程 (git submodule)
 ├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
 ├── learning/                  # 交互式课程 app（Vite + React）
@@ -40,8 +40,8 @@ rubickx/
 
 | Ng 技能 | 目录 | 内容 | 验证 |
 | --- | --- | --- | --- |
-| Building and deploying AI applications | `01-ai-applications/` | nanochat；agent-loop、agent-loop-trpc（迁移中，现在仍在 `go/`、`trpc-agent-go/`） | `make check check-trpc`；各 system 的 `test_impl.py` |
-| Software engineering fundamentals | `02-se-fundamentals/` | algo、patterns、system-design、network-security；systems-foundations（迁移中，现在在 `go/foundations/`） | `make -C 02-se-fundamentals/<track> test` 或 `verify` |
+| Building and deploying AI applications | `01-ai-applications/` | nanochat；agent-loop、agent-loop-trpc | `make check check-trpc`；各 system 的 `test_impl.py` |
+| Software engineering fundamentals | `02-se-fundamentals/` | algo、patterns、system-design、network-security；systems-foundations | `make -C 02-se-fundamentals/<track> test` 或 `verify` |
 | Using coding agents | `03-coding-agents/` | 本仓库的 agent 配置、hook、verifier 清单与 spec 约定 | 见其 README |
 | Shaping the build | `04-shaping-the-build/` | harness：判断材料值不值得沉淀、转成什么 | `make test-harness` |
 
@@ -89,12 +89,12 @@ make -C 02-se-fundamentals/patterns verify
 
 ## Go Foundations
 
-[`go/foundations/`](go/foundations/) 把系统机制压缩成 deterministic experiments。L4 Distributed Semantics 验证 session history、majority intersection 和 at-least-once duplicate effect，并明确不把集合实验当作 Raft/Paxos correctness proof。
+[`02-se-fundamentals/systems-foundations/`](02-se-fundamentals/systems-foundations/) 把系统机制压缩成 deterministic experiments。L4 Distributed Semantics 验证 session history、majority intersection 和 at-least-once duplicate effect，并明确不把集合实验当作 Raft/Paxos correctness proof。
 
 ```bash
-cd go
-go test -race ./foundations/...
-go vet ./foundations/...
+cd 02-se-fundamentals/systems-foundations
+go test -race ./...
+go vet ./...
 ```
 
 ## Go 实现
@@ -108,23 +108,23 @@ cp .env.example .env
 make run S=01
 ```
 
-每个课程都有对应的 walkthrough 文档，详见 [go/docs/zh/](go/docs/zh/)：
+每个课程都有对应的 walkthrough 文档，详见 [01-ai-applications/agent-loop/docs/zh/](01-ai-applications/agent-loop/docs/zh/)：
 
 
 | 课程  | 主题                      | 格言                                | 文档                                                       |
 | --- | ----------------------- | --------------------------------- | -------------------------------------------------------- |
-| s01 | Agent Loop              | "One loop & Bash is all you need" | [walkthrough](go/docs/zh/s01-the-agent-loop.md)          |
-| s02 | Tool Use                | "加一个工具，只加一个 handler"              | [walkthrough](go/docs/zh/s02-tool-use.md)                |
-| s03 | Todo Write              | "结构化状态，模型自己管理"                    | [walkthrough](go/docs/zh/s03-todo-write.md)              |
-| s04 | Subagent                | "fork 一个子循环，隔离上下文"                | [walkthrough](go/docs/zh/s04-subagent.md)                |
-| s05 | Skill Loading           | "动态注入 system prompt"              | [walkthrough](go/docs/zh/s05-skill-loading.md)           |
-| s06 | Context Compact         | "上下文满了就压缩，循环不断"                   | [walkthrough](go/docs/zh/s06-context-compact.md)         |
-| s07 | Task System             | "任务是持久化的 todo"                    | [walkthrough](go/docs/zh/s07-task-system.md)             |
-| s08 | Background Tasks        | "后台执行，异步通知"                       | [walkthrough](go/docs/zh/s08-background-tasks.md)        |
-| s09 | Agent Teams             | "多 agent 协作，共享 task list"         | [walkthrough](go/docs/zh/s09-agent-teams.md)             |
-| s10 | Team Protocols          | "shutdown / plan approval 协议"     | [walkthrough](go/docs/zh/s10-team-protocols.md)          |
-| s11 | Autonomous Agents       | "自治循环，自动发现并执行任务"                  | [walkthrough](go/docs/zh/s11-autonomous-agents.md)       |
-| s12 | Worktree Task Isolation | "git worktree 隔离并行任务"             | [walkthrough](go/docs/zh/s12-worktree-task-isolation.md) |
+| s01 | Agent Loop              | "One loop & Bash is all you need" | [walkthrough](01-ai-applications/agent-loop/docs/zh/s01-the-agent-loop.md)          |
+| s02 | Tool Use                | "加一个工具，只加一个 handler"              | [walkthrough](01-ai-applications/agent-loop/docs/zh/s02-tool-use.md)                |
+| s03 | Todo Write              | "结构化状态，模型自己管理"                    | [walkthrough](01-ai-applications/agent-loop/docs/zh/s03-todo-write.md)              |
+| s04 | Subagent                | "fork 一个子循环，隔离上下文"                | [walkthrough](01-ai-applications/agent-loop/docs/zh/s04-subagent.md)                |
+| s05 | Skill Loading           | "动态注入 system prompt"              | [walkthrough](01-ai-applications/agent-loop/docs/zh/s05-skill-loading.md)           |
+| s06 | Context Compact         | "上下文满了就压缩，循环不断"                   | [walkthrough](01-ai-applications/agent-loop/docs/zh/s06-context-compact.md)         |
+| s07 | Task System             | "任务是持久化的 todo"                    | [walkthrough](01-ai-applications/agent-loop/docs/zh/s07-task-system.md)             |
+| s08 | Background Tasks        | "后台执行，异步通知"                       | [walkthrough](01-ai-applications/agent-loop/docs/zh/s08-background-tasks.md)        |
+| s09 | Agent Teams             | "多 agent 协作，共享 task list"         | [walkthrough](01-ai-applications/agent-loop/docs/zh/s09-agent-teams.md)             |
+| s10 | Team Protocols          | "shutdown / plan approval 协议"     | [walkthrough](01-ai-applications/agent-loop/docs/zh/s10-team-protocols.md)          |
+| s11 | Autonomous Agents       | "自治循环，自动发现并执行任务"                  | [walkthrough](01-ai-applications/agent-loop/docs/zh/s11-autonomous-agents.md)       |
+| s12 | Worktree Task Isolation | "git worktree 隔离并行任务"             | [walkthrough](01-ai-applications/agent-loop/docs/zh/s12-worktree-task-isolation.md) |
 
 
 ## Web 学习平台

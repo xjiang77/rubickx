@@ -10,4 +10,4 @@
 | `patterns/` | 42 项工程模式（GoF 23、Reliability 6、Data & Messaging 7、Concurrency 6），四语言实现 + 共享 fixture + contract tests | `make -C 02-se-fundamentals/patterns verify` |
 | `system-design/` | 系统设计核心组件四语言实现（Rate Limiter 五种算法）+ Go HTTP / Redis / UI lab | `make -C 02-se-fundamentals/system-design test` |
 | `network-security/` | 10 个 loopback-only labs：网络路径、浏览器与 API 信任边界、SSO / federation、持续访问与证据闭环 | `make -C 02-se-fundamentals/network-security verify` |
-| `systems-foundations/`（迁移中，现在在 `go/foundations/`） | 执行模型（goroutine、race）与分布式语义（session、quorum、isolation、duplicate effect）的 deterministic 实验 | `cd go && go test -race ./foundations/...` |
+| `systems-foundations/` | 执行模型（goroutine、race）与分布式语义（session、quorum、isolation、duplicate effect）的 deterministic 实验 | `cd 02-se-fundamentals/systems-foundations && go test -race ./...` |

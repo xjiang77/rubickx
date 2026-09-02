@@ -13,20 +13,20 @@ The top level follows the four skills in Andrew Ng's [AI Engineering Skills Map]
 ```
 rubickx/
 ├── 01-ai-applications/        # Building and deploying AI applications
+│   ├── agent-loop/            #   Progressive Go agent sessions
+│   │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/
+│   │   └── docs/zh|en/         #   Go walkthroughs
+│   ├── agent-loop-trpc/       #   Same 12 sessions on trpc-agent-go
 │   └── nanochat/              #   LLM systems rewritten from scratch + micrograd
 ├── 02-se-fundamentals/        # Software engineering fundamentals
 │   ├── algo/                  #   Algorithms and data structures in five languages
 │   ├── patterns/              #   42 engineering patterns, four languages + shared contract tests
 │   ├── system-design/         #   Runnable system-design components and labs
-│   └── network-security/      #   10 loopback network-security labs + evidence
+│   ├── network-security/      #   10 loopback network-security labs + evidence
+│   └── systems-foundations/   #   Go systems experiments (standalone module)
 ├── 03-coding-agents/          # Using coding agents: this repo's agent workflow and verifier inventory
 ├── 04-shaping-the-build/      # Shaping the build
 │   └── harness/               #   Content-curation decision harness: cases + grader
-├── go/                        # Go implementations (moving to 01-ai-applications/agent-loop)
-│   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/
-│   ├── foundations/           # Runnable systems experiments (moving to 02-se-fundamentals/systems-foundations)
-│   └── docs/zh|en/            # Go walkthroughs
-├── trpc-agent-go/             # Same 12 sessions on trpc-agent-go (moving to 01-ai-applications/agent-loop-trpc)
 ├── deps/learn-claude-code/    # Upstream course (git submodule)
 ├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
 ├── learning/                  # Interactive course app (Vite + React)
@@ -79,12 +79,12 @@ make -C 02-se-fundamentals/patterns verify
 
 ## Go Foundations
 
-[`go/foundations/`](go/foundations/) turns systems mechanisms into deterministic experiments. L4 Distributed Semantics checks session histories, majority intersection, and at-least-once duplicate effects while explicitly avoiding claims that the set model proves Raft or Paxos correctness.
+[`02-se-fundamentals/systems-foundations/`](02-se-fundamentals/systems-foundations/) turns systems mechanisms into deterministic experiments. L4 Distributed Semantics checks session histories, majority intersection, and at-least-once duplicate effects while explicitly avoiding claims that the set model proves Raft or Paxos correctness.
 
 ```bash
-cd go
-go test -race ./foundations/...
-go vet ./foundations/...
+cd 02-se-fundamentals/systems-foundations
+go test -race ./...
+go vet ./...
 ```
 
 ## Go Implementation
@@ -98,22 +98,22 @@ cp .env.example .env
 make run S=01
 ```
 
-See [go/docs/en/](go/docs/en/) for detailed walkthroughs of each session.
+See [01-ai-applications/agent-loop/docs/en/](01-ai-applications/agent-loop/docs/en/) for detailed walkthroughs of each session.
 
 | Session | Topic | Walkthrough |
 |---------|-------|-------------|
-| s01 | Agent Loop | [doc](go/docs/en/s01-the-agent-loop.md) |
-| s02 | Tool Use | [doc](go/docs/en/s02-tool-use.md) |
-| s03 | Todo Write | [doc](go/docs/en/s03-todo-write.md) |
-| s04 | Subagent | [doc](go/docs/en/s04-subagent.md) |
-| s05 | Skill Loading | [doc](go/docs/en/s05-skill-loading.md) |
-| s06 | Context Compact | [doc](go/docs/en/s06-context-compact.md) |
-| s07 | Task System | [doc](go/docs/en/s07-task-system.md) |
-| s08 | Background Tasks | [doc](go/docs/en/s08-background-tasks.md) |
-| s09 | Agent Teams | [doc](go/docs/en/s09-agent-teams.md) |
-| s10 | Team Protocols | [doc](go/docs/en/s10-team-protocols.md) |
-| s11 | Autonomous Agents | [doc](go/docs/en/s11-autonomous-agents.md) |
-| s12 | Worktree Task Isolation | [doc](go/docs/en/s12-worktree-task-isolation.md) |
+| s01 | Agent Loop | [doc](01-ai-applications/agent-loop/docs/en/s01-the-agent-loop.md) |
+| s02 | Tool Use | [doc](01-ai-applications/agent-loop/docs/en/s02-tool-use.md) |
+| s03 | Todo Write | [doc](01-ai-applications/agent-loop/docs/en/s03-todo-write.md) |
+| s04 | Subagent | [doc](01-ai-applications/agent-loop/docs/en/s04-subagent.md) |
+| s05 | Skill Loading | [doc](01-ai-applications/agent-loop/docs/en/s05-skill-loading.md) |
+| s06 | Context Compact | [doc](01-ai-applications/agent-loop/docs/en/s06-context-compact.md) |
+| s07 | Task System | [doc](01-ai-applications/agent-loop/docs/en/s07-task-system.md) |
+| s08 | Background Tasks | [doc](01-ai-applications/agent-loop/docs/en/s08-background-tasks.md) |
+| s09 | Agent Teams | [doc](01-ai-applications/agent-loop/docs/en/s09-agent-teams.md) |
+| s10 | Team Protocols | [doc](01-ai-applications/agent-loop/docs/en/s10-team-protocols.md) |
+| s11 | Autonomous Agents | [doc](01-ai-applications/agent-loop/docs/en/s11-autonomous-agents.md) |
+| s12 | Worktree Task Isolation | [doc](01-ai-applications/agent-loop/docs/en/s12-worktree-task-isolation.md) |
 
 ## Web Learning Platform
 

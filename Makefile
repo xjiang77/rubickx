@@ -18,11 +18,11 @@ help:  ## Show available targets
 
 run:  ## Run a session REPL (go): make run S=06
 	@test -n "$(S)" || { echo "Usage: make run S=01"; exit 1; }
-	cd go && go run ./s$(S)*/
+	cd 01-ai-applications/agent-loop && go run ./s$(S)*/
 
 run-trpc:  ## Run a session REPL (trpc-agent-go): make run-trpc S=01
 	@test -n "$(S)" || { echo "Usage: make run-trpc S=01"; exit 1; }
-	cd trpc-agent-go && go run ./s$(S)*/
+	cd 01-ai-applications/agent-loop-trpc && go run ./s$(S)*/
 
 test: check check-trpc test-unit test-harness test-api  ## Run all tests (check → unit → harness → api)
 
@@ -36,12 +36,12 @@ test-api:  ## Run API connectivity test (needs ANTHROPIC_API_KEY)
 	python3 tests/test_s01_verify.py
 
 check:  ## Compile-check and vet all go sessions
-	@cd go && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
-	@cd go && go vet ./...
+	@cd 01-ai-applications/agent-loop && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
+	@cd 01-ai-applications/agent-loop && go vet ./...
 
 check-trpc:  ## Compile-check and vet all trpc-agent-go sessions
-	@cd trpc-agent-go && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
-	@cd trpc-agent-go && go vet ./...
+	@cd 01-ai-applications/agent-loop-trpc && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
+	@cd 01-ai-applications/agent-loop-trpc && go vet ./...
 
 web-dev:  ## Start the Next.js dev server
 	cd deps/learn-claude-code/web && npm run dev
@@ -60,8 +60,8 @@ verify-learning-git-gate1:  ## Verify the Fundamentals sequence locally
 
 setup:  ## Initial project setup (submodule + deps)
 	git submodule update --init --recursive
-	cd go && go mod download
-	cd trpc-agent-go && go mod download
+	cd 01-ai-applications/agent-loop && go mod download
+	cd 01-ai-applications/agent-loop-trpc && go mod download
 	$(MAKE) web-install
 
 harness-list:  ## List deterministic harness cases

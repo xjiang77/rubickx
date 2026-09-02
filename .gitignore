@@ -198,13 +198,13 @@ out/
 .task_outputs/
 .tasks/
 .teams/
-04-shaping-the-build/harness/runs/
-02-se-fundamentals/git-course/node_modules/
-02-se-fundamentals/git-course/dist/
-02-se-fundamentals/git-course/test-results/
-02-se-fundamentals/git-course/playwright-report/
-02-se-fundamentals/git-course/.playwright-cli/
-02-se-fundamentals/git-course/*.tsbuildinfo
+04-shaping-the-build/01-content-curation-decisions/harness/runs/
+02-se-fundamentals/05-scaling-and-operating-in-production/git-course/node_modules/
+02-se-fundamentals/05-scaling-and-operating-in-production/git-course/dist/
+02-se-fundamentals/05-scaling-and-operating-in-production/git-course/test-results/
+02-se-fundamentals/05-scaling-and-operating-in-production/git-course/playwright-report/
+02-se-fundamentals/05-scaling-and-operating-in-production/git-course/.playwright-cli/
+02-se-fundamentals/05-scaling-and-operating-in-production/git-course/*.tsbuildinfo
 .pages-site/
 
 # Ruff stuff:
@@ -234,10 +234,10 @@ web/out/
 test_providers.py
 
 # Rate Limiter Lab generated assets
-system-design/systems/01-rate-limiter/lab/ui/node_modules/
-!system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/
-system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/*
-!system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/.keep
+02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab/ui/node_modules/
+!02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/
+02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/*
+!02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab/server/internal/webui/dist/.keep
 
 # Internal analysis artifacts (not learning material)
 analysis/
@@ -247,7 +247,7 @@ analysis_progress.md
 .mcp.json
 
 # Go build artifacts
-01-ai-applications/agent-loop/bin/
+01-ai-applications/03-building-agentic-systems/agent-loop/bin/
 *.exe
 *.exe~
 *.dll
@@ -257,13 +257,13 @@ analysis_progress.md
 *.out
 coverage.out
 
-# Local Go lesson binaries (e.g. 01-ai-applications/agent-loop/s06-context-compact/s06-context-compact)
-01-ai-applications/agent-loop/s[0-9][0-9]*/s*
-!01-ai-applications/agent-loop/s[0-9][0-9]*/s*.go
+# Local Go lesson binaries (e.g. 01-ai-applications/03-building-agentic-systems/agent-loop/s06-context-compact/s06-context-compact)
+01-ai-applications/03-building-agentic-systems/agent-loop/s[0-9][0-9]*/s*
+!01-ai-applications/03-building-agentic-systems/agent-loop/s[0-9][0-9]*/s*.go
 
 # Local trpc-agent-go lesson binaries
-01-ai-applications/agent-loop-trpc/s[0-9][0-9]*/s*
-!01-ai-applications/agent-loop-trpc/s[0-9][0-9]*/s*.go
+01-ai-applications/03-building-agentic-systems/agent-loop-trpc/s[0-9][0-9]*/s*
+!01-ai-applications/03-building-agentic-systems/agent-loop-trpc/s[0-9][0-9]*/s*.go
 skill
 
 # macOS

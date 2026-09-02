@@ -12,45 +12,55 @@
 
 ```
 rubickx/
-├── 01-ai-applications/        # Building and deploying AI applications
-│   ├── agent-loop/            #   Go 递进式 agent 课程
-│   │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/
-│   │   └── docs/zh|en/         #   Go walkthrough 文档
-│   ├── agent-loop-trpc/       #   同 12 课的 trpc-agent-go 实现
-│   └── nanochat/              #   LLM 十系统从零重写 + micrograd
-├── 02-se-fundamentals/        # Software engineering fundamentals
-│   ├── git-course/            # 交互式 Git 基础课程（Vite + React）
-│   ├── algo/                  #   算法与数据结构，五语言
-│   ├── patterns/              #   42 项工程模式，四语言 + 共享 contract tests
-│   ├── system-design/         #   可运行的系统设计组件与 Lab
-│   ├── network-security/      #   10 个 loopback 网络安全 labs + evidence
-│   └── systems-foundations/   #   Go 系统机制实验（独立 module）
-├── 03-coding-agents/          # Using coding agents：本仓库的 agent 工作流与 verifier 清单
-├── 04-shaping-the-build/      # Shaping the build
-│   └── harness/               #   内容策展决策 harness：cases + grader
-├── deps/learn-claude-code/    # Learn Claude Code 上游课程 (git submodule)
-├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
-├── web/                       # GitHub Pages 静态首页
-├── tests/                     # 根级测试
-├── skills -> deps/.../skills  # symlink (运行时兼容)
-└── .github/workflows/         # CI
+├── 01-ai-applications/
+│   ├── 01-llm-foundations/
+│   ├── 02-grounding-models-with-data/
+│   ├── 03-building-agentic-systems/
+│   │   └── agent-loop/
+│   │   └── agent-loop-trpc/
+│   ├── 04-evaluation-driven-development/
+│   ├── 05-operating-in-production/
+│   ├── 06-machine-learning-foundations/
+│   │   └── nanochat/
+├── 02-se-fundamentals/
+│   ├── 01-building-full-stack-applications/
+│   ├── 02-managing-data/
+│   ├── 03-designing-system-architectures/
+│   │   └── system-design/
+│   │   └── patterns/
+│   │   └── systems-foundations/
+│   ├── 04-making-systems-secure-and-reliable/
+│   │   └── network-security/
+│   ├── 05-scaling-and-operating-in-production/
+│   │   └── git-course/
+│   ├── 06-algorithms-and-data-structures/
+│   │   └── algo/
+├── 03-coding-agents/
+│   ├── 01-agent-workflows/
+├── 04-shaping-the-build/
+│   ├── 01-content-curation-decisions/
+│   │   └── harness/
+├── deps/  web/  tests/  .github/
+└── Makefile  README.md  根配置
 ```
 
 ## Skills Map
 
+能力目录与状态见 [capabilities.json](web/capabilities.json) 和各 pillar README；11 项 Andrew 原能力全部保留，另有 3 项 Rubickx 扩展。Nanochat 为练习骨架，placeholder 不代表能力已覆盖。
+
 | Ng 技能 | Track 目录 | 内容 | 验证（仓库根目录执行） |
 | --- | --- | --- | --- |
-| Building and deploying AI applications | [`01-ai-applications/agent-loop/`](01-ai-applications/agent-loop/) | 12 课 Go agent 机制 | `make check` |
-| Building and deploying AI applications | [`01-ai-applications/agent-loop-trpc/`](01-ai-applications/agent-loop-trpc/) | 同 12 课的 trpc-agent-go 实现 | `make check-trpc` |
-| Building and deploying AI applications | [`01-ai-applications/nanochat/`](01-ai-applications/nanochat/) | LLM 十系统重写 + micrograd | 各 system 的 `test_impl.py` 与 `parity.py`（含待实现骨架） |
-| Software engineering fundamentals | [`02-se-fundamentals/git-course/`](02-se-fundamentals/git-course/) | Working tree、index、commit graph 与 HEAD | `make verify-learning-git-gate1` |
-| Software engineering fundamentals | [`02-se-fundamentals/algo/`](02-se-fundamentals/algo/) | 五语言算法与数据结构 | `make -C 02-se-fundamentals/algo test` |
-| Software engineering fundamentals | [`02-se-fundamentals/patterns/`](02-se-fundamentals/patterns/) | 42 项四语言工程模式与 contract tests | `make -C 02-se-fundamentals/patterns verify` |
-| Software engineering fundamentals | [`02-se-fundamentals/system-design/`](02-se-fundamentals/system-design/) | 系统设计组件与 HTTP / Redis lab | `make -C 02-se-fundamentals/system-design test` |
-| Software engineering fundamentals | [`02-se-fundamentals/network-security/`](02-se-fundamentals/network-security/) | 10 个 loopback 网络安全 labs | `make -C 02-se-fundamentals/network-security verify` |
-| Software engineering fundamentals | [`02-se-fundamentals/systems-foundations/`](02-se-fundamentals/systems-foundations/) | Go 执行模型与分布式语义实验 | `cd 02-se-fundamentals/systems-foundations && go test -race ./... && go vet ./...` |
-| Using coding agents | [`03-coding-agents/`](03-coding-agents/) | 本仓库的 agent 工作流、配置与 verifier 清单 | 见 README 的 verifier 清单 |
-| Shaping the build | [`04-shaping-the-build/harness/`](04-shaping-the-build/harness/) | 内容策展决策：cases + grader | `make test-harness` |
+| Building and deploying AI applications | [`01-ai-applications/03-building-agentic-systems/agent-loop/`](01-ai-applications/03-building-agentic-systems/agent-loop/) | 12 课 Go agent 机制 | `make check` |
+| Building and deploying AI applications | [`01-ai-applications/03-building-agentic-systems/agent-loop-trpc/`](01-ai-applications/03-building-agentic-systems/agent-loop-trpc/) | 同 12 课的 trpc-agent-go 实现 | `make check-trpc` |
+| Building and deploying AI applications | [`01-ai-applications/06-machine-learning-foundations/nanochat/`](01-ai-applications/06-machine-learning-foundations/nanochat/) | LLM 十系统重写 + micrograd | 各 system 的 `test_impl.py` 与 `parity.py`（含待实现骨架） |
+| Software engineering fundamentals | [`02-se-fundamentals/05-scaling-and-operating-in-production/git-course/`](02-se-fundamentals/05-scaling-and-operating-in-production/git-course/) | Working tree、index、commit graph 与 HEAD | `make verify-learning-git-gate1` |
+| Software engineering fundamentals | [`02-se-fundamentals/06-algorithms-and-data-structures/algo/`](02-se-fundamentals/06-algorithms-and-data-structures/algo/) | 五语言算法与数据结构 | `make -C 02-se-fundamentals/06-algorithms-and-data-structures/algo test` |
+| Software engineering fundamentals | [`02-se-fundamentals/03-designing-system-architectures/patterns/`](02-se-fundamentals/03-designing-system-architectures/patterns/) | 42 项四语言工程模式与 contract tests | `make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify` |
+| Software engineering fundamentals | [`02-se-fundamentals/03-designing-system-architectures/system-design/`](02-se-fundamentals/03-designing-system-architectures/system-design/) | 系统设计组件与 HTTP / Redis lab | `make -C 02-se-fundamentals/03-designing-system-architectures/system-design test` |
+| Software engineering fundamentals | [`02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/`](02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/) | 10 个 loopback 网络安全 labs | `make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify` |
+| Software engineering fundamentals | [`02-se-fundamentals/03-designing-system-architectures/systems-foundations/`](02-se-fundamentals/03-designing-system-architectures/systems-foundations/) | Go 执行模型与分布式语义实验 | `cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations && go test -race ./... && go vet ./...` |
+| Using coding agents | [`03-coding-agents/01-agent-workflows/`](03-coding-agents/01-agent-workflows/) | 本仓库的 agent 工作流、配置与 verifier 清单 | 见 README 的 verifier 清单 |
+| Shaping the build | [`04-shaping-the-build/01-content-curation-decisions/harness/`](04-shaping-the-build/01-content-curation-decisions/harness/) | 内容策展决策：cases + grader | `make test-harness` |
 
 ## 快速开始
 
@@ -76,9 +86,9 @@ Rubickx 首页按四项技能组织 track 与参考资源，入口在 [web/index
 
 ## Engineering Patterns
 
-[`02-se-fundamentals/patterns/`](02-se-fundamentals/patterns/) 与 `algo/`、`system-design/` 并列，保存 42 项“笔记判断 + 四语言实现 + 共享 fixture + 自动化测试”的 Pattern Library：GoF 23、Reliability 6、Data & Messaging 7、Concurrency 6。
+[`02-se-fundamentals/03-designing-system-architectures/patterns/`](02-se-fundamentals/03-designing-system-architectures/patterns/) 与 `system-design/`、`systems-foundations/` 同属 Designing system architectures，保存 42 项“笔记判断 + 四语言实现 + 共享 fixture + 自动化测试”的 Pattern Library：GoF 23、Reliability 6、Data & Messaging 7、Concurrency 6。
 
-首个 golden path 是 [Adapter Pattern](02-se-fundamentals/patterns/01-design-patterns/02-structural/01-adapter/NOTES.md)，完整 catalog 继续使用同一 behavior contract：
+首个 golden path 是 [Adapter Pattern](02-se-fundamentals/03-designing-system-architectures/patterns/01-design-patterns/02-structural/01-adapter/NOTES.md)，完整 catalog 继续使用同一 behavior contract：
 
 - 稳定 target contract：`ChatClient`
 - legacy adaptee：不同的 deployment、prompt、stop code 和错误码
@@ -86,19 +96,19 @@ Rubickx 首页按四项技能组织 track 与参考资源，入口在 [web/index
 - 统一验证 request mapping、response/error normalization 和 unsupported capability fail-explicitly
 
 ```bash
-make -C 02-se-fundamentals/patterns setup
-make -C 02-se-fundamentals/patterns test-pattern PATTERN=gof.structural.adapter
-make -C 02-se-fundamentals/patterns verify
+make -C 02-se-fundamentals/03-designing-system-architectures/patterns setup
+make -C 02-se-fundamentals/03-designing-system-architectures/patterns test-pattern PATTERN=gof.structural.adapter
+make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify
 ```
 
-完成度只看 [`patterns/PROGRESS.md`](02-se-fundamentals/patterns/PROGRESS.md)。
+完成度只看 [`patterns/PROGRESS.md`](02-se-fundamentals/03-designing-system-architectures/patterns/PROGRESS.md)。
 
 ## Go Foundations
 
-[`02-se-fundamentals/systems-foundations/`](02-se-fundamentals/systems-foundations/) 把系统机制压缩成 deterministic experiments。L4 Distributed Semantics 验证 session history、majority intersection 和 at-least-once duplicate effect，并明确不把集合实验当作 Raft/Paxos correctness proof。
+[`02-se-fundamentals/03-designing-system-architectures/systems-foundations/`](02-se-fundamentals/03-designing-system-architectures/systems-foundations/) 把系统机制压缩成 deterministic experiments。L4 Distributed Semantics 验证 session history、majority intersection 和 at-least-once duplicate effect，并明确不把集合实验当作 Raft/Paxos correctness proof。
 
 ```bash
-cd 02-se-fundamentals/systems-foundations
+cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations
 go test -race ./...
 go vet ./...
 ```
@@ -114,23 +124,23 @@ cp .env.example .env
 make run S=01
 ```
 
-每个课程都有对应的 walkthrough 文档，详见 [01-ai-applications/agent-loop/docs/zh/](01-ai-applications/agent-loop/docs/zh/)：
+每个课程都有对应的 walkthrough 文档，详见 [01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/)：
 
 
 | 课程  | 主题                      | 格言                                | 文档                                                       |
 | --- | ----------------------- | --------------------------------- | -------------------------------------------------------- |
-| s01 | Agent Loop              | "One loop & Bash is all you need" | [walkthrough](01-ai-applications/agent-loop/docs/zh/s01-the-agent-loop.md)          |
-| s02 | Tool Use                | "加一个工具，只加一个 handler"              | [walkthrough](01-ai-applications/agent-loop/docs/zh/s02-tool-use.md)                |
-| s03 | Todo Write              | "结构化状态，模型自己管理"                    | [walkthrough](01-ai-applications/agent-loop/docs/zh/s03-todo-write.md)              |
-| s04 | Subagent                | "fork 一个子循环，隔离上下文"                | [walkthrough](01-ai-applications/agent-loop/docs/zh/s04-subagent.md)                |
-| s05 | Skill Loading           | "动态注入 system prompt"              | [walkthrough](01-ai-applications/agent-loop/docs/zh/s05-skill-loading.md)           |
-| s06 | Context Compact         | "上下文满了就压缩，循环不断"                   | [walkthrough](01-ai-applications/agent-loop/docs/zh/s06-context-compact.md)         |
-| s07 | Task System             | "任务是持久化的 todo"                    | [walkthrough](01-ai-applications/agent-loop/docs/zh/s07-task-system.md)             |
-| s08 | Background Tasks        | "后台执行，异步通知"                       | [walkthrough](01-ai-applications/agent-loop/docs/zh/s08-background-tasks.md)        |
-| s09 | Agent Teams             | "多 agent 协作，共享 task list"         | [walkthrough](01-ai-applications/agent-loop/docs/zh/s09-agent-teams.md)             |
-| s10 | Team Protocols          | "shutdown / plan approval 协议"     | [walkthrough](01-ai-applications/agent-loop/docs/zh/s10-team-protocols.md)          |
-| s11 | Autonomous Agents       | "自治循环，自动发现并执行任务"                  | [walkthrough](01-ai-applications/agent-loop/docs/zh/s11-autonomous-agents.md)       |
-| s12 | Worktree Task Isolation | "git worktree 隔离并行任务"             | [walkthrough](01-ai-applications/agent-loop/docs/zh/s12-worktree-task-isolation.md) |
+| s01 | Agent Loop              | "One loop & Bash is all you need" | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s01-the-agent-loop.md)          |
+| s02 | Tool Use                | "加一个工具，只加一个 handler"              | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s02-tool-use.md)                |
+| s03 | Todo Write              | "结构化状态，模型自己管理"                    | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s03-todo-write.md)              |
+| s04 | Subagent                | "fork 一个子循环，隔离上下文"                | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s04-subagent.md)                |
+| s05 | Skill Loading           | "动态注入 system prompt"              | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s05-skill-loading.md)           |
+| s06 | Context Compact         | "上下文满了就压缩，循环不断"                   | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s06-context-compact.md)         |
+| s07 | Task System             | "任务是持久化的 todo"                    | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s07-task-system.md)             |
+| s08 | Background Tasks        | "后台执行，异步通知"                       | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s08-background-tasks.md)        |
+| s09 | Agent Teams             | "多 agent 协作，共享 task list"         | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s09-agent-teams.md)             |
+| s10 | Team Protocols          | "shutdown / plan approval 协议"     | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s10-team-protocols.md)          |
+| s11 | Autonomous Agents       | "自治循环，自动发现并执行任务"                  | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s11-autonomous-agents.md)       |
+| s12 | Worktree Task Isolation | "git worktree 隔离并行任务"             | [walkthrough](01-ai-applications/03-building-agentic-systems/agent-loop/docs/zh/s12-worktree-task-isolation.md) |
 
 
 ## Web 学习平台
@@ -160,16 +170,16 @@ npm run dev
 make harness-list
 
 # 初始化一个 run 目录
-make harness-init RUN=04-shaping-the-build/harness/runs/demo
+make harness-init RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo
 
 # 只跑一个 case
-make harness-init RUN=04-shaping-the-build/harness/runs/git-only CASE=git-pro-book
+make harness-init RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/git-only CASE=git-pro-book
 
 # 填完输出后评分
-make harness-grade RUN=04-shaping-the-build/harness/runs/demo
+make harness-grade RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo
 ```
 
-当前 harness 使用 deterministic fixtures 和 heuristic grader，细节见 [harness/README.md](04-shaping-the-build/harness/README.md)。
+当前 harness 使用 deterministic fixtures 和 heuristic grader，细节见 [harness/README.md](04-shaping-the-build/01-content-curation-decisions/harness/README.md)。
 
 ## 项目静态网页
 

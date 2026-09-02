@@ -1,13 +1,14 @@
-# 01 — Building and deploying AI applications
+# Building and deploying AI applications
 
-对应 Andrew Ng [AI Engineering Skills Map](https://www.deeplearning.ai/the-batch/the-ai-engineering-skills-map) 的第一项技能：理解 LLM、context engineering、agentic workflows、ML/DL 这些构件，并用 evals 与 error analysis 让不可预测的系统可控。
+构建与部署 AI 应用。[框架来源](https://x.com/AndrewYNg/status/2090840747738374568)。能力覆盖以实际实现与验证证据为准；状态不是熟练度评分。
 
-本目录放的是"自己从零把构件写一遍"的代码。
+| 能力 | 来源 | 当前状态 | 主归属实践 |
+| --- | --- | --- | --- |
+| [LLM foundations](01-llm-foundations/README.md) | Andrew Ng 原框架 | 仅有骨架 | 跨能力关联 / placeholder |
+| [Grounding models with data](02-grounding-models-with-data/README.md) | Andrew Ng 原框架 | 待建设 | 跨能力关联 / placeholder |
+| [Building agentic systems](03-building-agentic-systems/README.md) | Andrew Ng 原框架 | 已有局部实践 | agent-loop, agent-loop-trpc |
+| [Evaluation-driven development](04-evaluation-driven-development/README.md) | Andrew Ng 原框架 | 仅有骨架 | 跨能力关联 / placeholder |
+| [Operating in production](05-operating-in-production/README.md) | Andrew Ng 原框架 | 待建设 | 跨能力关联 / placeholder |
+| [Machine learning foundations](06-machine-learning-foundations/README.md) | Andrew Ng 原框架 | 仅有骨架 | nanochat |
 
-| Track | 内容 | 验证 |
-| --- | --- | --- |
-| `nanochat/` | LLM 全栈十个系统（tokenizer → data → model → optim → train → engine → SFT → RL → eval → tooluse）逐个重写，与参考实现 `nanochat-mlx` 对拍；`from-scratch/` 是 micrograd 与 addition-transformer 热身 | 每个系统目录内 `test_impl.py`（pytest）与 `parity.py` |
-| `agent-loop/` | learn-claude-code 12 课的 Go 重写：agent loop、tool use、subagent、skill loading、context compact、task system、agent teams、worktree isolation | 根目录 `make check`、`make run S=01` |
-| `agent-loop-trpc/` | 同 12 课用 trpc-agent-go 框架实现 | 根目录 `make check-trpc`、`make run-trpc S=01` |
-
-每个 track 的规范、计划与实验记录在 vault（`04_Projects/Rubickx/`），代码与代码邻接的 spec / notes 在这里。
+完整课程与模块整体归属，通过能力 README 表达交叉链接。配置与支撑面继续留在仓库根目录。

@@ -5,7 +5,7 @@
 export
 
 S ?=
-RUN ?= 04-shaping-the-build/harness/runs/manual
+RUN ?= 04-shaping-the-build/01-content-curation-decisions/harness/runs/manual
 CASE ?=
 
 .DEFAULT_GOAL := help
@@ -18,11 +18,11 @@ help:  ## Show available targets
 
 run:  ## Run a session REPL (go): make run S=06
 	@test -n "$(S)" || { echo "Usage: make run S=01"; exit 1; }
-	cd 01-ai-applications/agent-loop && go run ./s$(S)*/
+	cd 01-ai-applications/03-building-agentic-systems/agent-loop && go run ./s$(S)*/
 
 run-trpc:  ## Run a session REPL (trpc-agent-go): make run-trpc S=01
 	@test -n "$(S)" || { echo "Usage: make run-trpc S=01"; exit 1; }
-	cd 01-ai-applications/agent-loop-trpc && go run ./s$(S)*/
+	cd 01-ai-applications/03-building-agentic-systems/agent-loop-trpc && go run ./s$(S)*/
 
 test: check check-trpc test-unit test-harness test-api  ## Run all tests (check → unit → harness → api)
 
@@ -36,12 +36,12 @@ test-api:  ## Run API connectivity test (needs ANTHROPIC_API_KEY)
 	python3 tests/test_s01_verify.py
 
 check:  ## Compile-check and vet all go sessions
-	@cd 01-ai-applications/agent-loop && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
-	@cd 01-ai-applications/agent-loop && go vet ./...
+	@cd 01-ai-applications/03-building-agentic-systems/agent-loop && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
+	@cd 01-ai-applications/03-building-agentic-systems/agent-loop && go vet ./...
 
 check-trpc:  ## Compile-check and vet all trpc-agent-go sessions
-	@cd 01-ai-applications/agent-loop-trpc && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
-	@cd 01-ai-applications/agent-loop-trpc && go vet ./...
+	@cd 01-ai-applications/03-building-agentic-systems/agent-loop-trpc && for s in s*/; do echo "build $$s"; go build -o /dev/null ./"$$s" || exit 1; done
+	@cd 01-ai-applications/03-building-agentic-systems/agent-loop-trpc && go vet ./...
 
 web-dev:  ## Start the Next.js dev server
 	cd deps/learn-claude-code/web && npm run dev
@@ -50,25 +50,25 @@ web-install:  ## Install web app dependencies
 	cd deps/learn-claude-code/web && npm install
 
 learning-dev:  ## Start the interactive learning app
-	cd 02-se-fundamentals/git-course && npm run dev
+	cd 02-se-fundamentals/05-scaling-and-operating-in-production/git-course && npm run dev
 
 test-learning-git:  ## Run interactive Git course unit and component tests
-	cd 02-se-fundamentals/git-course && npm test
+	cd 02-se-fundamentals/05-scaling-and-operating-in-production/git-course && npm test
 
 verify-learning-git-gate1:  ## Verify the Fundamentals sequence locally
-	cd 02-se-fundamentals/git-course && npm run verify:gate1
+	cd 02-se-fundamentals/05-scaling-and-operating-in-production/git-course && npm run verify:gate1
 
 setup:  ## Initial project setup (submodule + deps)
 	git submodule update --init --recursive
-	cd 01-ai-applications/agent-loop && go mod download
-	cd 01-ai-applications/agent-loop-trpc && go mod download
+	cd 01-ai-applications/03-building-agentic-systems/agent-loop && go mod download
+	cd 01-ai-applications/03-building-agentic-systems/agent-loop-trpc && go mod download
 	$(MAKE) web-install
 
 harness-list:  ## List deterministic harness cases
-	PYTHONPATH=04-shaping-the-build python3 -m harness.run list-cases
+	PYTHONPATH=04-shaping-the-build/01-content-curation-decisions python3 -m harness.run list-cases
 
-harness-init:  ## Initialize a harness run directory: make harness-init RUN=04-shaping-the-build/harness/runs/demo CASE=git-pro-book
-	PYTHONPATH=04-shaping-the-build python3 -m harness.run init-run --run-dir "$(RUN)" $(if $(CASE),--case $(CASE),)
+harness-init:  ## Initialize a harness run directory: make harness-init RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo CASE=git-pro-book
+	PYTHONPATH=04-shaping-the-build/01-content-curation-decisions python3 -m harness.run init-run --run-dir "$(RUN)" $(if $(CASE),--case $(CASE),)
 
-harness-grade:  ## Grade a harness run directory: make harness-grade RUN=04-shaping-the-build/harness/runs/demo
-	PYTHONPATH=04-shaping-the-build python3 -m harness.run grade --run-dir "$(RUN)"
+harness-grade:  ## Grade a harness run directory: make harness-grade RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo
+	PYTHONPATH=04-shaping-the-build/01-content-curation-decisions python3 -m harness.run grade --run-dir "$(RUN)"

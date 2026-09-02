@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: pip install anthropic python-dotenv
 
+      - name: Check capability catalog
+        run: python3 scripts/check_capabilities.py
+
       - name: Run unit tests
         run: python tests/test_unit.py
 
@@ -117,23 +120,23 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: 02-se-fundamentals/system-design/systems/01-rate-limiter/lab/ui/package-lock.json
+          cache-dependency-path: 02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab/ui/package-lock.json
 
       - name: Install test dependencies
         run: |
           pip install pytest
-          npm ci --prefix 02-se-fundamentals/system-design/systems/01-rate-limiter/lab/ui
+          npm ci --prefix 02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab/ui
 
       - name: Test four-language rate limiter implementations
-        run: make -C 02-se-fundamentals/system-design test
+        run: make -C 02-se-fundamentals/03-designing-system-architectures/system-design test
 
       - name: Race-test Go system path
-        run: make -C 02-se-fundamentals/system-design/systems/01-rate-limiter/lab test-race
+        run: make -C 02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab test-race
 
       - name: Test and build Rate Limiter Lab UI
         run: |
-          make -C 02-se-fundamentals/system-design test-ui
-          make -C 02-se-fundamentals/system-design build-lab
+          make -C 02-se-fundamentals/03-designing-system-architectures/system-design test-ui
+          make -C 02-se-fundamentals/03-designing-system-architectures/system-design build-lab
 
   patterns:
     runs-on: ubuntu-latest
@@ -165,7 +168,7 @@ jobs:
         run: pip install pytest
 
       - name: Verify 42-pattern catalog and implementations
-        run: make -C 02-se-fundamentals/patterns verify
+        run: make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify
 
   go-foundations:
     runs-on: ubuntu-latest
@@ -178,9 +181,9 @@ jobs:
           go-version: "1.24"
 
       - name: Test Go foundations with race detector
-        working-directory: 02-se-fundamentals/systems-foundations
+        working-directory: 02-se-fundamentals/03-designing-system-architectures/systems-foundations
         run: go test -race ./...
 
       - name: Vet Go foundations
-        working-directory: 02-se-fundamentals/systems-foundations
+        working-directory: 02-se-fundamentals/03-designing-system-architectures/systems-foundations
         run: go vet ./...

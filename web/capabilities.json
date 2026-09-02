@@ -1,0 +1,398 @@
+{
+  "title": "AI Engineering Skills Map",
+  "defaultCapability": "03-designing-system-architectures",
+  "statuses": {
+    "partial": "已有局部实践",
+    "scaffold": "仅有骨架",
+    "planned": "待建设"
+  },
+  "pillars": [
+    {
+      "id": "01-ai-applications",
+      "title": "Building and deploying AI applications",
+      "zh": "构建与部署 AI 应用",
+      "color": "blue",
+      "icon": "box",
+      "source": "https://x.com/AndrewYNg/status/2090840747738374568"
+    },
+    {
+      "id": "02-se-fundamentals",
+      "title": "Software engineering fundamentals",
+      "zh": "软件工程基础",
+      "color": "green",
+      "icon": "terminal",
+      "source": "https://x.com/AndrewYNg/status/2093388974194872781"
+    },
+    {
+      "id": "03-coding-agents",
+      "title": "Using coding agents",
+      "zh": "使用 coding agents",
+      "color": "purple",
+      "icon": "code",
+      "source": "https://x.com/AndrewYNg/status/2088302050706686198"
+    },
+    {
+      "id": "04-shaping-the-build",
+      "title": "Shaping the build",
+      "zh": "决定构建什么",
+      "color": "orange",
+      "icon": "tool",
+      "source": "https://x.com/AndrewYNg/status/2088302050706686198"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "01-llm-foundations",
+      "pillar": "01-ai-applications",
+      "path": "01-ai-applications/01-llm-foundations",
+      "title": "LLM foundations",
+      "zh": "LLM 基础",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2090840747738374568",
+      "status": "scaffold",
+      "description": "理解 token、模型结构、上下文与推理行为。",
+      "boundary": "Nanochat tokenizer 与 model 提供学习契约，核心实现仍待本人完成。",
+      "next": "从 tokenizer 的 IO 契约与最小测试开始。",
+      "practices": [],
+      "related": [
+        "06-machine-learning-foundations"
+      ]
+    },
+    {
+      "id": "02-grounding-models-with-data",
+      "pillar": "01-ai-applications",
+      "path": "01-ai-applications/02-grounding-models-with-data",
+      "title": "Grounding models with data",
+      "zh": "用数据支撑模型",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2090840747738374568",
+      "status": "planned",
+      "description": "用检索与数据管道为模型提供相关、可信且及时的信息。",
+      "boundary": "当前没有端到端 grounding 实践；一般 tool use 不等同于 RAG 或数据质量验证。",
+      "next": "先定义小型检索任务、数据来源与相关性评估集。",
+      "practices": [],
+      "related": [
+        "02-managing-data",
+        "04-evaluation-driven-development"
+      ]
+    },
+    {
+      "id": "03-building-agentic-systems",
+      "pillar": "01-ai-applications",
+      "path": "01-ai-applications/03-building-agentic-systems",
+      "title": "Building agentic systems",
+      "zh": "构建 Agent 系统",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2090840747738374568",
+      "status": "partial",
+      "description": "把工具、记忆、任务与执行边界组合为可验证的 agent 工作流。",
+      "boundary": "已有 12 课 Go 与 trpc 实现；编译与离线测试不证明线上质量。",
+      "next": "为真实工具调用补任务级失败案例与评估证据。",
+      "practices": [
+        "agent-loop",
+        "agent-loop-trpc"
+      ],
+      "related": [
+        "01-agent-workflows",
+        "04-evaluation-driven-development"
+      ]
+    },
+    {
+      "id": "04-evaluation-driven-development",
+      "pillar": "01-ai-applications",
+      "path": "01-ai-applications/04-evaluation-driven-development",
+      "title": "Evaluation-driven development",
+      "zh": "评估驱动开发",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2090840747738374568",
+      "status": "scaffold",
+      "description": "用评估、错误分析和回归检查推动 AI 应用迭代。",
+      "boundary": "Nanochat eval 尚为骨架；内容策展 harness 可供机制参考，但不代表通用 AI eval 已覆盖。",
+      "next": "先为一个 AI 任务建立数据集、判定规则与失败分析。",
+      "practices": [],
+      "related": [
+        "06-machine-learning-foundations",
+        "01-content-curation-decisions"
+      ]
+    },
+    {
+      "id": "05-operating-in-production",
+      "pillar": "01-ai-applications",
+      "path": "01-ai-applications/05-operating-in-production",
+      "title": "Operating in production",
+      "zh": "AI 生产运维",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2090840747738374568",
+      "status": "planned",
+      "description": "持续观察 AI 应用的质量、成本、延迟与行为变化。",
+      "boundary": "当前没有 AI 线上运维实践；通用 CI 不证明漂移检测、模型质量或成本控制。",
+      "next": "选择真实 AI 服务后，定义观测指标、回归样本与响应流程。",
+      "practices": [],
+      "related": [
+        "05-scaling-and-operating-in-production"
+      ]
+    },
+    {
+      "id": "06-machine-learning-foundations",
+      "pillar": "01-ai-applications",
+      "path": "01-ai-applications/06-machine-learning-foundations",
+      "title": "Machine learning foundations",
+      "zh": "机器学习基础",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2090840747738374568",
+      "status": "scaffold",
+      "description": "通过模型与训练机制的从零实现理解机器学习基础。",
+      "boundary": "Nanochat 十系统与 from-scratch 练习保留原顺序，TODO 与 skip 不算能力完成。",
+      "next": "由本人按 RUNBOOK 完成 micrograd 与逐系统实现，再运行真实测试和对拍。",
+      "practices": [
+        "nanochat"
+      ],
+      "related": [
+        "01-llm-foundations",
+        "04-evaluation-driven-development"
+      ]
+    },
+    {
+      "id": "01-building-full-stack-applications",
+      "pillar": "02-se-fundamentals",
+      "path": "02-se-fundamentals/01-building-full-stack-applications",
+      "title": "Building full-stack applications",
+      "zh": "构建全栈应用",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2093388974194872781",
+      "status": "partial",
+      "description": "理解界面、API、状态与持久化如何组成完整应用。",
+      "boundary": "system-design 的 HTTP / Redis / UI lab 是局部实践，未覆盖完整身份与业务应用。",
+      "next": "扩充明确的端到端业务场景与身份、持久化边界。",
+      "practices": [],
+      "related": [
+        "03-designing-system-architectures"
+      ]
+    },
+    {
+      "id": "02-managing-data",
+      "pillar": "02-se-fundamentals",
+      "path": "02-se-fundamentals/02-managing-data",
+      "title": "Managing data",
+      "zh": "管理数据",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2093388974194872781",
+      "status": "partial",
+      "description": "围绕访问模式设计数据存储、事务、并发与消息语义。",
+      "boundary": "已有 Data & Messaging patterns 和分布式语义实验，未覆盖完整数据治理。",
+      "next": "将事务、重复效果与数据质量问题放入具体业务负载验证。",
+      "practices": [],
+      "related": [
+        "03-designing-system-architectures",
+        "02-grounding-models-with-data"
+      ]
+    },
+    {
+      "id": "03-designing-system-architectures",
+      "pillar": "02-se-fundamentals",
+      "path": "02-se-fundamentals/03-designing-system-architectures",
+      "title": "Designing system architectures",
+      "zh": "设计系统架构",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2093388974194872781",
+      "status": "partial",
+      "description": "专注系统架构设计与权衡：在复杂性、性能、成本与可靠性之间做出合理取舍。",
+      "boundary": "已有组件、模式与机制实验；局部测试不代表完整生产架构验证。",
+      "next": "结合真实负载记录架构取舍、故障边界与演进方案。",
+      "practices": [
+        "system-design",
+        "patterns",
+        "systems-foundations"
+      ],
+      "related": [
+        "02-managing-data",
+        "04-making-systems-secure-and-reliable"
+      ]
+    },
+    {
+      "id": "04-making-systems-secure-and-reliable",
+      "pillar": "02-se-fundamentals",
+      "path": "02-se-fundamentals/04-making-systems-secure-and-reliable",
+      "title": "Making systems secure and reliable",
+      "zh": "安全与可靠性",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2093388974194872781",
+      "status": "partial",
+      "description": "通过信任边界、测试、隔离和降级控制系统风险。",
+      "boundary": "10 个 loopback 安全 labs 与 reliability patterns 只证明给定实验条件。",
+      "next": "将故障注入与安全边界映射到具体系统并保留证据。",
+      "practices": [
+        "network-security"
+      ],
+      "related": [
+        "03-designing-system-architectures"
+      ]
+    },
+    {
+      "id": "05-scaling-and-operating-in-production",
+      "pillar": "02-se-fundamentals",
+      "path": "02-se-fundamentals/05-scaling-and-operating-in-production",
+      "title": "Scaling and operating in production",
+      "zh": "生产扩展与运维",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2093388974194872781",
+      "status": "partial",
+      "description": "通过版本控制、交付、观测与扩容维护运行中的软件。",
+      "boundary": "Git 课程仅覆盖版本控制基础，不代表 CI/CD、事故响应或扩容能力已覆盖。",
+      "next": "在 Git 基础之上补发布、回滚和可观测性的独立实践。",
+      "practices": [
+        "git-course"
+      ],
+      "related": [
+        "05-operating-in-production"
+      ]
+    },
+    {
+      "id": "06-algorithms-and-data-structures",
+      "pillar": "02-se-fundamentals",
+      "path": "02-se-fundamentals/06-algorithms-and-data-structures",
+      "title": "Algorithms and data structures",
+      "zh": "算法与数据结构",
+      "origin": "rubickx",
+      "source": null,
+      "status": "partial",
+      "description": "通过算法和数据结构练习理解复杂度与实现取舍。",
+      "boundary": "Rubickx 扩展；已有题目实践，但 Go dynamicarray / hashmap 仍是 TODO，总测试当前失败。完成度以 algo 自身记录和测试为准。",
+      "next": "按题目验证行为与复杂度，不用语言文件数量推断熟练度。",
+      "practices": [
+        "algo"
+      ],
+      "related": [
+        "03-designing-system-architectures"
+      ]
+    },
+    {
+      "id": "01-agent-workflows",
+      "pillar": "03-coding-agents",
+      "path": "03-coding-agents/01-agent-workflows",
+      "title": "Agent workflows",
+      "zh": "Agent 工作流",
+      "origin": "rubickx",
+      "source": null,
+      "status": "partial",
+      "description": "用明确任务、context 与 verifier 指导 coding agent 工作。",
+      "boundary": "Rubickx 扩展；只有本仓库的配置与验证清单，不代表通用工作流课程已完成。",
+      "next": "在真实任务中记录 spec、执行、验证和人工审查的证据。",
+      "practices": [
+        "agent-workflows"
+      ],
+      "related": [
+        "03-building-agentic-systems"
+      ]
+    },
+    {
+      "id": "01-content-curation-decisions",
+      "pillar": "04-shaping-the-build",
+      "path": "04-shaping-the-build/01-content-curation-decisions",
+      "title": "Content curation decisions",
+      "zh": "内容策展决策",
+      "origin": "rubickx",
+      "source": null,
+      "status": "partial",
+      "description": "判断材料是否值得沉淀，以及应形成什么交付物。",
+      "boundary": "Rubickx 扩展；内容策展 cases 与 grader 不能替代完整产品决策能力。",
+      "next": "扩充真实策展决策的反例，检查评分是否符合人工判断。",
+      "practices": [
+        "harness"
+      ],
+      "related": [
+        "04-evaluation-driven-development"
+      ]
+    }
+  ],
+  "practices": {
+    "agent-loop": {
+      "id": "agent-loop",
+      "path": "01-ai-applications/03-building-agentic-systems/agent-loop",
+      "description": "12 课 Go agent 机制",
+      "verify": "make check",
+      "icon": "terminal",
+      "status": "partial"
+    },
+    "agent-loop-trpc": {
+      "id": "agent-loop-trpc",
+      "path": "01-ai-applications/03-building-agentic-systems/agent-loop-trpc",
+      "description": "同 12 课的 trpc-agent-go 实现",
+      "verify": "make check-trpc",
+      "icon": "code",
+      "status": "partial"
+    },
+    "nanochat": {
+      "id": "nanochat",
+      "path": "01-ai-applications/06-machine-learning-foundations/nanochat",
+      "description": "LLM 十系统与 from-scratch 练习骨架",
+      "verify": "各系统目录 pytest test_impl.py；实现后 python parity.py",
+      "icon": "box",
+      "status": "scaffold"
+    },
+    "system-design": {
+      "id": "system-design",
+      "path": "02-se-fundamentals/03-designing-system-architectures/system-design",
+      "description": "系统组件与 HTTP / Redis / UI lab",
+      "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/system-design test",
+      "icon": "server",
+      "status": "partial"
+    },
+    "patterns": {
+      "id": "patterns",
+      "path": "02-se-fundamentals/03-designing-system-architectures/patterns",
+      "description": "42 项四语言工程模式与共享 contract tests",
+      "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify",
+      "icon": "grid",
+      "status": "partial"
+    },
+    "systems-foundations": {
+      "id": "systems-foundations",
+      "path": "02-se-fundamentals/03-designing-system-architectures/systems-foundations",
+      "description": "Go 执行模型与分布式语义实验",
+      "verify": "cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations && go test -race ./... && go vet ./...",
+      "icon": "layers",
+      "status": "partial"
+    },
+    "network-security": {
+      "id": "network-security",
+      "path": "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security",
+      "description": "10 个 loopback 网络安全 labs",
+      "verify": "make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify",
+      "icon": "shield",
+      "status": "partial"
+    },
+    "git-course": {
+      "id": "git-course",
+      "path": "02-se-fundamentals/05-scaling-and-operating-in-production/git-course",
+      "description": "交互式 Git 基础三课",
+      "verify": "make verify-learning-git-gate1",
+      "icon": "git-branch",
+      "status": "partial"
+    },
+    "algo": {
+      "id": "algo",
+      "path": "02-se-fundamentals/06-algorithms-and-data-structures/algo",
+      "description": "五语言算法与数据结构练习",
+      "verify": "make -C 02-se-fundamentals/06-algorithms-and-data-structures/algo test",
+      "icon": "code",
+      "status": "partial"
+    },
+    "agent-workflows": {
+      "id": "agent-workflows",
+      "path": "03-coding-agents/01-agent-workflows/README.md",
+      "description": "本仓库的工作流、配置与 verifier 清单",
+      "verify": "make check check-trpc test-unit test-harness",
+      "icon": "terminal",
+      "status": "partial"
+    },
+    "harness": {
+      "id": "harness",
+      "path": "04-shaping-the-build/01-content-curation-decisions/harness",
+      "description": "内容策展决策：cases 与 grader",
+      "verify": "make test-harness",
+      "icon": "tool",
+      "status": "partial"
+    }
+  }
+}

@@ -23,7 +23,9 @@ jobs:
         run: pip install anthropic python-dotenv
 
       - name: Check capability catalog
-        run: python3 scripts/check_capabilities.py
+        run: |
+          python3 scripts/check_capabilities.py
+          python3 scripts/render_skills_map.py --check
 
       - name: Run unit tests
         run: python tests/test_unit.py

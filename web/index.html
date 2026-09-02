@@ -1,96 +1,80 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rubickx | Skills Map</title>
-    <meta
-      name="description"
-      content="rubickx Skills Map：四项 AI Engineering 技能、学习 track、参考课程与源码入口。"
-    />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <div class="page">
-      <header class="header">
-        <nav class="nav" aria-label="Primary navigation">
-          <a class="brand" href="./index.html">rubickx</a>
-          <a href="https://github.com/xjiang77/rubickx" target="_blank" rel="noreferrer">GitHub</a>
-        </nav>
-
-        <p class="eyebrow">AI Engineering / Skills Map</p>
-        <h1>四项技能，一张学习地图</h1>
-        <p class="intro">
-          按 AI Engineering Skills Map 浏览学习 track，进入源码、实验与验证说明。
-          参考课程保留网站、上游与本地源码入口。
-        </p>
-      </header>
-
-      <nav class="pillar-nav" aria-label="Skills Map">
-        <a href="#01-ai-applications">01 构建 AI 应用</a>
-        <a href="#02-se-fundamentals">02 软件工程基础</a>
-        <a href="#03-coding-agents">03 使用 coding agents</a>
-        <a href="#04-shaping-the-build">04 决定构建什么</a>
-      </nav>
-
-      <main class="resources" aria-label="Skills Map tracks">
-        <section class="resource" id="01-ai-applications" aria-labelledby="01-ai-applications-title">
-          <div class="resource-title">
-            <h2 id="01-ai-applications-title">01 · 构建 AI 应用</h2>
-          </div>
-          <p>Building and deploying AI applications — 从 agent loop 到 LLM 构件，通过实现、测试与对拍理解系统。</p>
-          <ul class="tracks">
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/03-building-agentic-systems/agent-loop" target="_blank" rel="noreferrer">agent-loop</a> — 12 课 Go agent 机制</li>
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/03-building-agentic-systems/agent-loop-trpc" target="_blank" rel="noreferrer">agent-loop-trpc</a> — 同 12 课的 trpc-agent-go 实现</li>
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/06-machine-learning-foundations/nanochat" target="_blank" rel="noreferrer">nanochat</a> — LLM 十系统重写 + micrograd</li>
-          </ul>
-          <dl class="meta">
-            <div>
-              <dt>参考课程</dt>
-              <dd><a href="https://learn.shareai.run/" target="_blank" rel="noreferrer">Learn Claude Code</a> · <a href="https://github.com/shareAI-lab/learn-claude-code" target="_blank" rel="noreferrer">上游源码</a><br /><code>deps/learn-claude-code</code>（已引入 submodule）</dd>
-            </div>
-          </dl>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="理解 AI 工程能力，连接 Rubickx 实践。按 Andrew Ng 的能力框架浏览课程、实验与真实覆盖边界。">
+  <title>AI Engineering Skills Map</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./map.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#all-capabilities">跳到完整能力目录</a>
+  <div class="page">
+    <header>
+      <nav class="top-nav" aria-label="主导航"><a class="brand" href="./index.html">RUBICKX</a><a href="https://github.com/xjiang77/rubickx">GitHub</a></nav>
+      <h1>AI Engineering Skills Map</h1>
+      <p class="intro">理解 AI 工程能力，连接 Rubickx 实践。</p>
+      <p class="credit">Framework: Andrew Ng · DeepLearning.AI</p>
+    </header>
+    <main>
+      <section id="interactive-map" class="map green" aria-label="交互式能力地图" hidden>
+        <div class="root-node">AI Engineering</div>
+        <div id="pillars" class="pillars" role="group" aria-label="选择 pillar"></div>
+        <div id="capabilities" class="capabilities" role="group" aria-label="选择能力"></div>
+        <div id="extensions" class="extensions" role="group" aria-label="Rubickx 扩展能力"></div>
+        <section id="practice-panel" class="practice-panel" aria-labelledby="practice-title">
+          <div class="panel-label"><h2>Rubickx 实践映射</h2><span>本地实践关联 · 不代表完整能力覆盖</span></div>
+          <div id="practice-content"></div>
+          <a class="browse-all" href="#all-practices">浏览全部 11 个实践入口 ↓</a>
         </section>
-        <section class="resource" id="02-se-fundamentals" aria-labelledby="02-se-fundamentals-title">
-          <div class="resource-title">
-            <h2 id="02-se-fundamentals-title">02 · 软件工程基础</h2>
-          </div>
-          <p>Software engineering fundamentals — 用算法、工程模式与系统实验练习实现、验证和技术取舍。</p>
-          <ul class="tracks">
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/05-scaling-and-operating-in-production/git-course" target="_blank" rel="noreferrer">git-course</a> — 交互式 Git 基础：working tree、index、commit graph 与 HEAD</li>
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/06-algorithms-and-data-structures/algo" target="_blank" rel="noreferrer">algo</a> — 五语言算法与数据结构</li>
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/03-designing-system-architectures/patterns" target="_blank" rel="noreferrer">patterns</a> — 42 项四语言工程模式与 contract tests</li>
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/03-designing-system-architectures/system-design" target="_blank" rel="noreferrer">system-design</a> — 系统设计组件与 HTTP / Redis lab</li>
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/04-making-systems-secure-and-reliable/network-security" target="_blank" rel="noreferrer">network-security</a> — 10 个 loopback 网络安全 labs</li>
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/03-designing-system-architectures/systems-foundations" target="_blank" rel="noreferrer">systems-foundations</a> — Go 执行模型与分布式语义实验</li>
-          </ul>
-        </section>
-        <section class="resource" id="03-coding-agents" aria-labelledby="03-coding-agents-title">
-          <div class="resource-title">
-            <h2 id="03-coding-agents-title">03 · 使用 coding agents</h2>
-          </div>
-          <p>Using coding agents — 本仓库的 agent 配置、hook、spec 约定与验证命令入口。</p>
-          <ul class="tracks">
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/03-coding-agents" target="_blank" rel="noreferrer">Agent 工作流与 verifier 清单</a> — 本仓库的 agent 工作流、配置与 verifier 清单</li>
-          </ul>
-          <dl class="meta">
-            <div>
-              <dt>参考课程</dt>
-              <dd><a href="https://walkinglabs.github.io/learn-harness-engineering/zh/" target="_blank" rel="noreferrer">Learn Harness Engineering</a> · <a href="https://github.com/xjiang77/learn-harness-engineering" target="_blank" rel="noreferrer">Fork</a> · <a href="https://github.com/walkinglabs/learn-harness-engineering" target="_blank" rel="noreferrer">上游源码</a><br /><code>deps/learn-harness-engineering</code>（已引入 fork submodule）</dd>
-            </div>
-          </dl>
-        </section>
-        <section class="resource" id="04-shaping-the-build" aria-labelledby="04-shaping-the-build-title">
-          <div class="resource-title">
-            <h2 id="04-shaping-the-build-title">04 · 决定构建什么</h2>
-          </div>
-          <p>Shaping the build — 用明确的任务契约与评估标准，判断材料是否值得沉淀、应交付什么。</p>
-          <ul class="tracks">
-            <li><a href="https://github.com/xjiang77/rubickx/tree/main/04-shaping-the-build/01-content-curation-decisions/harness" target="_blank" rel="noreferrer">harness</a> — 内容策展决策：cases + grader</li>
-          </ul>
-        </section>
-      </main>
-    </div>
-  </body>
+        <p id="selection-status" class="sr-only" role="status" aria-live="polite"></p>
+      </section>
+      <p id="fallback-message" class="fallback-message">完整能力与实践目录如下；交互图加载后可按分支浏览。</p>
+      <aside class="sources" aria-label="原始资料"><strong>原始资料</strong><a href="https://x.com/AndrewYNg/status/2090840747738374568">AI 应用能力 · Andrew Ng</a><a href="https://x.com/AndrewYNg/status/2093388974194872781">软件工程基础 · Andrew Ng</a></aside>
+      <details id="all-capabilities" class="directory" open>
+        <summary>完整能力目录 <span>11 项原框架能力 · 3 项 Rubickx 扩展</span></summary>
+        <section class="directory-group"><h2>Building and deploying AI applications</h2>
+<article id="directory-01-llm-foundations"><h3><a href="#directory-01-llm-foundations" data-capability="01-llm-foundations">LLM foundations</a> / LLM 基础</h3><p class="meta">Andrew Ng 原框架 · 仅有骨架</p><p>理解 token、模型结构、上下文与推理行为。</p><p>Nanochat tokenizer 与 model 提供学习契约，核心实现仍待本人完成。</p><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/01-llm-foundations/README.md">能力说明 README</a></article>
+<article id="directory-02-grounding-models-with-data"><h3><a href="#directory-02-grounding-models-with-data" data-capability="02-grounding-models-with-data">Grounding models with data</a> / 用数据支撑模型</h3><p class="meta">Andrew Ng 原框架 · 待建设</p><p>用检索与数据管道为模型提供相关、可信且及时的信息。</p><p>当前没有端到端 grounding 实践；一般 tool use 不等同于 RAG 或数据质量验证。</p><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/02-grounding-models-with-data/README.md">能力说明 README</a></article>
+<article id="directory-03-building-agentic-systems"><h3><a href="#directory-03-building-agentic-systems" data-capability="03-building-agentic-systems">Building agentic systems</a> / 构建 Agent 系统</h3><p class="meta">Andrew Ng 原框架 · 已有局部实践</p><p>把工具、记忆、任务与执行边界组合为可验证的 agent 工作流。</p><p>已有 12 课 Go 与 trpc 实现；编译与离线测试不证明线上质量。</p><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/03-building-agentic-systems/README.md">能力说明 README</a></article>
+<article id="directory-04-evaluation-driven-development"><h3><a href="#directory-04-evaluation-driven-development" data-capability="04-evaluation-driven-development">Evaluation-driven development</a> / 评估驱动开发</h3><p class="meta">Andrew Ng 原框架 · 仅有骨架</p><p>用评估、错误分析和回归检查推动 AI 应用迭代。</p><p>Nanochat eval 尚为骨架；内容策展 harness 可供机制参考，但不代表通用 AI eval 已覆盖。</p><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/04-evaluation-driven-development/README.md">能力说明 README</a></article>
+<article id="directory-05-operating-in-production"><h3><a href="#directory-05-operating-in-production" data-capability="05-operating-in-production">Operating in production</a> / AI 生产运维</h3><p class="meta">Andrew Ng 原框架 · 待建设</p><p>持续观察 AI 应用的质量、成本、延迟与行为变化。</p><p>当前没有 AI 线上运维实践；通用 CI 不证明漂移检测、模型质量或成本控制。</p><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/05-operating-in-production/README.md">能力说明 README</a></article>
+<article id="directory-06-machine-learning-foundations"><h3><a href="#directory-06-machine-learning-foundations" data-capability="06-machine-learning-foundations">Machine learning foundations</a> / 机器学习基础</h3><p class="meta">Andrew Ng 原框架 · 仅有骨架</p><p>通过模型与训练机制的从零实现理解机器学习基础。</p><p>Nanochat 十系统与 from-scratch 练习保留原顺序，TODO 与 skip 不算能力完成。</p><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/06-machine-learning-foundations/README.md">能力说明 README</a></article></section>
+<section class="directory-group"><h2>Software engineering fundamentals</h2>
+<article id="directory-01-building-full-stack-applications"><h3><a href="#directory-01-building-full-stack-applications" data-capability="01-building-full-stack-applications">Building full-stack applications</a> / 构建全栈应用</h3><p class="meta">Andrew Ng 原框架 · 已有局部实践</p><p>理解界面、API、状态与持久化如何组成完整应用。</p><p>system-design 的 HTTP / Redis / UI lab 是局部实践，未覆盖完整身份与业务应用。</p><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/01-building-full-stack-applications/README.md">能力说明 README</a></article>
+<article id="directory-02-managing-data"><h3><a href="#directory-02-managing-data" data-capability="02-managing-data">Managing data</a> / 管理数据</h3><p class="meta">Andrew Ng 原框架 · 已有局部实践</p><p>围绕访问模式设计数据存储、事务、并发与消息语义。</p><p>已有 Data &amp; Messaging patterns 和分布式语义实验，未覆盖完整数据治理。</p><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/02-managing-data/README.md">能力说明 README</a></article>
+<article id="directory-03-designing-system-architectures"><h3><a href="#directory-03-designing-system-architectures" data-capability="03-designing-system-architectures">Designing system architectures</a> / 设计系统架构</h3><p class="meta">Andrew Ng 原框架 · 已有局部实践</p><p>专注系统架构设计与权衡：在复杂性、性能、成本与可靠性之间做出合理取舍。</p><p>已有组件、模式与机制实验；局部测试不代表完整生产架构验证。</p><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/03-designing-system-architectures/README.md">能力说明 README</a></article>
+<article id="directory-04-making-systems-secure-and-reliable"><h3><a href="#directory-04-making-systems-secure-and-reliable" data-capability="04-making-systems-secure-and-reliable">Making systems secure and reliable</a> / 安全与可靠性</h3><p class="meta">Andrew Ng 原框架 · 已有局部实践</p><p>通过信任边界、测试、隔离和降级控制系统风险。</p><p>10 个 loopback 安全 labs 与 reliability patterns 只证明给定实验条件。</p><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/04-making-systems-secure-and-reliable/README.md">能力说明 README</a></article>
+<article id="directory-05-scaling-and-operating-in-production"><h3><a href="#directory-05-scaling-and-operating-in-production" data-capability="05-scaling-and-operating-in-production">Scaling and operating in production</a> / 生产扩展与运维</h3><p class="meta">Andrew Ng 原框架 · 已有局部实践</p><p>通过版本控制、交付、观测与扩容维护运行中的软件。</p><p>Git 课程仅覆盖版本控制基础，不代表 CI/CD、事故响应或扩容能力已覆盖。</p><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/05-scaling-and-operating-in-production/README.md">能力说明 README</a></article>
+<article id="directory-06-algorithms-and-data-structures"><h3><a href="#directory-06-algorithms-and-data-structures" data-capability="06-algorithms-and-data-structures">Algorithms and data structures</a> / 算法与数据结构</h3><p class="meta">Rubickx 扩展 · 已有局部实践</p><p>通过算法和数据结构练习理解复杂度与实现取舍。</p><p>Rubickx 扩展；已有题目实践，但 Go dynamicarray / hashmap 仍是 TODO，总测试当前失败。完成度以 algo 自身记录和测试为准。</p><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/06-algorithms-and-data-structures/README.md">能力说明 README</a></article></section>
+<section class="directory-group"><h2>Using coding agents</h2>
+<article id="directory-01-agent-workflows"><h3><a href="#directory-01-agent-workflows" data-capability="01-agent-workflows">Agent workflows</a> / Agent 工作流</h3><p class="meta">Rubickx 扩展 · 已有局部实践</p><p>用明确任务、context 与 verifier 指导 coding agent 工作。</p><p>Rubickx 扩展；只有本仓库的配置与验证清单，不代表通用工作流课程已完成。</p><a href="https://github.com/xjiang77/rubickx/tree/main/03-coding-agents/01-agent-workflows/README.md">能力说明 README</a></article></section>
+<section class="directory-group"><h2>Shaping the build</h2>
+<article id="directory-01-content-curation-decisions"><h3><a href="#directory-01-content-curation-decisions" data-capability="01-content-curation-decisions">Content curation decisions</a> / 内容策展决策</h3><p class="meta">Rubickx 扩展 · 已有局部实践</p><p>判断材料是否值得沉淀，以及应形成什么交付物。</p><p>Rubickx 扩展；内容策展 cases 与 grader 不能替代完整产品决策能力。</p><a href="https://github.com/xjiang77/rubickx/tree/main/04-shaping-the-build/01-content-curation-decisions/README.md">能力说明 README</a></article></section>
+      </details>
+      <details id="all-practices" class="directory" open>
+        <summary>全部 11 个实践入口 <span>课程、实验与工作流</span></summary>
+        <ul class="all-practice-list"><li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/03-building-agentic-systems/agent-loop"><code>agent-loop</code></a><span>12 课 Go agent 机制 · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/03-building-agentic-systems/agent-loop-trpc"><code>agent-loop-trpc</code></a><span>同 12 课的 trpc-agent-go 实现 · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/01-ai-applications/06-machine-learning-foundations/nanochat"><code>nanochat</code></a><span>LLM 十系统与 from-scratch 练习骨架 · 仅有骨架</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/03-designing-system-architectures/system-design"><code>system-design</code></a><span>系统组件与 HTTP / Redis / UI lab · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/03-designing-system-architectures/patterns"><code>patterns</code></a><span>42 项四语言工程模式与共享 contract tests · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/03-designing-system-architectures/systems-foundations"><code>systems-foundations</code></a><span>Go 执行模型与分布式语义实验 · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/04-making-systems-secure-and-reliable/network-security"><code>network-security</code></a><span>10 个 loopback 网络安全 labs · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/05-scaling-and-operating-in-production/git-course"><code>git-course</code></a><span>交互式 Git 基础三课 · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/02-se-fundamentals/06-algorithms-and-data-structures/algo"><code>algo</code></a><span>五语言算法与数据结构练习 · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/03-coding-agents/01-agent-workflows/README.md"><code>agent-workflows</code></a><span>本仓库的工作流、配置与 verifier 清单 · 已有局部实践</span></li>
+<li><a href="https://github.com/xjiang77/rubickx/tree/main/04-shaping-the-build/01-content-curation-decisions/harness"><code>harness</code></a><span>内容策展决策：cases 与 grader · 已有局部实践</span></li></ul>
+      </details>
+      <details class="directory references">
+        <summary>参考课程与上游源码</summary>
+        <p><a href="https://learn.shareai.run/">Learn Claude Code</a> · <a href="https://github.com/shareAI-lab/learn-claude-code">上游源码</a> · <code>deps/learn-claude-code</code>（已引入 submodule）</p>
+        <p><a href="https://walkinglabs.github.io/learn-harness-engineering/zh/">Learn Harness Engineering</a> · <a href="https://github.com/xjiang77/learn-harness-engineering">Fork</a> · <a href="https://github.com/walkinglabs/learn-harness-engineering">上游源码</a> · <code>deps/learn-harness-engineering</code>（已引入 fork submodule）</p>
+      </details>
+    </main>
+    <footer>Rubickx · 从能力到实践，从实践回到理解。</footer>
+  </div>
+</body>
 </html>

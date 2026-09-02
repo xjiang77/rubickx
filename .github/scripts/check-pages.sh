@@ -5,10 +5,15 @@ set -euo pipefail
 ROOT="web"
 PORT="${PAGES_CHECK_PORT:-8123}"
 
+python3 scripts/check_capabilities.py
+python3 scripts/render_skills_map.py --check
+
 required_files=(
   "$ROOT/index.html"
   "$ROOT/styles.css"
   "$ROOT/favicon.svg"
+  "$ROOT/map.js"
+  "$ROOT/capabilities.json"
 )
 
 for file in "${required_files[@]}"; do

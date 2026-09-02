@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="理解 AI 工程能力，连接 Rubickx 实践。按 Andrew Ng 的能力框架浏览课程、实验与真实覆盖边界。">
+  <title>AI Engineering Skills Map</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./map.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#all-capabilities">跳到完整能力目录</a>
+  <div class="page">
+    <header>
+      <nav class="top-nav" aria-label="主导航"><a class="brand" href="./index.html">RUBICKX</a><a href="https://github.com/xjiang77/rubickx">GitHub</a></nav>
+      <h1>AI Engineering Skills Map</h1>
+      <p class="intro">理解 AI 工程能力，连接 Rubickx 实践。</p>
+      <p class="credit">Framework: Andrew Ng · DeepLearning.AI</p>
+    </header>
+    <main>
+      <section id="interactive-map" class="map green" aria-label="交互式能力地图" hidden>
+        <div class="root-node">AI Engineering</div>
+        <div id="pillars" class="pillars" role="group" aria-label="选择 pillar"></div>
+        <div id="capabilities" class="capabilities" role="group" aria-label="选择能力"></div>
+        <div id="extensions" class="extensions" role="group" aria-label="Rubickx 扩展能力"></div>
+        <section id="practice-panel" class="practice-panel" aria-labelledby="practice-title">
+          <div class="panel-label"><h2>Rubickx 实践映射</h2><span>本地实践关联 · 不代表完整能力覆盖</span></div>
+          <div id="practice-content"></div>
+          <a class="browse-all" href="#all-practices">浏览全部 11 个实践入口 ↓</a>
+        </section>
+        <p id="selection-status" class="sr-only" role="status" aria-live="polite"></p>
+      </section>
+      <p id="fallback-message" class="fallback-message">完整能力与实践目录如下；交互图加载后可按分支浏览。</p>
+      <aside class="sources" aria-label="原始资料"><strong>原始资料</strong><a href="https://x.com/AndrewYNg/status/2090840747738374568">AI 应用能力 · Andrew Ng</a><a href="https://x.com/AndrewYNg/status/2093388974194872781">软件工程基础 · Andrew Ng</a></aside>
+      <details id="all-capabilities" class="directory" open>
+        <summary>完整能力目录 <span>11 项原框架能力 · 3 项 Rubickx 扩展</span></summary>
+        <!-- CAPABILITIES -->
+      </details>
+      <details id="all-practices" class="directory" open>
+        <summary>全部 11 个实践入口 <span>课程、实验与工作流</span></summary>
+        <!-- PRACTICES -->
+      </details>
+      <details class="directory references">
+        <summary>参考课程与上游源码</summary>
+        <p><a href="https://learn.shareai.run/">Learn Claude Code</a> · <a href="https://github.com/shareAI-lab/learn-claude-code">上游源码</a> · <code>deps/learn-claude-code</code>（已引入 submodule）</p>
+        <p><a href="https://walkinglabs.github.io/learn-harness-engineering/zh/">Learn Harness Engineering</a> · <a href="https://github.com/xjiang77/learn-harness-engineering">Fork</a> · <a href="https://github.com/walkinglabs/learn-harness-engineering">上游源码</a> · <code>deps/learn-harness-engineering</code>（已引入 fork submodule）</p>
+      </details>
+    </main>
+    <footer>Rubickx · 从能力到实践，从实践回到理解。</footer>
+  </div>
+</body>
+</html>

@@ -8,27 +8,43 @@
 
 ## 项目结构
 
+顶层按 Andrew Ng 的 [AI Engineering Skills Map](https://www.deeplearning.ai/the-batch/the-ai-engineering-skills-map)（2026-08）四项技能组织；`deps/`、`web/`、`learning/`、`tests/` 是支撑面，不表达技能。
+
 ```
 rubickx/
-├── deps/learn-claude-code/    # Learn Claude Code 上游课程 (git submodule)
-│   ├── agents/                # Python 参考实现
-│   ├── docs/                  # 三语文档 (en/ja/zh)
-│   ├── web/                   # Next.js 学习平台
-│   └── skills/                # Skill 文件 (供 s05 使用)
-├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
-├── algo/                      # 算法与数据结构实现
-├── system-design/             # 可运行的系统设计实现与 Lab
-├── patterns/                  # 四语言工程模式实现与共享 contract tests
-├── go/                        # Go 实现
+├── 01-ai-applications/        # Building and deploying AI applications
+│   └── nanochat/              #   LLM 十系统从零重写 + micrograd
+├── 02-se-fundamentals/        # Software engineering fundamentals
+│   ├── algo/                  #   算法与数据结构，五语言
+│   ├── patterns/              #   42 项工程模式，四语言 + 共享 contract tests
+│   ├── system-design/         #   可运行的系统设计组件与 Lab
+│   └── network-security/      #   10 个 loopback 网络安全 labs + evidence
+├── 03-coding-agents/          # Using coding agents：本仓库的 agent 工作流与 verifier 清单
+├── 04-shaping-the-build/      # Shaping the build
+│   └── harness/               #   内容策展决策 harness：cases + grader
+├── go/                        # Go 实现（迁往 01-ai-applications/agent-loop，进行中）
 │   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 个递进式课程
-│   ├── foundations/           # 可运行的系统机制实验
-│   └── docs/                  # Go walkthrough 文档
-│       ├── zh/                # 中文
-│       └── en/                # English
-├── tests/                     # 测试
+│   ├── foundations/           # 可运行的系统机制实验（迁往 02-se-fundamentals/systems-foundations）
+│   └── docs/zh|en/            # Go walkthrough 文档
+├── trpc-agent-go/             # 同 12 课的 trpc-agent-go 实现（迁往 01-ai-applications/agent-loop-trpc）
+├── deps/learn-claude-code/    # Learn Claude Code 上游课程 (git submodule)
+├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
+├── learning/                  # 交互式课程 app（Vite + React）
+├── web/                       # GitHub Pages 静态首页
+├── tests/                     # 根级测试
 ├── skills -> deps/.../skills  # symlink (运行时兼容)
 └── .github/workflows/         # CI
 ```
+
+## Skills Map
+
+| Ng 技能 | 目录 | 内容 | 验证 |
+| --- | --- | --- | --- |
+| Building and deploying AI applications | `01-ai-applications/` | nanochat；agent-loop、agent-loop-trpc（迁移中，现在仍在 `go/`、`trpc-agent-go/`） | `make check check-trpc`；各 system 的 `test_impl.py` |
+| Software engineering fundamentals | `02-se-fundamentals/` | algo、patterns、system-design、network-security；systems-foundations（迁移中，现在在 `go/foundations/`） | `make -C 02-se-fundamentals/<track> test` 或 `verify` |
+| Using coding agents | `03-coding-agents/` | 本仓库的 agent 配置、hook、verifier 清单与 spec 约定 | 见其 README |
+| Shaping the build | `04-shaping-the-build/` | harness：判断材料值不值得沉淀、转成什么 | `make test-harness` |
+
 
 ## 快速开始
 
@@ -54,9 +70,9 @@ Rubickx 首页现在是一个学习 repo / website 索引，入口在 [web/index
 
 ## Engineering Patterns
 
-[`patterns/`](patterns/) 与 `algo/`、`system-design/` 并列，保存 42 项“笔记判断 + 四语言实现 + 共享 fixture + 自动化测试”的 Pattern Library：GoF 23、Reliability 6、Data & Messaging 7、Concurrency 6。
+[`02-se-fundamentals/patterns/`](02-se-fundamentals/patterns/) 与 `algo/`、`system-design/` 并列，保存 42 项“笔记判断 + 四语言实现 + 共享 fixture + 自动化测试”的 Pattern Library：GoF 23、Reliability 6、Data & Messaging 7、Concurrency 6。
 
-首个 golden path 是 [Adapter Pattern](patterns/01-design-patterns/02-structural/01-adapter/NOTES.md)，完整 catalog 继续使用同一 behavior contract：
+首个 golden path 是 [Adapter Pattern](02-se-fundamentals/patterns/01-design-patterns/02-structural/01-adapter/NOTES.md)，完整 catalog 继续使用同一 behavior contract：
 
 - 稳定 target contract：`ChatClient`
 - legacy adaptee：不同的 deployment、prompt、stop code 和错误码
@@ -64,12 +80,12 @@ Rubickx 首页现在是一个学习 repo / website 索引，入口在 [web/index
 - 统一验证 request mapping、response/error normalization 和 unsupported capability fail-explicitly
 
 ```bash
-make -C patterns setup
-make -C patterns test-pattern PATTERN=gof.structural.adapter
-make -C patterns verify
+make -C 02-se-fundamentals/patterns setup
+make -C 02-se-fundamentals/patterns test-pattern PATTERN=gof.structural.adapter
+make -C 02-se-fundamentals/patterns verify
 ```
 
-完成度只看 [`patterns/PROGRESS.md`](patterns/PROGRESS.md)。
+完成度只看 [`patterns/PROGRESS.md`](02-se-fundamentals/patterns/PROGRESS.md)。
 
 ## Go Foundations
 
@@ -138,16 +154,16 @@ npm run dev
 make harness-list
 
 # 初始化一个 run 目录
-make harness-init RUN=harness/runs/demo
+make harness-init RUN=04-shaping-the-build/harness/runs/demo
 
 # 只跑一个 case
-make harness-init RUN=harness/runs/git-only CASE=git-pro-book
+make harness-init RUN=04-shaping-the-build/harness/runs/git-only CASE=git-pro-book
 
 # 填完输出后评分
-make harness-grade RUN=harness/runs/demo
+make harness-grade RUN=04-shaping-the-build/harness/runs/demo
 ```
 
-当前 harness 使用 deterministic fixtures 和 heuristic grader，细节见 [harness/README.md](harness/README.md)。
+当前 harness 使用 deterministic fixtures 和 heuristic grader，细节见 [harness/README.md](04-shaping-the-build/harness/README.md)。
 
 ## 项目静态网页
 

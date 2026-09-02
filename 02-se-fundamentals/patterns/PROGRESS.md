@@ -1,6 +1,6 @@
 # Progress - Patterns 四语言实现
 
-本文件是动态完成度 SSOT。`[x]` 只表示该 pattern 的 canonical note、shared contract、四语言实现和四套 tests 已存在，并且 `make -C patterns test-pattern PATTERN=<id>` 已通过。身份、family、顺序和路径由 `catalog.json` 管理。
+本文件是动态完成度 SSOT。`[x]` 只表示该 pattern 的 canonical note、shared contract、四语言实现和四套 tests 已存在，并且 `make -C 02-se-fundamentals/patterns test-pattern PATTERN=<id>` 已通过。身份、family、顺序和路径由 `catalog.json` 管理。
 
 ## Design / Creational
 
@@ -67,6 +67,6 @@
 全部 42 项勾选后运行：
 
 ```bash
-make -C patterns verify
-make -C patterns verify-vault VAULT_ROOT=/Users/kevinxjiang/Obsidian/dragon-vault
+make -C 02-se-fundamentals/patterns verify
+make -C 02-se-fundamentals/patterns verify-vault VAULT_ROOT=/Users/kevinxjiang/Obsidian/dragon-vault
 ```

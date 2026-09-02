@@ -117,23 +117,23 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: system-design/systems/01-rate-limiter/lab/ui/package-lock.json
+          cache-dependency-path: 02-se-fundamentals/system-design/systems/01-rate-limiter/lab/ui/package-lock.json
 
       - name: Install test dependencies
         run: |
           pip install pytest
-          npm ci --prefix system-design/systems/01-rate-limiter/lab/ui
+          npm ci --prefix 02-se-fundamentals/system-design/systems/01-rate-limiter/lab/ui
 
       - name: Test four-language rate limiter implementations
-        run: make -C system-design test
+        run: make -C 02-se-fundamentals/system-design test
 
       - name: Race-test Go system path
-        run: make -C system-design/systems/01-rate-limiter/lab test-race
+        run: make -C 02-se-fundamentals/system-design/systems/01-rate-limiter/lab test-race
 
       - name: Test and build Rate Limiter Lab UI
         run: |
-          make -C system-design test-ui
-          make -C system-design build-lab
+          make -C 02-se-fundamentals/system-design test-ui
+          make -C 02-se-fundamentals/system-design build-lab
 
   patterns:
     runs-on: ubuntu-latest
@@ -165,7 +165,7 @@ jobs:
         run: pip install pytest
 
       - name: Verify 42-pattern catalog and implementations
-        run: make -C patterns verify
+        run: make -C 02-se-fundamentals/patterns verify
 
   go-foundations:
     runs-on: ubuntu-latest

@@ -198,7 +198,7 @@ out/
 .task_outputs/
 .tasks/
 .teams/
-harness/runs/
+04-shaping-the-build/harness/runs/
 learning/node_modules/
 learning/dist/
 learning/test-results/

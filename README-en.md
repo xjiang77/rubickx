@@ -8,25 +8,31 @@ The upstream project provides Python reference implementations and trilingual do
 
 ## Project Structure
 
+The top level follows the four skills in Andrew Ng's [AI Engineering Skills Map](https://www.deeplearning.ai/the-batch/the-ai-engineering-skills-map) (Aug 2026); `deps/`, `web/`, `learning/`, and `tests/` are supporting surfaces, not skills.
+
 ```
 rubickx/
-├── deps/learn-claude-code/    # Learn Claude Code upstream course (git submodule)
-│   ├── agents/                # Python reference implementations
-│   ├── docs/                  # Trilingual documentation (en/ja/zh)
-│   ├── web/                   # Next.js learning platform
-│   └── skills/                # Skill files for s05
+├── 01-ai-applications/        # Building and deploying AI applications
+│   └── nanochat/              #   LLM systems rewritten from scratch + micrograd
+├── 02-se-fundamentals/        # Software engineering fundamentals
+│   ├── algo/                  #   Algorithms and data structures in five languages
+│   ├── patterns/              #   42 engineering patterns, four languages + shared contract tests
+│   ├── system-design/         #   Runnable system-design components and labs
+│   └── network-security/      #   10 loopback network-security labs + evidence
+├── 03-coding-agents/          # Using coding agents: this repo's agent workflow and verifier inventory
+├── 04-shaping-the-build/      # Shaping the build
+│   └── harness/               #   Content-curation decision harness: cases + grader
+├── go/                        # Go implementations (moving to 01-ai-applications/agent-loop)
+│   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/
+│   ├── foundations/           # Runnable systems experiments (moving to 02-se-fundamentals/systems-foundations)
+│   └── docs/zh|en/            # Go walkthroughs
+├── trpc-agent-go/             # Same 12 sessions on trpc-agent-go (moving to 01-ai-applications/agent-loop-trpc)
+├── deps/learn-claude-code/    # Upstream course (git submodule)
 ├── deps/learn-harness-engineering/  # Learn Harness Engineering fork (git submodule)
-├── algo/                      # Algorithms and data structures
-├── system-design/             # Runnable system-design implementations and labs
-├── patterns/                  # Four-language engineering patterns with shared contract tests
-├── go/                        # Go implementation
-│   ├── s01-the-agent-loop/ ... s12-worktree-task-isolation/  # 12 progressive sessions
-│   ├── foundations/           # Runnable systems-mechanism experiments
-│   └── docs/                  # Go walkthrough docs
-│       ├── zh/                # 中文
-│       └── en/                # English
-├── tests/                     # Test suite
-├── skills -> deps/.../skills  # Symlink for runtime compatibility
+├── learning/                  # Interactive course app (Vite + React)
+├── web/                       # GitHub Pages landing page
+├── tests/                     # Root-level tests
+├── skills -> deps/.../skills  # symlink (runtime compatibility)
 └── .github/workflows/         # CI
 ```
 
@@ -54,9 +60,9 @@ Current source-backed learning resources:
 
 ## Engineering Patterns
 
-[`patterns/`](patterns/) sits beside `algo/` and `system-design/`. Its 42-entry library contains 23 GoF, 6 reliability, 7 data and messaging, and 6 concurrency patterns. Each entry closes the loop from design judgment to four-language implementation, a shared fixture, and automated tests.
+[`02-se-fundamentals/patterns/`](02-se-fundamentals/patterns/) sits beside `algo/` and `system-design/`. Its 42-entry library contains 23 GoF, 6 reliability, 7 data and messaging, and 6 concurrency patterns. Each entry closes the loop from design judgment to four-language implementation, a shared fixture, and automated tests.
 
-The first golden path is the [Adapter Pattern](patterns/01-design-patterns/02-structural/01-adapter/NOTES.md); the full catalog follows the same behavior contract:
+The first golden path is the [Adapter Pattern](02-se-fundamentals/patterns/01-design-patterns/02-structural/01-adapter/NOTES.md); the full catalog follows the same behavior contract:
 
 - stable target contract: `ChatClient`
 - legacy adaptee with different deployment, prompt, stop-code, and error semantics
@@ -64,12 +70,12 @@ The first golden path is the [Adapter Pattern](patterns/01-design-patterns/02-st
 - shared verification for request mapping, response/error normalization, and explicit unsupported-capability failures
 
 ```bash
-make -C patterns setup
-make -C patterns test-pattern PATTERN=gof.structural.adapter
-make -C patterns verify
+make -C 02-se-fundamentals/patterns setup
+make -C 02-se-fundamentals/patterns test-pattern PATTERN=gof.structural.adapter
+make -C 02-se-fundamentals/patterns verify
 ```
 
-[`patterns/PROGRESS.md`](patterns/PROGRESS.md) is the completion-status SSOT.
+[`patterns/PROGRESS.md`](02-se-fundamentals/patterns/PROGRESS.md) is the completion-status SSOT.
 
 ## Go Foundations
 
@@ -133,12 +139,12 @@ Quick commands:
 
 ```bash
 make harness-list
-make harness-init RUN=harness/runs/demo
-make harness-init RUN=harness/runs/git-only CASE=git-pro-book
-make harness-grade RUN=harness/runs/demo
+make harness-init RUN=04-shaping-the-build/harness/runs/demo
+make harness-init RUN=04-shaping-the-build/harness/runs/git-only CASE=git-pro-book
+make harness-grade RUN=04-shaping-the-build/harness/runs/demo
 ```
 
-See [harness/README.md](harness/README.md) for the contract, scoring model, and case set.
+See [harness/README.md](04-shaping-the-build/harness/README.md) for the contract, scoring model, and case set.
 
 ## Project Landing Page
 

@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}/algo/problems/0001-two-sum/go/twosum_practice_test.go"
+            "program": "${workspaceFolder}/02-se-fundamentals/algo/problems/0001-two-sum/go/twosum_practice_test.go"
         },
         {
             "name": "Attach to Process",

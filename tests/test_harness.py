@@ -7,7 +7,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(
+    0,
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "04-shaping-the-build"),
+)
 
 from harness.run import grade_run, init_run
 

@@ -5,7 +5,7 @@
 export
 
 S ?=
-RUN ?= harness/runs/manual
+RUN ?= 04-shaping-the-build/harness/runs/manual
 CASE ?=
 
 .DEFAULT_GOAL := help
@@ -65,10 +65,10 @@ setup:  ## Initial project setup (submodule + deps)
 	$(MAKE) web-install
 
 harness-list:  ## List deterministic harness cases
-	python3 -m harness.run list-cases
+	PYTHONPATH=04-shaping-the-build python3 -m harness.run list-cases
 
-harness-init:  ## Initialize a harness run directory: make harness-init RUN=harness/runs/demo CASE=git-pro-book
-	python3 -m harness.run init-run --run-dir "$(RUN)" $(if $(CASE),--case $(CASE),)
+harness-init:  ## Initialize a harness run directory: make harness-init RUN=04-shaping-the-build/harness/runs/demo CASE=git-pro-book
+	PYTHONPATH=04-shaping-the-build python3 -m harness.run init-run --run-dir "$(RUN)" $(if $(CASE),--case $(CASE),)
 
-harness-grade:  ## Grade a harness run directory: make harness-grade RUN=harness/runs/demo
-	python3 -m harness.run grade --run-dir "$(RUN)"
+harness-grade:  ## Grade a harness run directory: make harness-grade RUN=04-shaping-the-build/harness/runs/demo
+	PYTHONPATH=04-shaping-the-build python3 -m harness.run grade --run-dir "$(RUN)"

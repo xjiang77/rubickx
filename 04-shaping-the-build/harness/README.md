@@ -38,28 +38,30 @@ harness/
 
 ## 命令
 
+以下命令在仓库根目录执行。
+
 列出 case：
 
 ```bash
-python3 -m harness.run list-cases
+PYTHONPATH=04-shaping-the-build python3 -m harness.run list-cases
 ```
 
 初始化一个 run：
 
 ```bash
-python3 -m harness.run init-run --run-dir harness/runs/manual
+PYTHONPATH=04-shaping-the-build python3 -m harness.run init-run --run-dir 04-shaping-the-build/harness/runs/manual
 ```
 
 只初始化单个 case：
 
 ```bash
-python3 -m harness.run init-run --run-dir harness/runs/git-only --case git-pro-book
+PYTHONPATH=04-shaping-the-build python3 -m harness.run init-run --run-dir 04-shaping-the-build/harness/runs/git-only --case git-pro-book
 ```
 
 评分：
 
 ```bash
-python3 -m harness.run grade --run-dir harness/runs/manual
+PYTHONPATH=04-shaping-the-build python3 -m harness.run grade --run-dir 04-shaping-the-build/harness/runs/manual
 ```
 
 ## 当前 case

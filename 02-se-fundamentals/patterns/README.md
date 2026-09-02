@@ -37,10 +37,10 @@ The catalog contains 23 classic design, 6 reliability, 7 data and messaging, and
 ## Run
 
 ```bash
-make -C patterns setup
-make -C patterns test-pattern PATTERN=gof.structural.adapter
-make -C patterns verify
-make -C patterns verify-vault VAULT_ROOT=/Users/kevinxjiang/Obsidian/dragon-vault
+make -C 02-se-fundamentals/patterns setup
+make -C 02-se-fundamentals/patterns test-pattern PATTERN=gof.structural.adapter
+make -C 02-se-fundamentals/patterns verify
+make -C 02-se-fundamentals/patterns verify-vault VAULT_ROOT=/Users/kevinxjiang/Obsidian/dragon-vault
 ```
 
 `verify` fails while any catalog item is pending and runs all four language suites plus Go race detection. `verify-vault` is the final cross-repository gate and additionally validates frontmatter, three scenarios, navigation coverage, rubickx paths, and scoped wikilinks.

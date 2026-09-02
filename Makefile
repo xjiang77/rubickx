@@ -10,7 +10,7 @@ CASE ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run run-trpc test test-unit test-harness test-api check check-trpc web-dev web-install setup harness-list harness-init harness-grade
+.PHONY: help run run-trpc test test-unit test-harness test-api check check-trpc web-dev web-install learning-dev test-learning-git verify-learning-git-gate1 setup harness-list harness-init harness-grade
 
 help:  ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -48,6 +48,15 @@ web-dev:  ## Start the Next.js dev server
 
 web-install:  ## Install web app dependencies
 	cd deps/learn-claude-code/web && npm install
+
+learning-dev:  ## Start the interactive learning app
+	cd learning && npm run dev
+
+test-learning-git:  ## Run interactive Git course unit and component tests
+	cd learning && npm test
+
+verify-learning-git-gate1:  ## Verify the Fundamentals sequence locally
+	cd learning && npm run verify:gate1
 
 setup:  ## Initial project setup (submodule + deps)
 	git submodule update --init --recursive

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "cnb": {
+      "url": "https://mcp.cnb.woa.com/mcp",
+      "headers": {
+        "Authorization": ""
+      }
+    }
+  }
+}

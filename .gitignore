@@ -199,6 +199,13 @@ out/
 .tasks/
 .teams/
 harness/runs/
+learning/node_modules/
+learning/dist/
+learning/test-results/
+learning/playwright-report/
+learning/.playwright-cli/
+learning/*.tsbuildinfo
+.pages-site/
 
 # Ruff stuff:
 .ruff_cache/
@@ -274,3 +281,7 @@ blog-invisible-loop.md
 
 # Pi local observability logs
 .pi/obs/
+
+# Local agent config with credentials / personal permissions — never tracked
+.codex/
+.claude/settings.local.json

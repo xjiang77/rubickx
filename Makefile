@@ -10,7 +10,7 @@ CASE ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run run-trpc test test-unit test-harness test-math test-api check check-trpc web-dev web-install learning-dev test-learning-git verify-learning-git-gate1 setup harness-list harness-init harness-grade
+.PHONY: help run run-trpc test test-unit test-harness test-math test-linalg test-api check check-trpc web-dev web-install learning-dev test-learning-git verify-learning-git-gate1 setup harness-list harness-init harness-grade
 
 help:  ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -34,6 +34,9 @@ test-harness:  ## Run harness tests
 
 test-math:  ## Run math prerequisite checks (topic 1.6.0)
 	cd 01-ai-applications/06-machine-learning-foundations/math-prerequisites && python3 test_gradcheck.py
+
+test-linalg:  ## Run linear algebra exercise verifier (topic 1.6.5; fails until implemented)
+	python3 01-ai-applications/06-machine-learning-foundations/math-prerequisites/linear-algebra/vectors/test_vectors.py
 
 test-api:  ## Run API connectivity test (needs ANTHROPIC_API_KEY)
 	python3 tests/test_s01_verify.py

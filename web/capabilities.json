@@ -142,7 +142,7 @@
       "source": "https://x.com/AndrewYNg/status/2090840747738374568",
       "status": "partial",
       "description": "通过模型与训练机制的从零实现理解机器学习基础。",
-      "boundary": "数学前置已有可运行核对；Nanochat 十系统与 from-scratch 练习仍是骨架，TODO 与 skip 不算能力完成。",
+      "boundary": "数学前置已有可运行核对；线性代数与 Nanochat 十系统、from-scratch 练习仍是骨架，TODO 与 skip 不算能力完成。",
       "next": "由本人按 RUNBOOK 完成 micrograd 与逐系统实现，再运行真实测试和对拍。",
       "practices": [
         "math-prerequisites",
@@ -527,7 +527,7 @@
     "math-prerequisites": {
       "id": "math-prerequisites",
       "path": "01-ai-applications/06-machine-learning-foundations/math-prerequisites",
-      "description": "导数、梯度与链式法则的数值核对",
+      "description": "数学前置：导数、梯度与链式法则的数值核对；线性代数练习",
       "verify": "make test-math",
       "icon": "grid",
       "status": "partial"

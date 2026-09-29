@@ -8,11 +8,11 @@
 
 ## 当前状态
 
-**已有局部实践**。数学前置已有可运行核对；Nanochat 十系统与 from-scratch 练习仍是骨架，TODO 与 skip 不算能力完成。
+**已有局部实践**。数学前置已有可运行核对；线性代数与 Nanochat 十系统、from-scratch 练习仍是骨架，TODO 与 skip 不算能力完成。
 
 ## 主归属实践
 
-- [math-prerequisites](math-prerequisites) — 导数、梯度与链式法则的数值核对（topic 1.6.0）。
+- [math-prerequisites](math-prerequisites) — 导数、梯度与链式法则的数值核对（topic 1.6.0）；[线性代数练习](math-prerequisites/linear-algebra)（topic 1.6.5）。
 - [nanochat](nanochat) — LLM 十系统与 from-scratch 练习骨架。
 
 ## 跨能力链接
@@ -25,6 +25,7 @@
 从仓库根目录执行（Nanochat 命令在具体系统目录执行）：
 
 - `make test-math`
+- `make test-linalg`（骨架状态下预期失败；不计入 `make test`）
 - `各系统目录 pytest test_impl.py；实现后 python parity.py`（TODO / skip 不证明实现完成。）
 
 ## 下一步

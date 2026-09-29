@@ -7,6 +7,7 @@ PORT="${PAGES_CHECK_PORT:-8123}"
 
 python3 scripts/check_capabilities.py
 python3 scripts/check_topics.py
+python3 scripts/check_eli5.py
 python3 scripts/render_skills_map.py --check
 
 required_files=(

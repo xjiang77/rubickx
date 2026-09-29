@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="rubickx-topic" content="{TOPIC_ID}">
+<meta name="rubickx-derived-from" content="{VAULT_NOTE_PATH}@{NOTE_UPDATED}">
+<meta name="description" content="{一句话：这页帮零基础读者看懂什么}">
+<title>{Topic 标题} · ELI5 · Rubickx</title>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<style id="eli5-base">
+:root{--bg:#fbfbfa;--ink:#1f2523;--muted:#66706c;--line:#d9dedb;--link:#175f8a;--paper:#fff;--c:#2a63a5;--c-tint:#eef3fa;font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;color:var(--ink);background:var(--bg)}
+body.ai{--c:#2a63a5;--c-tint:#eef3fa}
+body.se{--c:#246b35;--c-tint:#eff6f0}
+body.agents{--c:#8054a7;--c-tint:#f4f0f8}
+body.build{--c:#ad501d;--c-tint:#fbf1eb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg)}
+a{color:var(--link)}
+.wrap{max-width:880px;margin:0 auto;padding:28px 16px 64px}
+.crumb{font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
+.crumb a{text-decoration:none}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18px 0 6px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px;line-height:1.6}
+.screen{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin:0 0 18px}
+.screen figure{margin:0}
+.screen svg{display:block;width:100%;height:auto;max-height:340px}
+.screen p{font-size:19px;line-height:1.65;margin:14px 0 0}
+.step{display:inline-block;font-size:12px;font-weight:600;color:var(--c);background:var(--c-tint);border-radius:4px;padding:2px 8px;margin-bottom:10px}
+.limits,.summary,.try,.deeper{border-radius:12px;padding:16px 20px;margin:18px 0 0;line-height:1.65;font-size:16px}
+.limits{border:1px dashed var(--line);color:var(--muted)}
+.summary{background:var(--c-tint);font-size:19px;font-weight:500}
+.try,.deeper{border:1px solid var(--line);background:var(--paper)}
+.try code{display:block;margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:8px;overflow-x:auto;font-size:13px;white-space:pre}
+.try p code{display:inline;margin:0;padding:0 2px;background:none;white-space:normal;font-size:.9em}
+h2{font-size:15px;margin:0 0 6px}
+.flag{font-size:13px;color:var(--muted);border-left:3px solid var(--c);padding-left:10px;margin:0 0 20px}
+footer{margin-top:36px;font-size:13px;color:var(--muted)}
+@media(max-width:640px){.screen{padding:16px 12px 14px}.screen p{font-size:17px}}
+svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
+.box{fill:var(--paper);stroke:var(--ink);stroke-width:1.5}
+.hl{fill:var(--c-tint);stroke:var(--c);stroke-width:2}
+.op{fill:var(--bg);stroke:var(--muted);stroke-width:1.5}
+.fwd{stroke:var(--ink);stroke-width:2;fill:none}
+.bwd{stroke:var(--c);stroke-width:2.5;fill:none;stroke-dasharray:7 5}
+.faint{opacity:.35}
+.t{font-size:28px;fill:var(--ink)}
+.tb{font-size:34px;font-weight:600;fill:var(--ink)}
+.tc{font-size:28px;font-weight:600;fill:var(--c)}
+.ts{font-size:22px;fill:var(--muted)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="{ai|se|agents|build}">
+<div class="wrap">
+  <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#{CAPABILITY_ID}">{能力英文名}</a><span>›</span><span>{TOPIC_ID}</span></nav>
+  <h1>{用一个问题当标题}</h1>
+  <p class="lede">{一句话：读完这页你会看懂什么}</p>
+  <main>
+    <section class="screen">
+      <span class="step">1</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="{这张图画了什么}"><!-- 主图 --></svg></figure>
+      <p>{一两句话}</p>
+    </section>
+    <!-- 3–6 屏，每屏一张图、一两句话 -->
+  </main>
+  <aside class="limits"><h2>这个比喻在哪里不成立</h2><p>{类比的失效点}</p></aside>
+  <p class="summary">{一句话总结}</p>
+  <section class="try"><h2>去试试</h2><p>{实践说明}</p><code>{命令}</code></section>
+  <section class="deeper"><h2>想深入</h2><p>知识正文：《{正文标题}》（私有知识库）。来源：{公开来源链接}</p></section>
+  <footer>Rubickx · ELI5 · <a href="../../index.html#{CAPABILITY_ID}">回到能力地图</a></footer>
+</div>
+</body>
+</html>

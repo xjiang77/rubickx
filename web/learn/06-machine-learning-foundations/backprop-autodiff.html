@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="rubickx-topic" content="1.6.1">
+<meta name="rubickx-derived-from" content="02_Knowledge/01-ai-applications/06-machine-learning-foundations/02 - AI - 反向传播：链式法则与计算图.md@2026-09-03">
+<meta name="description" content="用五张图看懂反向传播：前向计算、局部放大倍数、往回相乘、多路相加与一步步训练。">
+<title>反向传播 · ELI5 · Rubickx</title>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<style id="eli5-base">
+:root{--bg:#fbfbfa;--ink:#1f2523;--muted:#66706c;--line:#d9dedb;--link:#175f8a;--paper:#fff;--c:#2a63a5;--c-tint:#eef3fa;font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;color:var(--ink);background:var(--bg)}
+body.ai{--c:#2a63a5;--c-tint:#eef3fa}
+body.se{--c:#246b35;--c-tint:#eff6f0}
+body.agents{--c:#8054a7;--c-tint:#f4f0f8}
+body.build{--c:#ad501d;--c-tint:#fbf1eb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg)}
+a{color:var(--link)}
+.wrap{max-width:880px;margin:0 auto;padding:28px 16px 64px}
+.crumb{font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
+.crumb a{text-decoration:none}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18px 0 6px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px;line-height:1.6}
+.screen{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin:0 0 18px}
+.screen figure{margin:0}
+.screen svg{display:block;width:100%;height:auto;max-height:340px}
+.screen p{font-size:19px;line-height:1.65;margin:14px 0 0}
+.step{display:inline-block;font-size:12px;font-weight:600;color:var(--c);background:var(--c-tint);border-radius:4px;padding:2px 8px;margin-bottom:10px}
+.limits,.summary,.try,.deeper{border-radius:12px;padding:16px 20px;margin:18px 0 0;line-height:1.65;font-size:16px}
+.limits{border:1px dashed var(--line);color:var(--muted)}
+.summary{background:var(--c-tint);font-size:19px;font-weight:500}
+.try,.deeper{border:1px solid var(--line);background:var(--paper)}
+.try code{display:block;margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:8px;overflow-x:auto;font-size:13px;white-space:pre}
+.try p code{display:inline;margin:0;padding:0 2px;background:none;white-space:normal;font-size:.9em}
+h2{font-size:15px;margin:0 0 6px}
+.flag{font-size:13px;color:var(--muted);border-left:3px solid var(--c);padding-left:10px;margin:0 0 20px}
+footer{margin-top:36px;font-size:13px;color:var(--muted)}
+@media(max-width:640px){.screen{padding:16px 12px 14px}.screen p{font-size:17px}}
+svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
+.box{fill:var(--paper);stroke:var(--ink);stroke-width:1.5}
+.hl{fill:var(--c-tint);stroke:var(--c);stroke-width:2}
+.op{fill:var(--bg);stroke:var(--muted);stroke-width:1.5}
+.fwd{stroke:var(--ink);stroke-width:2;fill:none}
+.bwd{stroke:var(--c);stroke-width:2.5;fill:none;stroke-dasharray:7 5}
+.faint{opacity:.35}
+.t{font-size:28px;fill:var(--ink)}
+.tb{font-size:34px;font-weight:600;fill:var(--ink)}
+.tc{font-size:28px;font-weight:600;fill:var(--c)}
+.ts{font-size:22px;fill:var(--muted)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="ai">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<marker id="af" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f2523"/></marker>
+<marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a63a5"/></marker>
+</defs></svg>
+<div class="wrap">
+  <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#06-machine-learning-foundations">Machine learning foundations</a><span>›</span><span>1.6.1</span></nav>
+  <h1>结果错了，每个数该改多少？</h1>
+  <p class="lede">反向传播：从结果往回走，算出每个数对结果的影响。</p>
+  <main>
+    <section class="screen">
+      <span class="step">1</span>
+      <figure><svg viewBox="0 95 800 145" role="img" aria-label="x 等于 2，加 3 得 5，再平方得 25，箭头从左指向右"><g>
+<rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+<line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
+<line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
+<rect class="box" x="355" y="110" width="100" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">5</text>
+<line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
+<line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text>
+</g><text class="ts" x="710" y="226" text-anchor="middle">结果</text></svg></figure>
+      <p>数字从左往右，一步步算出结果。这叫<strong>前向</strong>。</p>
+    </section>
+    <section class="screen">
+      <span class="step">2</span>
+      <figure><svg viewBox="0 95 800 165" role="img" aria-label="加 3 这一步的放大倍数是 1，平方这一步在 5 处的放大倍数是 10"><g>
+<rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+<line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
+<line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
+<rect class="box" x="355" y="110" width="100" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">5</text>
+<line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
+<line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text>
+</g><rect x="222" y="206" width="80" height="40" rx="8" class="hl"/><text class="tc" x="262" y="234" text-anchor="middle">×1</text>
+<rect x="502" y="206" width="90" height="40" rx="8" class="hl"/><text class="tc" x="547" y="234" text-anchor="middle">×10</text>
+</svg></figure>
+      <p>想知道 x 挪一点点，结果会挪多少，先看每一步自己的<strong>放大倍数</strong>：加 3 时，输入挪多少，输出就挪多少（×1）；在 5 这里平方，输出大约挪 10 倍（×10）。</p>
+    </section>
+    <section class="screen">
+      <span class="step">3</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="虚线箭头从结果往回走，沿途把倍数相乘：1 乘 10，再乘 1，x 的影响是 10"><g>
+<rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+<line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
+<line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
+<rect class="box" x="355" y="110" width="100" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">5</text>
+<line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
+<line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text>
+</g><path class="bwd" d="M710,100 C710,40 560,40 547,100" marker-end="url(#ab)"/>
+<path class="bwd" d="M547,100 C530,30 290,30 262,100" marker-end="url(#ab)"/>
+<path class="bwd" d="M262,100 C250,50 110,50 85,100" marker-end="url(#ab)"/>
+<text class="tc" x="630" y="36" text-anchor="middle">1 × 10</text>
+<text class="tc" x="405" y="28" text-anchor="middle">10 × 1</text>
+<rect x="30" y="206" width="110" height="46" rx="8" class="hl"/><text class="tc" x="85" y="237" text-anchor="middle">= 10</text>
+<text class="ts" x="85" y="276" text-anchor="middle">x 的影响</text></svg></figure>
+      <p>从结果往回走，把沿途的倍数<strong>乘起来</strong>：x 挪一点点，结果大约挪它的 10 倍。这个 10 就是 x 的<strong>梯度</strong>。</p>
+    </section>
+    <section class="screen">
+      <span class="step">4</span>
+      <figure><svg viewBox="0 30 800 275" role="img" aria-label="a 等于 5，一条路乘 3，一条路平方，两路相加得 40；两条路带回的影响 3 和 10 相加得 13"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">a = 5</text>
+<path class="fwd" d="M150,135 C200,80 220,70 262,70" marker-end="url(#af)"/><path class="fwd" d="M150,165 C200,220 220,230 262,230" marker-end="url(#af)"/>
+<circle class="op" cx="300" cy="70" r="36"/><text class="t" x="300" y="78" text-anchor="middle">×3</text>
+<circle class="op" cx="300" cy="230" r="36"/><text class="t" x="300" y="238" text-anchor="middle">平方</text>
+<path class="fwd" d="M336,70 C420,70 440,120 482,140" marker-end="url(#af)"/><path class="fwd" d="M336,230 C420,230 440,180 482,160" marker-end="url(#af)"/>
+<circle class="op" cx="520" cy="150" r="36"/><text class="t" x="520" y="158" text-anchor="middle">+</text>
+<line class="fwd" x1="556" y1="150" x2="627" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">40</text>
+<text class="tc" x="200" y="52" text-anchor="middle">带回 3</text><text class="tc" x="240" y="290" text-anchor="middle">带回 10</text>
+<rect x="4" y="206" width="178" height="50" rx="8" class="hl"/><text class="tc" x="93" y="241" text-anchor="middle">3 + 10 = 13</text></svg></figure>
+      <p>一个数走了两条路，两条路带回来的影响要<strong>加起来</strong>，不能只留一条。</p>
+    </section>
+    <section class="screen">
+      <span class="step">5</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="曲线随着一步步调整逐渐下降"><line class="fwd" x1="70" y1="40" x2="70" y2="262"/><line class="fwd" x1="70" y1="262" x2="770" y2="262" marker-end="url(#af)"/>
+<text class="ts" x="80" y="36">离目标有多远</text><text class="ts" x="760" y="290" text-anchor="end">一小步、一小步</text>
+<polyline points="90,70 170,120 250,160 330,190 410,212 490,228 570,238 650,244 730,247" fill="none" stroke="#2a63a5" stroke-width="3"/><circle cx="90" cy="70" r="5" fill="#2a63a5"/><circle cx="170" cy="120" r="5" fill="#2a63a5"/><circle cx="250" cy="160" r="5" fill="#2a63a5"/><circle cx="330" cy="190" r="5" fill="#2a63a5"/><circle cx="410" cy="212" r="5" fill="#2a63a5"/><circle cx="490" cy="228" r="5" fill="#2a63a5"/><circle cx="570" cy="238" r="5" fill="#2a63a5"/><circle cx="650" cy="244" r="5" fill="#2a63a5"/><circle cx="730" cy="247" r="5" fill="#2a63a5"/></svg></figure>
+      <p>训练就是：朝让结果变好的方向，把每个数挪一小步，再算一遍，重复很多次。</p>
+    </section>
+  </main>
+  <aside class="limits"><h2>这个比喻在哪里不成立</h2><p>常有人把它比作“出了错，沿原路追责”。但梯度有正有负，说的是<strong>往哪边挪</strong>，不是谁犯了错；而且放大倍数只在当前位置附近准，一步挪太大，就不准了。</p></aside>
+  <p class="summary">反向传播＝从结果往回走，把每一步的放大倍数乘起来；同一个数走了几条路，就把几条路的影响加起来。</p>
+  <section class="try"><h2>去试试</h2><p>在 nanochat 的练习里亲手写一个标量自动微分引擎：<code>Value</code>、<code>backward()</code> 和一个小 MLP。verifier 用数值差分逐项核对你的梯度。实现要自己写，这页不给答案。</p><code>python3 01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd/test_micrograd.py</code></section>
+  <section class="deeper"><h2>想深入</h2><p>知识正文：《反向传播：链式法则与计算图》《Micrograd：标量自动微分引擎》（私有知识库）。公开来源：<a href="https://github.com/karpathy/micrograd">karpathy/micrograd</a> · <a href="https://www.youtube.com/watch?v=VMj-3S1tku0">视频讲解</a>。</p></section>
+  <footer>Rubickx · ELI5 · <a href="../../index.html#06-machine-learning-foundations">回到能力地图</a></footer>
+</div>
+</body>
+</html>

@@ -30,12 +30,12 @@
       },
       "practice": {
         "kind": "code",
-        "state": "present",
+        "state": "partial",
         "paths": [
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/01-tokenizer"
         ],
         "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/01-tokenizer && pytest test_impl.py",
-        "plan": null
+        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
       "eli5": null
     },
@@ -54,13 +54,13 @@
       },
       "practice": {
         "kind": "code",
-        "state": "present",
+        "state": "partial",
         "paths": [
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/03-model",
           "01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/addition-transformer"
         ],
         "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/03-model && pytest test_impl.py",
-        "plan": null
+        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
       "eli5": null
     },
@@ -542,12 +542,12 @@
       },
       "practice": {
         "kind": "code",
-        "state": "present",
+        "state": "partial",
         "paths": [
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/06-engine"
         ],
         "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/06-engine && pytest test_impl.py",
-        "plan": null
+        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
       "eli5": null
     },
@@ -648,14 +648,21 @@
       },
       "practice": {
         "kind": "code",
-        "state": "present",
+        "state": "partial",
         "paths": [
           "01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd"
         ],
-        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd && pytest",
-        "plan": null
+        "verify": "python3 01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd/test_micrograd.py",
+        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
-      "eli5": null
+      "eli5": {
+        "path": "web/learn/06-machine-learning-foundations/backprop-autodiff.html",
+        "derived_from": {
+          "note": "02_Knowledge/01-ai-applications/06-machine-learning-foundations/02 - AI - 反向传播：链式法则与计算图.md",
+          "updated": "2026-09-03"
+        },
+        "sample": true
+      }
     },
     {
       "id": "1.6.2",
@@ -670,13 +677,13 @@
       },
       "practice": {
         "kind": "code",
-        "state": "present",
+        "state": "partial",
         "paths": [
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/04-optim",
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/05-train"
         ],
         "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/05-train && pytest test_impl.py",
-        "plan": null
+        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
       "eli5": null
     },
@@ -693,13 +700,13 @@
       },
       "practice": {
         "kind": "code",
-        "state": "present",
+        "state": "partial",
         "paths": [
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/07-sft",
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/08-rl"
         ],
         "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/07-sft && pytest test_impl.py",
-        "plan": null
+        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
       "eli5": null
     },
@@ -714,13 +721,13 @@
       },
       "practice": {
         "kind": "code",
-        "state": "present",
+        "state": "partial",
         "paths": [
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/02-data",
           "01-ai-applications/06-machine-learning-foundations/nanochat/systems/09-eval"
         ],
         "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/02-data && pytest test_impl.py",
-        "plan": null
+        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
       "eli5": null
     },
@@ -1635,7 +1642,7 @@
         "state": "missing",
         "paths": [],
         "verify": null,
-        "plan": "skills/eli5-rubickx，本计划自己要用的 skill"
+        "plan": ".claude/skills/eli5-rubickx，本计划自己要用的 skill"
       },
       "eli5": null
     },
@@ -1819,7 +1826,14 @@
         "verify": null,
         "plan": "可行性三分类清单工具，加一次真实解释的复盘"
       },
-      "eli5": null
+      "eli5": {
+        "path": "web/learn/03-communicating-and-leading/explaining-feasibility.html",
+        "derived_from": {
+          "note": "02_Knowledge/04-shaping-the-build/03-communicating-and-leading/01 - Eng - 向非工程背景的人解释技术可行性.md",
+          "updated": "2026-09-15"
+        },
+        "sample": true
+      }
     },
     {
       "id": "4.4.1",

@@ -2,6 +2,17 @@
 
 > C5 约束：实现由本人手写。agent 可以讲解概念、评审代码、维护验证脚本，不得给出完成的实现。
 
+## 顺序
+
+1. **学**：读 ELI5 页 `web/learn/06-machine-learning-foundations/linear-algebra.html`（从知识正文 02 派生）。
+2. **玩**：运行 `playground/` 下四个小程序，只看不写：
+   - `01_draw_vectors.py` 终端画板：向量、首尾相接的加法、数乘、共线向量的 span 与不共线的网格；
+   - `02_hit_the_target.py` 命中目标：输入系数逼近目标向量，四关分别对应正文与测验的例子，第 4 关基向量共线；
+   - `03_pixel_blend.py` 像素字母混合：5×5 字母作为 25 维向量，线性组合产生渐变；
+   - `04_attention_toy.py` attention 玩具：手调 score，看 softmax 权重与输出点在三角形内移动。
+3. **做**：闭卷实现 `vectors.py`。
+4. **测**：`make test-linalg`，再做题库中的选择题。
+
 ## 目标
 
 只用 Python 列表与标量运算，实现向量的加法与数乘、线性组合、共线判定、二维方程组求解、换基坐标、张成判定与三向量线性无关判定，并用它们复现正文 02 的全部数值示例，包括 attention 输出作为 value 向量加权平均的实例。

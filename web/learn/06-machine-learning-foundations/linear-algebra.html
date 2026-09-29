@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="rubickx-topic" content="1.6.5">
+<meta name="rubickx-derived-from" content="02_Knowledge/01-ai-applications/06-machine-learning-foundations/01-linear-algebra/02 - AI - 向量与空间：三种视角、线性组合与基.md@2026-09-29">
+<meta name="description" content="向量的三种视角、加法与数乘，以及由这两种运算生成的 linear combination、span 与 basis；所有数值均可逐步核对。">
+<title>Vector、linear combination 与 basis · ELI5 · Rubickx</title>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<style id="eli5-base">
+:root{--bg:#fbfbfa;--ink:#1f2523;--muted:#66706c;--line:#d9dedb;--link:#175f8a;--paper:#fff;--c:#2a63a5;--c-tint:#eef3fa;font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;color:var(--ink);background:var(--bg)}
+body.ai{--c:#2a63a5;--c-tint:#eef3fa}
+body.se{--c:#246b35;--c-tint:#eff6f0}
+body.agents{--c:#8054a7;--c-tint:#f4f0f8}
+body.build{--c:#ad501d;--c-tint:#fbf1eb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg)}
+a{color:var(--link)}
+.wrap{max-width:880px;margin:0 auto;padding:28px 16px 64px}
+.crumb{font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
+.crumb a{text-decoration:none}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18px 0 6px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px;line-height:1.6}
+.screen{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin:0 0 18px}
+.screen figure{margin:0}
+.screen svg{display:block;width:100%;height:auto;max-height:340px}
+.screen p{font-size:19px;line-height:1.65;margin:14px 0 0}
+.step{display:inline-block;font-size:12px;font-weight:600;color:var(--c);background:var(--c-tint);border-radius:4px;padding:2px 8px;margin-bottom:10px}
+.part{font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted);margin:34px 0 12px}
+.context{display:grid;gap:14px;margin:0 0 8px}
+.ctx{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 22px;min-width:0}
+.ctx h2{font-size:17px;margin:0 0 6px;color:var(--c)}
+.ctx p{font-size:17px;line-height:1.7;margin:0}
+.ctx p+p{margin-top:10px}
+.ctx figure{margin:14px 0 0}
+.ctx svg{display:block;width:100%;height:auto}
+.intro{font-size:17px;line-height:1.7;margin:0 0 16px}
+.intro p{margin:0 0 6px}
+.intro ol{margin:4px 0 0;padding-left:1.4em}
+.ctx ol.steps{margin:10px 0 0;padding-left:1.5em;font-size:17px;line-height:1.7}
+.ctx ol.steps li{margin:0 0 6px;padding-left:2px}
+.ctx ol.steps b{color:var(--c)}
+.ctx h3{font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--muted);margin:16px 0 0}
+.ctx .formula{font-size:18px;margin-top:8px}
+.ctx .formula .fl{display:block}
+.units{font-size:15px;line-height:1.6;color:var(--ink);background:var(--c-tint);border-left:3px solid var(--c);border-radius:0 8px 8px 0;padding:8px 12px;margin:10px 0 0}
+.units b{color:var(--c)}
+.screen .tbl{margin-top:12px}
+.tbl{overflow-x:auto;margin:8px 0 2px}
+.tbl table{border-collapse:collapse;font-size:14px;line-height:1.4}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:5px 10px;text-align:right;white-space:nowrap}
+.tbl th{color:var(--muted);font-weight:600;font-size:13px}
+.tbl th small{display:block;font-weight:400}
+.tbl.text table{width:100%}
+.tbl.text th,.tbl.text td{text-align:left;white-space:normal;vertical-align:top}
+.tbl.text tbody th{white-space:nowrap}
+@media(max-width:640px){.tbl th,.tbl td{padding:4px 5px;font-size:13px}.ctx .formula{font-size:16px;white-space:normal;line-height:1.6}.ctx .formula .fl{margin:0 0 8px}.ctx .formula .note{display:block;margin:0}}
+.formula{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:21px;line-height:1.9;background:var(--c-tint);border-radius:10px;padding:10px 16px;margin:14px 0 0;overflow-x:auto;white-space:nowrap}
+.formula var{font-style:italic}
+.formula .note{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;font-size:14px;color:var(--muted);margin-left:10px;white-space:normal}
+.flow{list-style:none;display:flex;gap:26px;padding:0;margin:14px 0 0}
+.flow li{flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;position:relative;background:var(--paper)}
+.flow li b{display:block;font-size:17px}
+.flow li span{display:block;font-size:14px;color:var(--muted)}
+.flow li.on{border-color:var(--c);background:var(--c-tint)}
+.flow li:not(:last-child)::after{content:"→";position:absolute;right:-20px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.flow-note{font-size:14px;color:var(--muted);text-align:center;margin:8px 0 0}
+.timeline{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.timeline li{padding:26px 6px 0;text-align:center;position:relative;min-width:0}
+.timeline li::before{content:"";position:absolute;top:9px;left:0;right:0;border-top:2px solid var(--ink)}
+.timeline li::after{content:"";position:absolute;top:3px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--c)}
+.timeline .y{display:block;font-weight:600;color:var(--c);font-size:17px}
+.timeline .e{display:block;font-size:15px}
+.timeline .w{display:block;font-size:13px;color:var(--muted)}
+@media(max-width:640px){.flow{flex-direction:column;gap:20px}.flow li:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%)}.timeline{grid-template-columns:1fr}.timeline li{text-align:left;padding:0 0 12px 28px}.timeline li::before{top:0;bottom:0;left:6px;right:auto;border-top:0;border-left:2px solid var(--ink)}.timeline li::after{top:4px;left:0;margin-left:0}}
+.uses{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:16px 20px;margin:18px 0 0}
+.uses ul{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:10px}
+.uses li{font-size:15px;line-height:1.65;border-left:3px solid var(--c);padding-left:12px}
+.uses b{display:block;font-size:16px}
+.tree{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:16px 20px;margin:18px 0 0}
+.tree .branches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:8px}
+.tree h3{font-size:13px;color:var(--c);margin:0 0 6px;letter-spacing:.04em}
+.tree ul{list-style:none;padding:0;margin:0;font-size:14px;line-height:1.6}
+.tree li{margin:0 0 6px}
+.tree .todo{color:var(--muted)}
+a.term{color:inherit;text-decoration:underline dotted var(--c);text-underline-offset:3px}
+@media(max-width:640px){.tree .branches{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.limits,.summary,.try,.deeper{border-radius:12px;padding:16px 20px;margin:18px 0 0;line-height:1.65;font-size:16px}
+.limits{border:1px dashed var(--line);color:var(--muted)}
+.summary{background:var(--c-tint);font-size:19px;font-weight:500}
+.try,.deeper{border:1px solid var(--line);background:var(--paper)}
+.try code{display:block;margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:8px;overflow-x:auto;font-size:13px;white-space:pre}
+.try p code{display:inline;margin:0;padding:0 2px;background:none;white-space:normal;font-size:.9em}
+h2{font-size:15px;margin:0 0 6px}
+.flag{font-size:13px;color:var(--muted);border-left:3px solid var(--c);padding-left:10px;margin:0 0 20px}
+footer{margin-top:36px;font-size:13px;color:var(--muted)}
+@media(max-width:640px){.screen{padding:16px 12px 14px}.screen p{font-size:17px}}
+svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
+.box{fill:var(--paper);stroke:var(--ink);stroke-width:1.5}
+.hl{fill:var(--c-tint);stroke:var(--c);stroke-width:2}
+.op{fill:var(--bg);stroke:var(--muted);stroke-width:1.5}
+.fwd{stroke:var(--ink);stroke-width:2;fill:none}
+.bwd{stroke:var(--c);stroke-width:2.5;fill:none;stroke-dasharray:7 5}
+.faint{opacity:.35}
+.t{font-size:28px;fill:var(--ink)}
+.tb{font-size:34px;font-weight:600;fill:var(--ink)}
+.tc{font-size:28px;font-weight:600;fill:var(--c)}
+.ts{font-size:22px;fill:var(--muted)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="ai">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<marker id="af" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f2523"/></marker>
+<marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a63a5"/></marker>
+<marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#66706c"/></marker>
+</defs></svg>
+<div class="wrap">
+  <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#06-machine-learning-foundations">Machine learning foundations</a><span>›</span><span>1.6.5</span></nav>
+  <h1>Vector（向量）、linear combination（线性组合）与 basis（基）：线性代数的起点</h1>
+  <p class="lede">Vector 的三种视角、两种运算，以及由运算生成的 span（张成）与 basis；对应《Essence of Linear Algebra》第 1–2 集，所有数值均可逐步核对。</p>
+  <p class="flag">对应的知识正文由 agent 起草，尚待人工核验。</p>
+  <p class="part">概述</p>
+  <section class="context">
+    <div class="ctx why"><h2>背景</h2><p>语言模型内部的数据与 parameter（参数）都以 vector 与 matrix（矩阵）存储：token 的 embedding 是 vector，attention 的输出是 value vector 的 linear combination，LoRA 的权重更新落在少数几个 vector 的 span 内。Vector 的两种运算以及由此定义的 span 与 basis，是后续 matrix、determinant（行列式）与 eigenvector（特征向量）的前提。本页只介绍第 1–2 集的内容。</p><ol class="flow" aria-label="从 vector 到 matrix"><li><b>Vector</b><span>加法与数乘</span></li><li><b>Linear combination</b><span>缩放后相加</span></li><li><b>Span 与 basis</b><span>能到达的范围与坐标</span></li><li class="on"><b>Matrix</b><span>下一页：linear transformation</span></li></ol></div>
+    <div class="ctx what"><h2>定义与示例</h2><p><strong>Vector</strong> 是一类数学对象，其上定义了两种运算——两个 vector 相加，以及 vector 乘以一个数（scalar，标量）——且运算结果仍是 vector。几何上它是从原点出发的箭头，由长度与方向决定；数值上它是有序的数字列表，顺序与长度均有意义。示例采用屏幕颜色：一种颜色由红、绿、蓝三个分量表示，是一个三维 vector。</p><h3>示例</h3><ol class="steps"><li><b>表示</b>：把颜色记为三个 0 到 255 的数。红色为 (255, 0, 0)，黄色为 (255, 255, 0)。</li><li><b>数乘</b>：红色乘以 0.5，每个分量减半，得到 (127.5, 0, 0)，即亮度减半的红。</li><li><b>相加</b>：0.5 倍红色与 0.5 倍黄色逐分量相加，得到 (255, 127.5, 0)，屏幕上显示为橙色。缩放后相加的结果称为 linear combination。</li><li><b>Span</b>：只用红与绿两种颜色，无论系数怎样取，蓝分量始终为 0，能配出的颜色只占全部颜色中的一个平面，这个平面就是红与绿的 span。</li><li><b>Basis</b>：红、绿、蓝任一种都配不出另外两种，称为 linearly independent（线性无关）；三者又能配出全部颜色，因此构成颜色空间的一个 basis，(R, G, B) 即颜色在这组 basis 下的坐标。</li></ol><h3>公式</h3><div class="formula"><span class="fl"><var>v</var> + <var>w</var> = [<var>v</var>₁ + <var>w</var>₁, <var>v</var>₂ + <var>w</var>₂, <var>v</var>₃ + <var>w</var>₃]，&nbsp; <var>c</var>·<var>v</var> = [<var>c</var><var>v</var>₁, <var>c</var><var>v</var>₂, <var>c</var><var>v</var>₃]<span class="note">加法与数乘均逐分量进行</span></span><span class="fl"><var>a</var>·<var>v</var> + <var>b</var>·<var>w</var><span class="note">linear combination</span></span><span class="fl">0.5·(255, 0, 0) + 0.5·(255, 255, 0) = (255, 127.5, 0)</span></div><figure><svg viewBox="0 0 800 150" role="img" aria-label="三个色块：0.5 倍红色加 0.5 倍黄色等于橙色，下方标注各自的 RGB 分量"><rect x="40" y="20" width="150" height="70" rx="10" fill="rgb(255,0,0)"/><text class="t" x="115" y="120" text-anchor="middle" style="font-size:20px">(255, 0, 0)</text><text class="tb" x="230" y="65" text-anchor="middle" style="font-size:26px">× 0.5 +</text><rect x="270" y="20" width="150" height="70" rx="10" fill="rgb(255,255,0)"/><text class="t" x="345" y="120" text-anchor="middle" style="font-size:20px">(255, 255, 0)</text><text class="tb" x="470" y="65" text-anchor="middle" style="font-size:26px">× 0.5 =</text><rect x="520" y="20" width="150" height="70" rx="10" fill="rgb(255,128,0)"/><text class="t" x="595" y="120" text-anchor="middle" style="font-size:20px">(255, 127.5, 0)</text><text class="ts" x="595" y="142" text-anchor="middle">橙色</text></svg></figure></div>
+    <div class="ctx origin"><h2>起源与发展</h2><p>Vector 一词来自 Hamilton 1843 年的 quaternion（四元数）。Grassmann 1844 年的《扩张论》已定义 linear independence、span 与维数，但长期无人理解；Peano 1888 年给出 vector space（向量空间）的公理化定义，1920 年前后由 Banach、Noether 等人各自重新发现；Halmos 1942 年的教材确立了以 vector space 为起点的现代讲法。</p><ol class="timeline" aria-label="时间线"><li><span class="y">1843</span><span class="e">Quaternion 与 vector 一词</span><span class="w">Hamilton</span></li><li><span class="y">1844</span><span class="e">Linear independence、span、维数</span><span class="w">Grassmann</span></li><li><span class="y">1888</span><span class="e">Vector space 公理</span><span class="w">Peano</span></li><li><span class="y">约 1920</span><span class="e">概念被重新发现</span><span class="w">Banach、Noether 等</span></li><li><span class="y">1942</span><span class="e">《有限维向量空间》</span><span class="w">Halmos</span></li></ol></div>
+  </section>
+  <p class="part">逐步推演</p>
+  <div class="intro"><p>推演在平面上进行，使用两个 vector v = [3, 1] 与 w = [1, 2]（知识正文 02 的例子），第 4 屏扩展到三维。屏幕上的一格为 1 个单位。</p><p>本例说明以下要点：</p><ol><li>坐标是对 basis vector 的缩放：(3, −2) 表示 3 倍的 î 加 −2 倍的 ĵ。</li><li>Linear combination 的几何意义是首尾相接：缩放后的箭头依次接上，终点即结果。</li><li>Span 由 vector 是否共线决定；basis 要求 linearly independent 且 span 整个空间。</li></ol></div>
+  <main>
+    <section class="screen" id="coordinates">
+      <span class="step">1 · 坐标即缩放 basis vector</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="坐标系中单位向量 î 与 ĵ，3 倍 î 向右、−2 倍 ĵ 向下首尾相接，合成指向 (3, −2) 的箭头"><line class="fwd" x1="80" y1="140" x2="500" y2="140" marker-end="url(#af)"/><line class="fwd" x1="200" y1="290" x2="200" y2="20" marker-end="url(#af)"/><text class="ts" x="492" y="130" text-anchor="end">x</text><text class="ts" x="212" y="34">y</text>
+<line x1="200" y1="140" x2="260" y2="140" stroke="#2a63a5" stroke-width="4" marker-end="url(#ab)"/><text class="tc" x="232" y="128" text-anchor="middle" style="font-size:22px">î</text>
+<line x1="200" y1="140" x2="200" y2="80" stroke="#2a63a5" stroke-width="4" marker-end="url(#ab)"/><text class="tc" x="186" y="90" text-anchor="end" style="font-size:22px">ĵ</text>
+<line x1="200" y1="158" x2="380" y2="158" stroke="#66706c" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#ag)"/><text class="ts" x="300" y="184" text-anchor="middle">3 · î</text>
+<line x1="380" y1="158" x2="380" y2="260" stroke="#66706c" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#ag)"/><text class="ts" x="392" y="216">(−2) · ĵ</text>
+<line class="fwd" x1="200" y1="140" x2="380" y2="260" style="stroke-width:3" marker-end="url(#af)"/><circle cx="380" cy="260" r="6" fill="#1f2523"/><text class="t" x="396" y="280" style="font-size:22px">(3, −2)</text>
+<text class="tb" x="640" y="110" text-anchor="middle" style="font-size:28px">(3, −2)</text><text class="tc" x="640" y="155" text-anchor="middle" style="font-size:24px">= 3 · î + (−2) · ĵ</text><text class="ts" x="640" y="195" text-anchor="middle">î = (1, 0)，ĵ = (0, 1)</text></svg></figure>
+      <div class="formula">(3, −2) = 3·(1, 0) + (−2)·(0, 1) = (3, 0) + (0, −2)</div>
+      <p>î 与 ĵ 是长度为 1、分别指向 x 与 y 方向的 basis vector。每个坐标是一个 scalar，缩放对应的 basis vector；两段缩放后的箭头首尾相接，终点即该 vector。</p>
+    </section>
+    <section class="screen" id="combination">
+      <span class="step">2 · Linear combination 首尾相接</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="v 等于 (3, 1)、w 等于 (1, 2)；2 倍 v 从原点向右上，w 接在其尖端，终点是 (7, 4)"><line class="fwd" x1="60" y1="270" x2="470" y2="270" marker-end="url(#af)"/><line class="fwd" x1="120" y1="290" x2="120" y2="30" marker-end="url(#af)"/>
+<line x1="120" y1="270" x2="222" y2="236" stroke="#1f2523" stroke-width="3" marker-end="url(#af)"/><text class="t" x="228" y="256" style="font-size:22px">v = (3, 1)</text>
+<line x1="120" y1="270" x2="154" y2="202" stroke="#1f2523" stroke-width="3" marker-end="url(#af)"/><text class="t" x="144" y="192" text-anchor="end" style="font-size:22px">w = (1, 2)</text>
+<line x1="120" y1="270" x2="324" y2="202" stroke="#66706c" stroke-width="3.5" stroke-dasharray="7 5" marker-end="url(#ag)"/><text class="ts" x="300" y="238" text-anchor="middle">2 · v = (6, 2)</text>
+<line x1="324" y1="202" x2="358" y2="134" stroke="#66706c" stroke-width="3.5" stroke-dasharray="7 5" marker-end="url(#ag)"/><text class="ts" x="368" y="176">1 · w</text>
+<line x1="120" y1="270" x2="358" y2="134" stroke="#2a63a5" stroke-width="4" marker-end="url(#ab)"/><circle cx="358" cy="134" r="6" fill="#2a63a5"/><text class="tc" x="374" y="128" style="font-size:24px">(7, 4)</text>
+<text class="tb" x="630" y="110" text-anchor="middle" style="font-size:26px">2 · v + 1 · w</text><text class="tc" x="630" y="155" text-anchor="middle" style="font-size:24px">= (6, 2) + (1, 2) = (7, 4)</text><text class="ts" x="630" y="195" text-anchor="middle">系数 (2, 1) 由方程</text><text class="ts" x="630" y="225" text-anchor="middle">3a + b = 7、a + 2b = 4 解出</text></svg></figure>
+      <div class="formula"><var>a</var>·<var>v</var> + <var>b</var>·<var>w</var>：&nbsp; 2·(3, 1) + 1·(1, 2) = (6, 2) + (1, 2) = (7, 4)</div>
+      <p>把 v 拉长到 2 倍，再把 w 平移到它的尖端，从原点到 w 尖端的箭头即 linear combination 的结果。数值上先数乘再逐分量相加，与图中的首尾相接一致。</p>
+    </section>
+    <section class="screen" id="span">
+      <span class="step">3 · Span：共线与不共线</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="左图：v 与 2 倍 v 共线，所有 linear combination 的落点排成一条直线；右图：v 与 w 不共线，落点铺成覆盖平面的网格"><text class="t" x="180" y="40" text-anchor="middle" style="font-size:22px">v 与 u = (6, 2) 共线</text>
+<line x1="30" y1="250" x2="330" y2="150" stroke="#d9dedb" stroke-width="2"/>
+<circle cx="30" cy="250" r="5" fill="#66706c"/><circle cx="60" cy="240" r="5" fill="#66706c"/><circle cx="90" cy="230" r="5" fill="#66706c"/><circle cx="120" cy="220" r="5" fill="#66706c"/><circle cx="150" cy="210" r="5" fill="#66706c"/><circle cx="180" cy="200" r="5" fill="#66706c"/><circle cx="210" cy="190" r="5" fill="#66706c"/><circle cx="240" cy="180" r="5" fill="#66706c"/><circle cx="270" cy="170" r="5" fill="#66706c"/><circle cx="300" cy="160" r="5" fill="#66706c"/><circle cx="330" cy="150" r="5" fill="#66706c"/>
+<line x1="120" y1="220" x2="150" y2="210" stroke="#1f2523" stroke-width="3" marker-end="url(#af)"/><text class="t" x="150" y="238" style="font-size:20px">v</text>
+<line x1="120" y1="220" x2="180" y2="200" stroke="#2a63a5" stroke-width="3" marker-end="url(#ab)"/><text class="tc" x="186" y="196" style="font-size:20px">u</text>
+<text class="ts" x="180" y="285" text-anchor="middle">span 只是一条直线</text>
+<text class="t" x="600" y="40" text-anchor="middle" style="font-size:22px">v 与 w = (1, 2) 不共线</text>
+<g fill="#66706c"><circle cx="424" cy="286" r="5"/><circle cx="457" cy="275" r="5"/><circle cx="490" cy="264" r="5"/><circle cx="523" cy="253" r="5"/><circle cx="556" cy="242" r="5"/><circle cx="435" cy="264" r="5"/><circle cx="468" cy="253" r="5"/><circle cx="501" cy="242" r="5"/><circle cx="534" cy="231" r="5"/><circle cx="567" cy="220" r="5"/><circle cx="446" cy="242" r="5"/><circle cx="479" cy="231" r="5"/><circle cx="512" cy="220" r="5"/><circle cx="545" cy="209" r="5"/><circle cx="578" cy="198" r="5"/><circle cx="457" cy="220" r="5"/><circle cx="490" cy="209" r="5"/><circle cx="523" cy="198" r="5"/><circle cx="556" cy="187" r="5"/><circle cx="589" cy="176" r="5"/><circle cx="468" cy="198" r="5"/><circle cx="501" cy="187" r="5"/><circle cx="534" cy="176" r="5"/><circle cx="567" cy="165" r="5"/><circle cx="600" cy="154" r="5"/></g>
+<line x1="512" y1="220" x2="545" y2="209" stroke="#1f2523" stroke-width="3" marker-end="url(#af)"/><text class="t" x="548" y="226" style="font-size:20px">v</text>
+<line x1="512" y1="220" x2="523" y2="198" stroke="#2a63a5" stroke-width="3" marker-end="url(#ab)"/><text class="tc" x="528" y="192" style="font-size:20px">w</text>
+<text class="ts" x="600" y="285" text-anchor="middle">span 铺满整个平面（系数取 −2 到 2）</text></svg></figure>
+      <div class="formula"><var>a</var>·<var>v</var> + <var>b</var>·(2<var>v</var>) = (<var>a</var> + 2<var>b</var>)·<var>v</var>，&nbsp; 始终是 <var>v</var> 的倍数</div>
+      <p>Span 是全部 linear combination 的集合。u 是 v 的 2 倍，任何组合仍是 v 的倍数，span 只是一条直线；w 不与 v 共线，两个系数各自独立，span 覆盖整个平面。</p>
+    </section>
+    <section class="screen" id="basis">
+      <span class="step">4 · Linearly independent 与 basis</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="三维空间中一张过原点的平面，v1 与 v2 在平面内，v3 等于 v1 加 v2 也在平面内；换成 (0, 0, 1) 的箭头离开平面"><polygon points="150,240 540,240 640,110 250,110" fill="#eef3fa" stroke="#d9dedb" stroke-width="2"/>
+<circle cx="330" cy="205" r="5" fill="#1f2523"/><text class="ts" x="318" y="226" text-anchor="end">原点</text>
+<line x1="330" y1="205" x2="470" y2="205" stroke="#1f2523" stroke-width="3" marker-end="url(#af)"/><text class="t" x="410" y="230" text-anchor="middle" style="font-size:20px">v₁ = (1, 0, 1)</text>
+<line x1="330" y1="205" x2="400" y2="150" stroke="#1f2523" stroke-width="3" marker-end="url(#af)"/><text class="t" x="290" y="140" text-anchor="end" style="font-size:20px">v₂ = (0, 1, 1)</text>
+<line x1="330" y1="205" x2="540" y2="150" stroke="#66706c" stroke-width="3.5" stroke-dasharray="7 5" marker-end="url(#ag)"/><text class="ts" x="560" y="146">v₃ = v₁ + v₂：仍在平面内</text>
+<line x1="330" y1="205" x2="330" y2="50" stroke="#2a63a5" stroke-width="4" marker-end="url(#ab)"/><text class="tc" x="344" y="60" style="font-size:22px">换成 (0, 0, 1)：离开平面</text>
+<text class="ts" x="700" y="280" text-anchor="end">平面 = v₁ 与 v₂ 的 span</text></svg></figure>
+      <div class="formula">(1, 1, 2) = 1·(1, 0, 1) + 1·(0, 1, 1)，&nbsp; 故 <var>v</var>₁、<var>v</var>₂、<var>v</var>₃ linearly dependent，span 是一张平面</div>
+      <p>去掉某个 vector 而 span 不变，这组 vector 即 linearly dependent；每个 vector 都为 span 增加一个维度，则 linearly independent。既 linearly independent 又 span 整个空间的一组 vector 称为 basis，此时每个 vector 的坐标唯一。</p>
+    </section>
+  </main>
+  <aside class="limits"><h2>适用条件与局限</h2><p>本页只处理二维、三维与实数 scalar；n 维与其他数域的推广见 abstract vector space（抽象向量空间）。Basis 不唯一，î 与 ĵ 只是最常用的一组；同一个 vector 在不同 basis 下坐标不同。判断多个 vector 是否 linearly independent，一般需要计算 rank（秩）或 determinant，"随机三个 vector 几乎一定 linearly independent"是概率性的说法。</p></aside>
+  <section class="uses"><h2>工程应用</h2><ul><li><b>Embedding 是 vector</b>语言模型把每个 token 映射为一个 d 维 vector，模型内部各层传递的也是同样维数的 vector；分量的含义由训练决定，不对应可命名的属性。</li><li><b>Attention 的输出是 linear combination</b>Attention(Q, K, V) 的每一行是 V 各行的 linear combination，系数由 softmax 给出，非负且和为 1，因此输出落在 value vector 的 span 内，并且位于它们围成的区域之中。</li><li><b>LoRA 的更新落在低维 span 内</b>LoRA 把权重更新写成 B·A，B 只有 r 列；更新矩阵的每一列都是这 r 个列 vector 的 linear combination，因此全部列位于维数不超过 r 的子空间内，这正是"低秩"的含义。</li></ul></section>
+  <p class="summary">Vector 由加法与数乘定义；缩放后相加得到 linear combination，全部组合构成 span；linearly independent 且 span 整个空间的一组 vector 是 basis，坐标即对 basis 的缩放系数。</p>
+  <section class="tree"><h2>知识树</h2><div class="branches"><div><h3>前置知识</h3><ul><li>坐标系与有序数组 <span class="todo">（中学数学，不单列）</span></li></ul></div><div><h3>核心概念</h3><ul><li><a href="#coordinates">坐标与 basis vector</a></li><li><a href="#combination">Linear combination</a></li><li><a href="#span">Span</a></li><li><a href="#basis">Linearly independent 与 basis</a></li></ul></div><div><h3>延伸主题</h3><ul><li>Matrix 与 linear transformation <span class="todo">（1.6.5 下一页，待写）</span></li><li>Rank、column space 与 null space <span class="todo">（待写）</span></li><li><a href="math-prerequisites.html#gradient">Gradient 是 partial derivative 组成的 vector</a></li></ul></div><div><h3>应用场景</h3><ul><li>Attention：value vector 的加权平均 <span class="todo">（1.1.2，图解待写）</span></li><li>LoRA：低秩更新 <span class="todo">（1.1.3，图解待写）</span></li><li><a href="backprop-autodiff.html">Backpropagation</a></li></ul></div></div></section>
+  <section class="try"><h2>实践</h2><p>先运行 playground 看 vector 在动：终端画板、命中目标、像素字母混合、attention 玩具；再闭卷实现 <code>vectors.py</code> 的九个函数，用验证器逐项核对本页与知识正文的数值。</p><code>cd 01-ai-applications/06-machine-learning-foundations/math-prerequisites/linear-algebra/vectors
+python3 playground/01_draw_vectors.py
+python3 playground/02_hit_the_target.py
+make -C ../../../../.. test-linalg</code></section>
+  <section class="deeper"><h2>参考资料</h2><p>知识正文：《向量与空间：三种视角、线性组合与基》《线性代数的起源与发展》（私有知识库，待核验）。公开来源：<a href="https://www.3blue1brown.com/lessons/vectors">3Blue1Brown：Vectors, what even are they?</a> · <a href="https://www.3blue1brown.com/lessons/span">Linear combinations, span, and basis vectors</a>。</p></section>
+  <footer>Rubickx · ELI5 · <a href="../../index.html#06-machine-learning-foundations">回到能力地图</a></footer>
+</div>
+</body>
+</html>

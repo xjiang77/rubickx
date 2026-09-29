@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="rubickx-topic" content="4.3.1">
 <meta name="rubickx-derived-from" content="02_Knowledge/04-shaping-the-build/03-communicating-and-leading/01 - Eng - 向非工程背景的人解释技术可行性.md@2026-09-15">
-<meta name="description" content="解释技术可行性的背景、定义与历史沿革；以合同金额提取为例，逐步对照三类问题，并给出完整回答的组织方式。">
+<meta name="description" content="解释技术可行性的背景、定义与起源；以合同金额提取为例，逐步对照三类问题，并给出完整回答的组织方式。">
 <title>解释技术可行性 · ELI5 · Rubickx</title>
 <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
 <style id="eli5-base">
@@ -29,7 +29,7 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .step{display:inline-block;font-size:12px;font-weight:600;color:var(--c);background:var(--c-tint);border-radius:4px;padding:2px 8px;margin-bottom:10px}
 .part{font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted);margin:34px 0 12px}
 .context{display:grid;gap:14px;margin:0 0 8px}
-.ctx{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 22px}
+.ctx{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 22px;min-width:0}
 .ctx h2{font-size:17px;margin:0 0 6px;color:var(--c)}
 .ctx p{font-size:17px;line-height:1.7;margin:0}
 .ctx figure{margin:14px 0 0}
@@ -40,6 +40,15 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .ctx ol.steps{margin:10px 0 0;padding-left:1.5em;font-size:17px;line-height:1.7}
 .ctx ol.steps li{margin:0 0 6px;padding-left:2px}
 .ctx ol.steps b{color:var(--c)}
+.ctx h3{font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--muted);margin:16px 0 0}
+.ctx .formula{font-size:18px;margin-top:8px}
+.ctx .formula .fl{display:block}
+.ctx .rounds{overflow-x:auto;margin:8px 0 2px}
+.ctx .rounds table{border-collapse:collapse;font-size:14px;line-height:1.4}
+.ctx .rounds th,.ctx .rounds td{border-bottom:1px solid var(--line);padding:5px 10px;text-align:right;white-space:nowrap}
+.ctx .rounds th{color:var(--muted);font-weight:600;font-size:13px}
+.ctx .rounds th small{display:block;font-weight:400}
+@media(max-width:640px){.ctx .rounds th,.ctx .rounds td{padding:4px 5px;font-size:13px}.ctx .formula{font-size:16px;white-space:normal;line-height:1.6}.ctx .formula .fl{margin:0 0 8px}.ctx .formula .note{display:block;margin:0}}
 .formula{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:21px;line-height:1.9;background:var(--c-tint);border-radius:10px;padding:10px 16px;margin:14px 0 0;overflow-x:auto;white-space:nowrap}
 .formula var{font-style:italic}
 .formula .note{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;font-size:14px;color:var(--muted);margin-left:10px;white-space:normal}
@@ -106,14 +115,14 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
   <p class="flag">样板页：对应的知识正文尚待人工核验，内容以核验后的版本为准。</p>
   <p class="part">概述</p>
   <section class="context">
-    <div class="ctx why"><h2>背景与动机</h2><p>AI 应用工程师经常需要回答产品、业务、法务部门提出的“能否实现”问题。回答直接影响对方的排期、投入以及对用户的承诺；类别判断错误会使后续的排期与投入估计产生系统性偏差。</p></div>
-    <div class="ctx what"><h2>定义与示例</h2><p>解释技术可行性（explaining technical feasibility）是面向非工程背景决策者的一种沟通方法：先判定问题属于哪一类，再给出对方能据此决策的答案。以合同金额提取为例：</p><ol class="steps"><li><b>识别问题</b>：业务部门询问：能否用 AI 从合同中自动提取金额。</li><li><b>判定类别</b>：该任务不受硬限制约束，但输出是概率性的，增加投入只能提高正确比例，因此属于可靠性问题。</li><li><b>给出决策依据</b>：100 份合同中约 90 份提取正确，错误多来自扫描件模糊与表格跨页；同时说明出错时的兜底方案。</li></ol><figure><svg viewBox="0 35 800 85" role="img" aria-label="一个问题“能否实现”分成三类：A 不可能，B 代价问题，C 可靠性问题；合同金额提取属于 C"><rect class="hl" x="10" y="45" width="190" height="64" rx="32"/><text class="t" x="105" y="86" text-anchor="middle" style="font-weight:600">能否实现？</text>
+    <div class="ctx why"><h2>背景</h2><p>AI 应用工程师经常需要回答产品、业务、法务部门提出的“能否实现”问题。回答直接影响对方的排期、投入以及对用户的承诺；类别判断错误会使后续的排期与投入估计产生系统性偏差。</p></div>
+    <div class="ctx what"><h2>定义与示例</h2><p>解释技术可行性（explaining technical feasibility）是面向非工程背景决策者的一种沟通方法：先判定问题属于哪一类，再给出对方能据此决策的答案。以合同金额提取为例：</p><h3>示例</h3><ol class="steps"><li><b>识别问题</b>：业务部门询问：能否用 AI 从合同中自动提取金额。</li><li><b>判定类别</b>：该任务不受硬限制约束，但输出是概率性的，增加投入只能提高正确比例，因此属于可靠性问题。</li><li><b>给出决策依据</b>：100 份合同中约 90 份提取正确，错误多来自扫描件模糊与表格跨页；同时说明出错时的兜底方案。</li></ol><figure><svg viewBox="0 35 800 85" role="img" aria-label="一个问题“能否实现”分成三类：A 不可能，B 代价问题，C 可靠性问题；合同金额提取属于 C"><rect class="hl" x="10" y="45" width="190" height="64" rx="32"/><text class="t" x="105" y="86" text-anchor="middle" style="font-weight:600">能否实现？</text>
 <line class="fwd" x1="200" y1="77" x2="248" y2="77" marker-end="url(#af)"/>
 <rect class="box" x="252" y="45" width="150" height="64" rx="10"/><text class="t" x="327" y="86" text-anchor="middle">A 不可能</text>
 <rect class="box" x="412" y="45" width="180" height="64" rx="10"/><text class="t" x="502" y="86" text-anchor="middle">B 代价问题</text>
 <rect class="hl" x="602" y="45" width="190" height="64" rx="10"/><text class="t" x="697" y="86" text-anchor="middle">C 可靠性问题</text>
 </svg></figure></div>
-    <div class="ctx origin"><h2>历史沿革</h2><p>Andrew Ng 于 2026 年发布的 AI 工程能力地图将“沟通与领导”列为一项能力：AI 使工程师参与更多职能的决策，而多数非技术人员不了解 AI 的能力范围，需要具备技术背景的人说明哪些可行、哪些不可行。难点在于 AI 的输出是概率性的，与传统软件“程序正确则结果始终正确”的直觉不同。</p><figure><svg viewBox="0 10 800 115" role="img" aria-label="对比：传统软件输出确定，十次都正确；AI 应用输出概率性，十次中偶有一次错误"><text class="t" x="20" y="40" style="font-weight:600">传统软件</text><text class="ts" x="20" y="72">输出确定，每次正确</text><rect x="20" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="54" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="88" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="122" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="156" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="190" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="224" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="258" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="292" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="326" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/>
+    <div class="ctx origin"><h2>起源与发展</h2><p>Andrew Ng 于 2026 年发布的 AI 工程能力地图将“沟通与领导”列为一项能力：AI 使工程师参与更多职能的决策，而多数非技术人员不了解 AI 的能力范围，需要具备技术背景的人说明哪些可行、哪些不可行。难点在于 AI 的输出是概率性的，与传统软件“程序正确则结果始终正确”的直觉不同。</p><figure><svg viewBox="0 10 800 115" role="img" aria-label="对比：传统软件输出确定，十次都正确；AI 应用输出概率性，十次中偶有一次错误"><text class="t" x="20" y="40" style="font-weight:600">传统软件</text><text class="ts" x="20" y="72">输出确定，每次正确</text><rect x="20" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="54" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="88" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="122" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="156" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="190" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="224" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="258" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="292" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="326" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/>
 <text class="t" x="430" y="40" style="font-weight:600">AI 应用</text><text class="ts" x="430" y="72">输出概率性，偶有错误</text><rect x="430" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="464" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="498" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="532" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="566" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="600" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="634" y="90" width="26" height="26" rx="4" fill="none" stroke="#ad501d" stroke-width="2" stroke-dasharray="4 3"/><rect x="668" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="702" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/><rect x="736" y="90" width="26" height="26" rx="4" fill="#ad501d" opacity=".78"/></svg></figure></div>
   </section>
   <p class="part">逐步推演</p>

@@ -17,10 +17,10 @@ BASE = re.compile(r'<style id="eli5-base">.*?</style>', re.S)
 CJK = re.compile(r'[一-鿿]')
 SCREEN_TEXT_BUDGET = 400   # 所有屏的说明文字合计汉字数上限
 CONTEXT_TEXT_BUDGET = 600  # 「概述」三块文字（段落与步骤）合计汉字数上限
-CONTEXT_HEADINGS = {'why': '背景与动机', 'what': '定义与示例', 'origin': '历史沿革'}
+CONTEXT_HEADINGS = {'why': ('背景', '背景与动机'), 'what': ('定义与示例',), 'origin': ('起源与发展',)}
 TREE_HEADINGS = ('前置知识', '核心概念', '延伸主题', '应用场景')
 # 口语化的旧标题：知识说明用名词性标题（见 SKILL.md「知识说明的专业文体」）
-COLLOQUIAL = ('为什么要懂它', '它是什么', '从哪里来', '先弄清楚', '用一个例子推演一遍', '去试试', '想深入', '什么时候用得上')
+COLLOQUIAL = ('为什么要懂它', '它是什么', '从哪里来', '先弄清楚', '用一个例子推演一遍', '去试试', '想深入', '什么时候用得上', '历史沿革')
 MIN_SCREENS, MAX_SCREENS = 3, 6
 CAP_IDS = {c['id'] for c in json.loads((ROOT / 'web/capabilities.json').read_text())['capabilities']}
 
@@ -143,12 +143,20 @@ def check_page(path, base):
         errors.append(f'屏内说明 {n} 字，超过 {SCREEN_TEXT_BUDGET}')
     lacking = {'why', 'what', 'origin'} - p.ctx_blocks
     if lacking:
-        errors.append(f'「概述」缺 {sorted(lacking)}（背景与动机 / 定义与示例 / 历史沿革）')
+        errors.append(f'「概述」缺 {sorted(lacking)}（背景 / 定义与示例 / 起源与发展）')
     for key, want in CONTEXT_HEADINGS.items():
-        if key in p.ctx_blocks and p.ctx_headings.get(key, '').strip() != want:
-            errors.append(f'.ctx.{key} 的标题应为「{want}」')
+        if key in p.ctx_blocks and p.ctx_headings.get(key, '').strip() not in want:
+            errors.append(f'.ctx.{key} 的标题应为「' + '」或「'.join(want) + '」')
     if not p.steps_in_what:
         errors.append('「定义与示例」须用 <ol class="steps"> 分步说明应用示例')
+    what = re.search(r'<div class="ctx what">(.*?)</div>\s*<div class="ctx origin">', html, re.S)
+    if what:
+        body = what.group(1)
+        steps = re.search(r'<ol class="steps">(.*?)</ol>', body, re.S)
+        if steps and re.search(r'[=∂∇←]', re.sub(r'<[^>]+>', '', steps.group(1))):
+            errors.append('示例步骤里不写符号公式：先用具体例子说明，公式放在其后的「公式」块')
+        if '<h3>公式</h3>' in body and body.index('<h3>公式</h3>') < body.index('<ol class="steps">'):
+            errors.append('「公式」块应在示例步骤之后')
     if '<p class="part">概述</p>' not in html or '<p class="part">逐步推演</p>' not in html:
         errors.append('分段标题应为「概述」「逐步推演」')
     found = [w for w in COLLOQUIAL if f'>{w}' in html or f'{w}<' in html]

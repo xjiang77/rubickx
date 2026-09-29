@@ -4,7 +4,7 @@
 
 | 段 | 内容 | 位置 |
 |---|---|---|
-| 学 | ELI5 图解页，从知识正文派生；notebook 的 Markdown 单元格与之同屏对应 | `web/learn/06-machine-learning-foundations/<slug>.html`，`<目录>/<name>.ipynb` |
+| 学 | ELI5 图解页，从知识正文派生；notebook 的 Markdown 单元格与之逐步对应 | `web/learn/06-machine-learning-foundations/<slug>.html`，`<目录>/<name>.ipynb` |
 | 玩 | 能直接运行、有画面或交互的小程序，只看不写 | `<目录>/<name>.ipynb` 的演示单元格；同样的程序在 `<目录>/playground/` |
 | 做 | 骨架函数由本人手写，不得引入 numpy 等库替代（C5） | `<目录>/<name>.py` |
 | 测 | 验证器（骨架状态下预期失败，不得改为 skip）与题库 | `<目录>/test_<name>.py`，`web/quiz/` |

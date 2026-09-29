@@ -153,8 +153,8 @@ def check_page(path, base):
     if what:
         body = what.group(1)
         steps = re.search(r'<ol class="steps">(.*?)</ol>', body, re.S)
-        if steps and re.search(r'[=∂∇←]', re.sub(r'<[^>]+>', '', steps.group(1))):
-            errors.append('示例步骤里不写符号公式：先用具体例子说明，公式放在其后的「公式」块')
+        if steps and re.search(r'[∂∇←]|(?<![A-Za-z])[A-Za-zŷη]\s*=', re.sub(r'<[^>]+>', '', steps.group(1))):
+            errors.append('示例步骤里不写符号公式（可写文字公式，如“loss =（预测 − 实际）²”）：符号公式放在其后的「公式」块')
         if '<h3>公式</h3>' in body and body.index('<h3>公式</h3>') < body.index('<ol class="steps">'):
             errors.append('「公式」块应在示例步骤之后')
     if '<p class="part">概述</p>' not in html or '<p class="part">逐步推演</p>' not in html:

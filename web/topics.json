@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "dragon-vault Goals/skills-map-landing/plan.md §3（2026-09-29 冻结）",
-  "note": "knowledge.notes 是私有知识库里的路径，只作标识，不生成公开链接；state 由 vault 侧检查同步。",
+  "note": "knowledge.notes 是私有知识库里的路径，只作标识，不生成公开链接；state 由 vault 侧检查同步。 relations 是 topic 之间的关系：requires 前置，extends 延展（在它之上长出来的），applies_to 用在哪里。",
   "states": {
     "knowledge": {
       "missing": "缺正文",
@@ -635,6 +635,44 @@
       "eli5": null
     },
     {
+      "id": "1.6.0",
+      "slug": "math-prerequisites",
+      "capability": "06-machine-learning-foundations",
+      "title": "数学前置：导数、偏导数与梯度、链式法则",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/06-machine-learning-foundations/00-math-prerequisites/01 - AI - 导数：变化率与局部线性近似.md",
+          "02_Knowledge/01-ai-applications/06-machine-learning-foundations/00-math-prerequisites/02 - AI - 偏导数与梯度：多个参数时往哪边调.md",
+          "02_Knowledge/01-ai-applications/06-machine-learning-foundations/00-math-prerequisites/03 - AI - 链式法则：复合运算怎样求导.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/math-prerequisites"
+        ],
+        "verify": "make test-math",
+        "plan": null
+      },
+      "eli5": {
+        "path": "web/learn/06-machine-learning-foundations/math-prerequisites.html",
+        "derived_from": {
+          "note": "02_Knowledge/01-ai-applications/06-machine-learning-foundations/00-math-prerequisites/01 - AI - 导数：变化率与局部线性近似.md",
+          "updated": "2026-09-29"
+        }
+      },
+      "relations": {
+        "requires": [],
+        "extends": [
+          "1.6.1",
+          "1.6.2"
+        ],
+        "applies_to": []
+      }
+    },
+    {
       "id": "1.6.1",
       "slug": "backprop-autodiff",
       "capability": "06-machine-learning-foundations",
@@ -659,9 +697,22 @@
         "path": "web/learn/06-machine-learning-foundations/backprop-autodiff.html",
         "derived_from": {
           "note": "02_Knowledge/01-ai-applications/06-machine-learning-foundations/02 - AI - 反向传播：链式法则与计算图.md",
-          "updated": "2026-09-03"
+          "updated": "2026-09-29"
         },
         "sample": true
+      },
+      "relations": {
+        "requires": [
+          "1.6.0"
+        ],
+        "extends": [
+          "1.6.2"
+        ],
+        "applies_to": [
+          "1.1.3",
+          "1.6.3",
+          "1.5.1"
+        ]
       }
     },
     {
@@ -685,7 +736,14 @@
         "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/05-train && pytest test_impl.py",
         "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
       },
-      "eli5": null
+      "eli5": null,
+      "relations": {
+        "requires": [
+          "1.6.1"
+        ],
+        "extends": [],
+        "applies_to": []
+      }
     },
     {
       "id": "1.6.3",
@@ -1833,6 +1891,16 @@
           "updated": "2026-09-15"
         },
         "sample": true
+      },
+      "relations": {
+        "requires": [],
+        "extends": [
+          "4.2.1"
+        ],
+        "applies_to": [
+          "4.2.2",
+          "4.1.3"
+        ]
       }
     },
     {

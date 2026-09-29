@@ -109,6 +109,11 @@ def check_page(path, base):
     m = len(CJK.findall(''.join(p.context_text)))
     if m > CONTEXT_TEXT_BUDGET:
         errors.append(f'「先弄清楚」{m} 字，超过 {CONTEXT_TEXT_BUDGET}')
+    for block, label in (('uses', '在 AI 工程里什么时候用得上'), ('tree', '知识树')):
+        if f'<section class="{block}"><h2>{label}</h2>' not in html:
+            errors.append(f'缺「{label}」')
+    if '<section class="tree">' in html and not all(f'<h3>{h}</h3>' in html for h in ('前置', '本体', '延展', '用在哪里')):
+        errors.append('知识树须有前置、本体、延展、用在哪里四个方向')
     missing = {'limits', 'summary', 'try', 'deeper'} - p.blocks
     if missing:
         errors.append(f'缺固定结尾块 {sorted(missing)}')

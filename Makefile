@@ -10,7 +10,7 @@ CASE ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run run-trpc test test-unit test-harness test-api check check-trpc web-dev web-install learning-dev test-learning-git verify-learning-git-gate1 setup harness-list harness-init harness-grade
+.PHONY: help run run-trpc test test-unit test-harness test-math test-api check check-trpc web-dev web-install learning-dev test-learning-git verify-learning-git-gate1 setup harness-list harness-init harness-grade
 
 help:  ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -24,13 +24,16 @@ run-trpc:  ## Run a session REPL (trpc-agent-go): make run-trpc S=01
 	@test -n "$(S)" || { echo "Usage: make run-trpc S=01"; exit 1; }
 	cd 01-ai-applications/03-building-agentic-systems/agent-loop-trpc && go run ./s$(S)*/
 
-test: check check-trpc test-unit test-harness test-api  ## Run all tests (check → unit → harness → api)
+test: check check-trpc test-unit test-harness test-math test-api  ## Run all tests (check → unit → harness → math → api)
 
 test-unit:  ## Run offline Python unit tests
 	python3 tests/test_unit.py
 
 test-harness:  ## Run harness tests
 	python3 tests/test_harness.py
+
+test-math:  ## Run math prerequisite checks (topic 1.6.0)
+	cd 01-ai-applications/06-machine-learning-foundations/math-prerequisites && python3 test_gradcheck.py
 
 test-api:  ## Run API connectivity test (needs ANTHROPIC_API_KEY)
 	python3 tests/test_s01_verify.py

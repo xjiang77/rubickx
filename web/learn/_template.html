@@ -55,6 +55,18 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .timeline .e{display:block;font-size:15px}
 .timeline .w{display:block;font-size:13px;color:var(--muted)}
 @media(max-width:640px){.flow{flex-direction:column;gap:20px}.flow li:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%)}.timeline{grid-template-columns:1fr}.timeline li{text-align:left;padding:0 0 12px 28px}.timeline li::before{top:0;bottom:0;left:6px;right:auto;border-top:0;border-left:2px solid var(--ink)}.timeline li::after{top:4px;left:0;margin-left:0}}
+.uses{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:16px 20px;margin:18px 0 0}
+.uses ul{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:10px}
+.uses li{font-size:15px;line-height:1.65;border-left:3px solid var(--c);padding-left:12px}
+.uses b{display:block;font-size:16px}
+.tree{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:16px 20px;margin:18px 0 0}
+.tree .branches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:8px}
+.tree h3{font-size:13px;color:var(--c);margin:0 0 6px;letter-spacing:.04em}
+.tree ul{list-style:none;padding:0;margin:0;font-size:14px;line-height:1.6}
+.tree li{margin:0 0 6px}
+.tree .todo{color:var(--muted)}
+a.term{color:inherit;text-decoration:underline dotted var(--c);text-underline-offset:3px}
+@media(max-width:640px){.tree .branches{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .limits,.summary,.try,.deeper{border-radius:12px;padding:16px 20px;margin:18px 0 0;line-height:1.65;font-size:16px}
 .limits{border:1px dashed var(--line);color:var(--muted)}
 .summary{background:var(--c-tint);font-size:19px;font-weight:500}
@@ -101,7 +113,9 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
     <!-- 3–6 屏，每屏一张图、一两句话 -->
   </main>
   <aside class="limits"><h2>适用边界</h2><p>{这个例子说明不了什么；用了类比时，写出类比在哪里失效}</p></aside>
+  <section class="uses"><h2>在 AI 工程里什么时候用得上</h2><ul><li><b>{场景}</b>{怎样用这个概念判断}</li></ul></section>
   <p class="summary">{一句话总结}</p>
+  <section class="tree"><h2>知识树</h2><div class="branches"><div><h3>前置</h3><ul><li>{链接}</li></ul></div><div><h3>本体</h3><ul><li>{链接}</li></ul></div><div><h3>延展</h3><ul><li>{链接}</li></ul></div><div><h3>用在哪里</h3><ul><li>{链接}</li></ul></div></div></section>
   <section class="try"><h2>去试试</h2><p>{实践说明}</p><code>{命令}</code></section>
   <section class="deeper"><h2>想深入</h2><p>知识正文：《{正文标题}》（私有知识库）。来源：{公开来源链接}</p></section>
   <footer>Rubickx · ELI5 · <a href="../../index.html#{CAPABILITY_ID}">回到能力地图</a></footer>

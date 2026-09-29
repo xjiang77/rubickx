@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TOPICS = ROOT / 'web/topics.json'
 CAPS = ROOT / 'web/capabilities.json'
-ID = re.compile(r'^[1-4]\.[1-6]\.[1-9]$')
+ID = re.compile(r'^[1-4]\.[1-6]\.[0-9]$')
 SLUG = re.compile(r'^[a-z0-9]+(-[a-z0-9]+)*$')
 
 
@@ -62,6 +62,15 @@ def check(doc, caps):
             src = e['derived_from']
             assert src['note'] in k['notes'] and re.match(r'^\d{4}-\d{2}-\d{2}$', src['updated']), where
             assert f'<meta name="rubickx-derived-from" content="{src["note"]}@{src["updated"]}">' in html, where
+    ids_set = set(ids)
+    for t in topics:
+        rel = t.get('relations')
+        if rel is None:
+            continue
+        assert set(rel) == {'requires', 'extends', 'applies_to'}, (t['id'], 'relations 须含 requires / extends / applies_to')
+        for kind, targets in rel.items():
+            for x in targets:
+                assert x in ids_set and x != t['id'], (t['id'], kind, x)
     missing = set(cap_ids) - covered
     assert not missing, ('能力没有 topic', sorted(missing))
     # 页面目录里的每个 ELI5 页都必须登记

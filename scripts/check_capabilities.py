@@ -36,7 +36,7 @@ def check(data):
     caps = data['capabilities']
     practices = data['practices']
     assert data['title'] == 'AI Engineering Skills Map'
-    assert len(data['pillars']) == 4 and len(caps) == 22 and len(practices) == 11
+    assert len(data['pillars']) == 4 and len(caps) == 22 and len(practices) == 12
     ids = {c['id'] for c in caps}
     assert len(ids) == len(caps) and data['defaultCapability'] in ids
     owners = []
@@ -63,18 +63,23 @@ def check(data):
         if c['status'] == 'planned':
             assert not c['practices'], c['id']
             assert list((ROOT / c['path']).iterdir()) == [readme], c['id']
+        if c['practices']:
+            # 能力状态取其实践中最高的一级：planned < scaffold < partial
+            order = list(data['statuses'])[::-1]
+            best = max((practices[k]['status'] for k in c['practices']), key=order.index)
+            assert c['status'] == best, (c['id'], c['status'], best)
         owners.extend(c['practices'])
         for k in c['practices']:
             p = practices[k]
             assert p['path'].startswith(c['path'] + '/'), k
             assert (ROOT / p['path']).exists(), p['path']
-            assert p['status'] == c['status'] and p['verify'], k
+            assert p['status'] in data['statuses'] and p['verify'], k
         for target in re.findall(r'\]\(([^)]+)\)', text):
             if '://' not in target and not target.startswith('#'):
                 assert (readme.parent / target.split('#')[0]).exists(), (readme, target)
     assert len(owners) == len(set(owners)) and set(owners) == set(practices)
     assert practices['nanochat']['status'] == 'scaffold'
-    print('Capability gate passed: 4 pillars, 22 capabilities (20 original + 2 extensions), 11 unique practices; sources, states, READMEs and links agree.')
+    print('Capability gate passed: 4 pillars, 22 capabilities (20 original + 2 extensions), 12 unique practices; sources, states, READMEs and links agree.')
 
 
 if __name__ == '__main__':

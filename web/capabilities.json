@@ -140,11 +140,12 @@
       "zh": "机器学习基础",
       "origin": "andrew",
       "source": "https://x.com/AndrewYNg/status/2090840747738374568",
-      "status": "scaffold",
+      "status": "partial",
       "description": "通过模型与训练机制的从零实现理解机器学习基础。",
-      "boundary": "Nanochat 十系统与 from-scratch 练习保留原顺序，TODO 与 skip 不算能力完成。",
+      "boundary": "数学前置已有可运行核对；Nanochat 十系统与 from-scratch 练习仍是骨架，TODO 与 skip 不算能力完成。",
       "next": "由本人按 RUNBOOK 完成 micrograd 与逐系统实现，再运行真实测试和对拍。",
       "practices": [
+        "math-prerequisites",
         "nanochat"
       ],
       "related": [
@@ -459,14 +460,6 @@
       "icon": "code",
       "status": "partial"
     },
-    "nanochat": {
-      "id": "nanochat",
-      "path": "01-ai-applications/06-machine-learning-foundations/nanochat",
-      "description": "LLM 十系统与 from-scratch 练习骨架",
-      "verify": "各系统目录 pytest test_impl.py；实现后 python parity.py",
-      "icon": "box",
-      "status": "scaffold"
-    },
     "system-design": {
       "id": "system-design",
       "path": "02-se-fundamentals/03-designing-system-architectures/system-design",
@@ -530,6 +523,22 @@
       "verify": "make test-harness",
       "icon": "tool",
       "status": "partial"
+    },
+    "math-prerequisites": {
+      "id": "math-prerequisites",
+      "path": "01-ai-applications/06-machine-learning-foundations/math-prerequisites",
+      "description": "导数、梯度与链式法则的数值核对",
+      "verify": "make test-math",
+      "icon": "grid",
+      "status": "partial"
+    },
+    "nanochat": {
+      "id": "nanochat",
+      "path": "01-ai-applications/06-machine-learning-foundations/nanochat",
+      "description": "LLM 十系统与 from-scratch 练习骨架",
+      "verify": "各系统目录 pytest test_impl.py；实现后 python parity.py",
+      "icon": "box",
+      "status": "scaffold"
     }
   }
 }

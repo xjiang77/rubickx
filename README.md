@@ -53,6 +53,7 @@ rubickx/
 | --- | --- | --- | --- |
 | Building and deploying AI applications | [`01-ai-applications/03-building-agentic-systems/agent-loop/`](01-ai-applications/03-building-agentic-systems/agent-loop/) | 12 课 Go agent 机制 | `make check` |
 | Building and deploying AI applications | [`01-ai-applications/03-building-agentic-systems/agent-loop-trpc/`](01-ai-applications/03-building-agentic-systems/agent-loop-trpc/) | 同 12 课的 trpc-agent-go 实现 | `make check-trpc` |
+| Building and deploying AI applications | [`01-ai-applications/06-machine-learning-foundations/math-prerequisites/`](01-ai-applications/06-machine-learning-foundations/math-prerequisites/) | 导数、梯度与链式法则的数值核对 | `make test-math` |
 | Building and deploying AI applications | [`01-ai-applications/06-machine-learning-foundations/nanochat/`](01-ai-applications/06-machine-learning-foundations/nanochat/) | LLM 十系统重写 + micrograd | 各 system 的 `test_impl.py` 与 `parity.py`（含待实现骨架） |
 | Software engineering fundamentals | [`02-se-fundamentals/05-scaling-and-operating-in-production/git-course/`](02-se-fundamentals/05-scaling-and-operating-in-production/git-course/) | Working tree、index、commit graph 与 HEAD | `make verify-learning-git-gate1` |
 | Software engineering fundamentals | [`02-se-fundamentals/06-algorithms-and-data-structures/algo/`](02-se-fundamentals/06-algorithms-and-data-structures/algo/) | 五语言算法与数据结构 | `make -C 02-se-fundamentals/06-algorithms-and-data-structures/algo test` |

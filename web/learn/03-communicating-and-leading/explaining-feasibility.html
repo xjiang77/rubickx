@@ -55,6 +55,18 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .timeline .e{display:block;font-size:15px}
 .timeline .w{display:block;font-size:13px;color:var(--muted)}
 @media(max-width:640px){.flow{flex-direction:column;gap:20px}.flow li:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%)}.timeline{grid-template-columns:1fr}.timeline li{text-align:left;padding:0 0 12px 28px}.timeline li::before{top:0;bottom:0;left:6px;right:auto;border-top:0;border-left:2px solid var(--ink)}.timeline li::after{top:4px;left:0;margin-left:0}}
+.uses{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:16px 20px;margin:18px 0 0}
+.uses ul{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:10px}
+.uses li{font-size:15px;line-height:1.65;border-left:3px solid var(--c);padding-left:12px}
+.uses b{display:block;font-size:16px}
+.tree{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:16px 20px;margin:18px 0 0}
+.tree .branches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:8px}
+.tree h3{font-size:13px;color:var(--c);margin:0 0 6px;letter-spacing:.04em}
+.tree ul{list-style:none;padding:0;margin:0;font-size:14px;line-height:1.6}
+.tree li{margin:0 0 6px}
+.tree .todo{color:var(--muted)}
+a.term{color:inherit;text-decoration:underline dotted var(--c);text-underline-offset:3px}
+@media(max-width:640px){.tree .branches{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .limits,.summary,.try,.deeper{border-radius:12px;padding:16px 20px;margin:18px 0 0;line-height:1.65;font-size:16px}
 .limits{border:1px dashed var(--line);color:var(--muted)}
 .summary{background:var(--c-tint);font-size:19px;font-weight:500}
@@ -92,7 +104,7 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
   <p class="part">先弄清楚</p>
   <section class="context">
     <div class="ctx why"><h2>为什么要懂它</h2><p>做 AI 应用的工程师，经常要回答产品、业务、法务同事的一个问题：“这个能不能做？”回答会直接决定对方怎样排期、投入多少、对用户承诺什么。答错了类别，后面的计划会一路偏离。</p></div>
-    <div class="ctx what"><h2>它是什么</h2><p>解释技术可行性，就是先判断问题属于哪一类，再给出对方能据此决策的答案。例如业务同事问：“能不能用 AI 从合同里自动提取金额？”这属于可靠性问题：一百份合同里大约九十份能正确提取，剩下十份多是扫描件模糊或表格跨页。</p><figure><svg viewBox="0 35 800 85" role="img" aria-label="一个问题“能不能做”分成三类：A 不可能，B 代价问题，C 可靠性问题；合同提取金额属于 C"><rect class="hl" x="10" y="45" width="190" height="64" rx="32"/><text class="t" x="105" y="86" text-anchor="middle" style="font-weight:600">能不能做？</text>
+    <div class="ctx what"><h2>它是什么</h2><p>解释技术可行性（explaining technical feasibility），就是先判断问题属于哪一类，再给出对方能据此决策的答案。例如业务同事问：“能不能用 AI 从合同里自动提取金额？”这属于可靠性问题：一百份合同里大约九十份能正确提取，剩下十份多是扫描件模糊或表格跨页。</p><figure><svg viewBox="0 35 800 85" role="img" aria-label="一个问题“能不能做”分成三类：A 不可能，B 代价问题，C 可靠性问题；合同提取金额属于 C"><rect class="hl" x="10" y="45" width="190" height="64" rx="32"/><text class="t" x="105" y="86" text-anchor="middle" style="font-weight:600">能不能做？</text>
 <line class="fwd" x1="200" y1="77" x2="248" y2="77" marker-end="url(#af)"/>
 <rect class="box" x="252" y="45" width="150" height="64" rx="10"/><text class="t" x="327" y="86" text-anchor="middle">A 不可能</text>
 <rect class="box" x="412" y="45" width="180" height="64" rx="10"/><text class="t" x="502" y="86" text-anchor="middle">B 代价问题</text>
@@ -139,7 +151,9 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
     </section>
   </main>
   <aside class="limits"><h2>适用边界</h2><p>三分类用来先判断方向。现实中一件事可以同时是代价问题和可靠性问题；类别也会随时间变化，“现在的技术做不到”不等于“不可能”，说这句话时要给出复核的时间点。本篇对应的正文尚未经过真实沟通的检验，按假设阅读。</p></aside>
+  <section class="uses"><h2>在 AI 工程里什么时候用得上</h2><ul><li><b>排期评审上被问“这个 AI 功能能不能上线”</b>先判断类别再回答。可靠性问题要给出正确的比例、出错的样子和兜底方案，不能只答“能”。</li><li><b>对外承诺准确率或服务水平</b>给出分母和口径：在什么数据上、按什么标准算的。可靠性问题不承诺 100%。</li><li><b>演示成功之后，对方准备直接上线</b>一次成功只说明“有时候可以”，不说明“经常可以”。主动说明，否则演示会被当成验收。</li></ul></section>
   <p class="summary">先判断“能不能做”属于哪一类：不可能、代价问题还是可靠性问题，再按结论、类别、例子、条件给出答案。</p>
+  <section class="tree"><h2>知识树</h2><div class="branches"><div><h3>前置</h3><ul><li>LLM 的能力与限制 <span class="todo">（1.1，图解待写）</span></li><li>Hard Limits Analysis <span class="todo">（原则，私有知识库）</span></li></ul></div><div><h3>本体</h3><ul><li>解释技术可行性（本页）</li></ul></div><div><h3>延展</h3><ul><li>AI 适用性与风险闸门 <span class="todo">（4.2.1，图解待写）</span></li><li>指标口径、分母与归因 <span class="todo">（2.5.2，图解待写）</span></li></ul></div><div><h3>用在哪里</h3><ul><li>无 spec 时怎么起 spec <span class="todo">（4.2.2，图解待写）</span></li><li>构建循环的下一步 <span class="todo">（4.1.3，图解待写）</span></li></ul></div></div></section>
   <section class="try"><h2>去试试</h2><p>实践待建：一个可行性三分类清单小工具，再加一次真实解释的复盘（topic 4.3.1）。建好后这里会给出命令。</p></section>
   <section class="deeper"><h2>想深入</h2><p>知识正文：《向非工程背景的人解释技术可行性》（私有知识库，待核验）。公开来源：<a href="https://x.com/AndrewYNg/status/2098459474608672916">Andrew Ng · Shaping the build</a>。</p></section>
   <footer>Rubickx · ELI5 · <a href="../../index.html#03-communicating-and-leading">回到能力地图</a></footer>

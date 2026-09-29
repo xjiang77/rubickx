@@ -4,14 +4,14 @@
 
 ## 顺序
 
-1. **学**：读 ELI5 页 `web/learn/06-machine-learning-foundations/linear-algebra.html`（从知识正文 02 派生）。
-2. **玩**：运行 `playground/` 下四个小程序，只看不写：
-   - `01_draw_vectors.py` 终端画板：向量、首尾相接的加法、数乘、共线向量的 span 与不共线的网格；
-   - `02_hit_the_target.py` 命中目标：输入系数逼近目标向量，四关分别对应正文与测验的例子，第 4 关基向量共线；
-   - `03_pixel_blend.py` 像素字母混合：5×5 字母作为 25 维向量，线性组合产生渐变；
-   - `04_attention_toy.py` attention 玩具：手调 score，看 softmax 权重与输出点在三角形内移动。
-3. **做**：闭卷实现 `vectors.py`。
-4. **测**：`make test-linalg`，再做题库中的选择题。
+主线是 notebook `vectors.ipynb`（JupyterLab 打开，从上到下执行），它与 ELI5 页 `web/learn/06-machine-learning-foundations/linear-algebra.html` 同屏对应；每一屏四段：
+
+1. **学**：该屏的说明与公式（Markdown 单元格）。
+2. **玩**：运行演示——字符画板、命中目标、像素字母混合、attention 玩具（代码单元格，只看不写；同样的程序也可在 `playground/` 下直接运行）。
+3. **做**：在 `vectors.py` 中手写该屏要求的函数，回到 notebook 重新执行「做」单元格确认状态。
+4. **测**：该屏的验证单元格；骨架状态下失败是预期结果。
+
+全部通过后运行总验证器 `make test-linalg`，再做题库中的选择题。交付前用 Restart Kernel and Run All Cells 确认从头能跑通；提交前清除输出。
 
 ## 目标
 

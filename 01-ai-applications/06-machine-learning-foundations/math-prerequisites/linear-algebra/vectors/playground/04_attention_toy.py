@@ -38,25 +38,31 @@ def draw(weights):
     print("权重 = [" + ", ".join(f"{w:.3f}" for w in weights) + f"]，和 = {sum(weights):.3f}，输出 O = ({ox:.3f}, {oy:.3f})")
 
 
-print("顶点 1、2、3 是 value 向量 v1, v2, v3（放大 6 倍画出）。O 是 attention 输出。")
-for name, scores in [("均匀 score", [0, 0, 0]),
-                     ("正文示例：权重约 0.7/0.2/0.1", [1.9459, 0.6931, 0.0]),
-                     ("score 拉大：几乎只看 v3", [0, 0, 8])]:
-    print(f"\n--- {name}：score = {scores}")
-    draw(softmax(scores))
 
-print("\n自己试：输入三个 score（如 2 0 -1），q 退出。")
-while True:
-    try:
-        s = input("score > ").strip()
-    except EOFError:
-        break
-    if s in ("q", "quit", ""):
-        break
-    try:
-        scores = [float(x) for x in s.split()]
-        assert len(scores) == 3
-    except (ValueError, AssertionError):
-        print("需要三个数")
-        continue
-    draw(softmax(scores))
+def main():
+    print("顶点 1、2、3 是 value 向量 v1, v2, v3（放大 6 倍画出）。O 是 attention 输出。")
+    for name, scores in [("均匀 score", [0, 0, 0]),
+                         ("正文示例：权重约 0.7/0.2/0.1", [1.9459, 0.6931, 0.0]),
+                         ("score 拉大：几乎只看 v3", [0, 0, 8])]:
+        print(f"\n--- {name}：score = {scores}")
+        draw(softmax(scores))
+
+    print("\n自己试：输入三个 score（如 2 0 -1），q 退出。")
+    while True:
+        try:
+            s = input("score > ").strip()
+        except EOFError:
+            break
+        if s in ("q", "quit", ""):
+            break
+        try:
+            scores = [float(x) for x in s.split()]
+            assert len(scores) == 3
+        except (ValueError, AssertionError):
+            print("需要三个数")
+            continue
+        draw(softmax(scores))
+
+
+if __name__ == "__main__":
+    main()

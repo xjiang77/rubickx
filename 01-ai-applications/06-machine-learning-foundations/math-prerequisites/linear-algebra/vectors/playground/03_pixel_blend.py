@@ -34,12 +34,18 @@ def render(vec, w=5):
     return out
 
 
-a, b = to_vec(A), to_vec(B)
-steps = [0.0, 0.25, 0.5, 0.75, 1.0]
-frames = [render(blend(a, b, s)) for s in steps]
-print("      " + "      ".join(f"s={s:<4}" for s in steps))
-for r in range(5):
-    print("      " + "      ".join(f[r] + " " for f in frames))
-print("\n每一列是 (1−s)·A + s·B 在 s 取 0、0.25、0.5、0.75、1 时的样子；中间的字母既不是 A 也不是 B，")
-print("但它落在 A 与 B 的张成（一张二维平面）内。25 维空间里绝大多数点都不在这张平面上。")
-print("\n试试：把 s 改成 −0.5 或 1.5（超出 0…1），线性组合仍然成立，只是像素值会越界，被截到 0…1 显示。")
+
+def main():
+    a, b = to_vec(A), to_vec(B)
+    steps = [0.0, 0.25, 0.5, 0.75, 1.0]
+    frames = [render(blend(a, b, s)) for s in steps]
+    print("      " + "      ".join(f"s={s:<4}" for s in steps))
+    for r in range(5):
+        print("      " + "      ".join(f[r] + " " for f in frames))
+    print("\n每一列是 (1−s)·A + s·B 在 s 取 0、0.25、0.5、0.75、1 时的样子；中间的字母既不是 A 也不是 B，")
+    print("但它落在 A 与 B 的张成（一张二维平面）内。25 维空间里绝大多数点都不在这张平面上。")
+    print("\n试试：把 s 改成 −0.5 或 1.5（超出 0…1），线性组合仍然成立，只是像素值会越界，被截到 0…1 显示。")
+
+
+if __name__ == "__main__":
+    main()

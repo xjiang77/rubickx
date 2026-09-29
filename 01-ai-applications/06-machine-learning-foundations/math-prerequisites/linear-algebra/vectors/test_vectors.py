@@ -140,7 +140,8 @@ def run_doctests() -> bool:
 
     ok = True
     for module in (vectors, svgplot, canvas, display_helpers, attention_toy, pixel_blend, draw_vectors, hit_the_target):
-        result = doctest.testmod(module, verbose=False)
+        # 只报告每个 docstring 的第一处失败，骨架状态下输出不至于刷屏
+        result = doctest.testmod(module, verbose=False, optionflags=doctest.REPORT_ONLY_FIRST_FAILURE)
         status = "PASS" if result.failed == 0 else "FAIL"
         print(f"{status} doctest {module.__name__}: {result.attempted - result.failed}/{result.attempted}")
         ok = ok and result.failed == 0

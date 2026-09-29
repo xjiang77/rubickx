@@ -42,8 +42,9 @@ description: 为 Rubickx Skills Map 的一个 topic 写 ELI5 页（大图少字�
 
 按 dragon-vault 的 `99_System/Specs/02_Chinese_Style_Spec.md` 与 `03_Chinese_Style_Examples.md`：
 
-- 标题直接写概念名与它回答的问题（如“反向传播：沿计算图求出每个参数的梯度”），不用悬念式标题。
-- 优先用领域已有的术语（梯度、局部导数、链式法则、计算图、学习率），第一次出现时先给直观含义，再附英文，例如“这张图叫计算图（computational graph）”；同一概念全文称谓一致，不自造简称或口语化的替代说法（例如不用“放大倍数”代替“局部导数”）。
+- 标题直接写概念名与它回答的问题（如“Backpropagation（反向传播）：沿 computational graph 求出每个 parameter 的 gradient”），不用悬念式标题。
+- **专业术语用英文原词**，第一次出现时在括号里给常用中文译名，之后只用英文：例如 loss function（损失函数）、gradient（梯度）、learning rate（学习率）、computational graph（计算图）。句首的英文术语首字母大写。日常词语（输入、预测、误差、正确答案）用中文。
+- 第一次出现时先给直观含义，再给术语：例如“每个节点是一个中间结果，每条箭头是一次运算，这张图就是 computational graph”。同一概念全文称谓一致，不自造简称或口语化的替代说法（例如不用“放大倍数”代替 local derivative）。
 - 用动词写清谁对什么做了什么；比较与程度要说明对象和尺度；依据不足时收窄结论。
 - 术语与正文保持一致：页面用词跟随知识库正文，例如可行性三类用正文的“不可能 / 代价问题 / 可靠性问题”。
 

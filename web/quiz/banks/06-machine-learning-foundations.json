@@ -1,16 +1,16 @@
 {
   "capability": "06-machine-learning-foundations",
-  "version": 2,
+  "version": 3,
   "status": "sample",
   "updated": "2026-09-29",
-  "note": "样板题库：覆盖 1.6.0–1.6.3，由知识库正文派生；1.6.4 待正文补齐后再出题。v2 起改用预测模型的例子，并加入判断场景题。",
+  "note": "样板题库：覆盖 1.6.0–1.6.3，由知识库正文派生；1.6.4 待正文补齐后再出题。v2 起改用预测模型的例子，并加入判断场景题。 v3 起专业术语用英文，常用中文译名见 ELI5 页。",
   "questions": [
     {
       "id": "ml-001",
       "topic": "1.6.1",
       "type": "single",
       "scenario": false,
-      "prompt": "模型 ŷ = w·x，误差 e = ŷ − y，损失 L = e²，取 x = 2、y = 10、w = 3。∂L/∂w 是多少？",
+      "prompt": "模型 ŷ = w·x，误差 e = ŷ − y，loss L = e²，取 x = 2、y = 10、w = 3。∂L/∂w 是多少？",
       "options": [
         "−16",
         "16",
@@ -20,14 +20,14 @@
       "answer": [
         0
       ],
-      "explain": "链式法则：∂L/∂w = ∂L/∂e · ∂e/∂ŷ · ∂ŷ/∂w = (2 × (−4)) × 1 × 2 = −16。负号表示 w 增大时损失减小。"
+      "explain": "Chain rule：∂L/∂w = ∂L/∂e · ∂e/∂ŷ · ∂ŷ/∂w = (2 × (−4)) × 1 × 2 = −16。负号表示 w 增大时 loss 减小。"
     },
     {
       "id": "ml-002",
       "topic": "1.6.1",
       "type": "single",
       "scenario": true,
-      "prompt": "变量 a 同时参与两条计算路径，反向传播时两条路径带回的梯度分别是 3 和 10。a.grad 应该是多少？",
+      "prompt": "变量 a 同时参与两条计算路径，backpropagation 时两条路径带回的 gradient 分别是 3 和 10。a.grad 应该是多少？",
       "options": [
         "13",
         "10：后算的那条覆盖先算的",
@@ -37,42 +37,42 @@
       "answer": [
         0
       ],
-      "explain": "同一个变量参与多条路径时，梯度要累加而不是覆盖：3 + 10 = 13。手写 autograd 最常见的 bug 就是这里用了赋值。"
+      "explain": "同一个变量参与多条路径时，gradient 要累加而不是覆盖：3 + 10 = 13。手写 autograd 最常见的 bug 就是这里用了赋值。"
     },
     {
       "id": "ml-003",
       "topic": "1.6.1",
       "type": "single",
       "scenario": false,
-      "prompt": "某一层的梯度一直是 0。下面哪个判断最稳妥？",
+      "prompt": "某一层的 gradient 一直是 0。下面哪个判断最稳妥？",
       "options": [
         "模型已经学完了",
-        "可能是激活函数饱和，或计算图在这里被断开，需要检查",
-        "一定是学习率太大",
-        "说明这层参数不重要，可以删掉"
+        "可能是激活函数饱和，或 computational graph 在这里被断开，需要检查",
+        "一定是 learning rate 太大",
+        "说明这层 parameter 不重要，可以删掉"
       ],
       "answer": [
         1
       ],
-      "explain": "梯度为 0 不一定是不学习：激活饱和、图被断开（例如误用 detach）都会导致梯度为 0。先查梯度路径，再下结论。"
+      "explain": "Gradient 为 0 不一定是不学习：激活饱和、图被断开（例如误用 detach）都会导致 gradient 为 0。先查 gradient 路径，再下结论。"
     },
     {
       "id": "ml-004",
       "topic": "1.6.1",
       "type": "multi",
       "scenario": false,
-      "prompt": "反向传播时，一个操作节点算自己的梯度，需要知道哪些东西？（多选）",
+      "prompt": "Backpropagation 时，一个操作节点算自己的 gradient，需要知道哪些东西？（多选）",
       "options": [
-        "自己的局部导数",
-        "从上游（更靠近损失的一侧）传回来的梯度",
+        "自己的 local derivative",
+        "从上游（更靠近 loss 的一侧）传回来的 gradient",
         "整个网络的完整公式",
-        "损失函数的具体形式"
+        "Loss 函数的具体形式"
       ],
       "answer": [
         0,
         1
       ],
-      "explain": "链式法则的好处就在这里：每个节点只需要局部导数和上游梯度，二者相乘就是自己的梯度，不需要知道全局公式。"
+      "explain": "Chain rule 的好处就在这里：每个节点只需要 local derivative 和上游 gradient，二者相乘就是自己的 gradient，不需要知道全局公式。"
     },
     {
       "id": "ml-005",
@@ -81,15 +81,15 @@
       "scenario": true,
       "prompt": "训练循环里漏写了 optimizer.zero_grad()。最可能出现什么现象？",
       "options": [
-        "梯度在多个 batch 之间不断累加，更新越来越偏、训练不稳定",
+        "Gradient 在多个 batch 之间不断累加，更新越来越偏、训练不稳定",
         "程序直接报错退出",
-        "参数完全不再更新",
+        "Parameter 完全不再更新",
         "没有任何影响"
       ],
       "answer": [
         0
       ],
-      "explain": "PyTorch 的 .grad 默认累加。不清零，每一步用的都是历史梯度之和；除非你是刻意做梯度累积，否则训练会失控。"
+      "explain": "PyTorch 的 .grad 默认累加。不清零，每一步用的都是历史 gradient 之和；除非你是刻意做 gradient 累积，否则训练会失控。"
     },
     {
       "id": "ml-006",
@@ -98,32 +98,32 @@
       "scenario": false,
       "prompt": "tensor.detach() 做的是什么？",
       "options": [
-        "切断梯度路径：之后的计算不会再把梯度传回它之前的部分",
+        "切断 gradient 路径：之后的计算不会再把 gradient 传回它之前的部分",
         "把 tensor 移到 CPU",
         "释放这块显存",
-        "冻结优化器的学习率"
+        "冻结 optimizer 的 learning rate"
       ],
       "answer": [
         0
       ],
-      "explain": "detach 适合有意停止反传（例如 target 网络、日志统计），不适合随手修 bug：它可能正是某层梯度为 0 的原因。"
+      "explain": "detach 适合有意停止反传（例如 target 网络、日志统计），不适合随手修 bug：它可能正是某层 gradient 为 0 的原因。"
     },
     {
       "id": "ml-007",
       "topic": "1.6.2",
       "type": "single",
       "scenario": true,
-      "prompt": "训练循环写成了：前向 → 算损失 → optimizer.zero_grad() → optimizer.step() → loss.backward()（反向放到了更新之后）。会发生什么？",
+      "prompt": "训练循环写成了：前向 → 算 loss → optimizer.zero_grad() → optimizer.step() → loss.backward()（反向放到了更新之后）。会发生什么？",
       "options": [
-        "参数基本不会被更新：step 时梯度刚被清空，反向算出的梯度又在下一轮开头被清掉",
+        "Parameter 基本不会被更新：step 时 gradient 刚被清空，反向算出的 gradient 又在下一轮开头被清掉",
         "和正常顺序完全等价",
         "PyTorch 会自动调整顺序",
-        "学习率会翻倍"
+        "Learning rate 会翻倍"
       ],
       "answer": [
         0
       ],
-      "explain": "step 只读取当时 .grad 里的值。这个顺序下，每次 step 看到的都是刚清空的梯度，而 backward 算出的梯度还没被用上就在下一轮被清掉。正确顺序是：前向 → 损失 → 清零 → 反向 → 更新。"
+      "explain": "step 只读取当时 .grad 里的值。这个顺序下，每次 step 看到的都是刚清空的 gradient，而 backward 算出的 gradient 还没被用上就在下一轮被清掉。正确顺序是：前向 → loss → 清零 → 反向 → 更新。"
     },
     {
       "id": "ml-008",
@@ -135,14 +135,14 @@
         "shape",
         "dtype",
         "device",
-        "学习率"
+        "Learning rate"
       ],
       "answer": [
         0,
         1,
         2
       ],
-      "explain": "Tensor 是带 shape、dtype、device 的数值容器，三者不匹配是最常见的报错与静默错误来源。学习率属于优化器，不是 Tensor 的属性。"
+      "explain": "Tensor 是带 shape、dtype、device 的数值容器，三者不匹配是最常见的报错与静默错误来源。learning rate 属于 optimizer，不是 Tensor 的属性。"
     },
     {
       "id": "ml-009",
@@ -187,7 +187,7 @@
       "options": [
         "Reward hacking：模型学会迎合 judge（更长、更自信、格式更漂亮），而不是变得更对",
         "测试集泄漏到了训练集",
-        "学习率太低",
+        "Learning rate 太低",
         "judge 打分太严格"
       ],
       "answer": [
@@ -217,7 +217,7 @@
       "topic": "1.6.0",
       "type": "single",
       "scenario": false,
-      "prompt": "L = e² 在 e = −4 处的导数是 −8。用导数估计：e 从 −4 增加到 −3.9，L 大约变为多少？",
+      "prompt": "L = e² 在 e = −4 处的 derivative 是 −8。用 derivative 估计：e 从 −4 增加到 −3.9，L 大约变为多少？",
       "options": [
         "15.2",
         "16.8",
@@ -234,12 +234,12 @@
       "topic": "1.6.0",
       "type": "single",
       "scenario": true,
-      "prompt": "两个参数 (w, b) 的梯度是 ∇L = (−16, −8)。按梯度下降，下一步应该怎样调？",
+      "prompt": "两个 parameter (w, b) 的 gradient 是 ∇L = (−16, −8)。按 gradient descent，下一步应该怎样调？",
       "options": [
         "w 和 b 都调大，w 调得更多",
         "w 和 b 都调小",
         "w 调大、b 调小",
-        "梯度为负说明已经到最低点，不用动"
+        "Gradient 为负说明已经到最低点，不用动"
       ],
       "answer": [
         0
@@ -251,17 +251,17 @@
       "topic": "1.6.0",
       "type": "single",
       "scenario": true,
-      "prompt": "一个信号经过 20 层运算才影响损失，每一层的局部导数都约为 0.5。按链式法则，传回第一层的梯度会怎样？",
+      "prompt": "一个信号经过 20 层运算才影响 loss，每一层的 local derivative 都约为 0.5。按 chain rule，传回第一层的 gradient 会怎样？",
       "options": [
-        "变得极小，约为最后一层的百万分之一（梯度消失）",
-        "变得极大（梯度爆炸）",
+        "变得极小，约为最后一层的百万分之一（vanishing gradient）",
+        "变得极大（exploding gradient）",
         "和最后一层一样大",
         "约为 0.5 × 20 = 10 倍"
       ],
       "answer": [
         0
       ],
-      "explain": "链式法则是连乘：0.5²⁰ ≈ 9.5 × 10⁻⁷。残差连接、归一化等设计就是为了缓解这种连乘带来的梯度消失。"
+      "explain": "Chain rule 是连乘：0.5²⁰ ≈ 9.5 × 10⁻⁷。残差连接、归一化等设计就是为了缓解这种连乘带来的 vanishing gradient。"
     },
     {
       "id": "ml-016",
@@ -270,15 +270,15 @@
       "scenario": true,
       "prompt": "微调一个大模型时显存不够。下面哪种做法最直接地减少训练占用的显存？",
       "options": [
-        "冻结大部分参数（例如用 LoRA），必要时再用 activation checkpointing",
-        "把学习率调大",
+        "冻结大部分 parameter（例如用 LoRA），必要时再用 activation checkpointing",
+        "把 learning rate 调大",
         "增大 batch size",
         "多训练几个 epoch"
       ],
       "answer": [
         0
       ],
-      "explain": "冻结的参数不求梯度、也不存优化器状态；activation checkpointing 用重算换掉反向传播要保存的中间结果。增大 batch 反而占用更多。"
+      "explain": "冻结的 parameter 不求 gradient、也不存 optimizer 状态；activation checkpointing 用重算换掉 backpropagation 要保存的中间结果。增大 batch 反而占用更多。"
     },
     {
       "id": "ml-017",
@@ -287,15 +287,15 @@
       "scenario": true,
       "prompt": "推理服务的代码里忘了用 torch.no_grad()。最可能的后果是什么？",
       "options": [
-        "显存占用和延迟上升：框架保存了只有反向传播才用得到的中间结果",
+        "显存占用和延迟上升：框架保存了只有 backpropagation 才用得到的中间结果",
         "输出结果会变",
-        "模型参数会被悄悄更新",
+        "模型 parameter 会被悄悄更新",
         "没有任何影响"
       ],
       "answer": [
         0
       ],
-      "explain": "不关闭梯度时，前向计算会为反向传播保存中间结果。推理不需要反向传播，这些开销白白浪费；参数只有在调用 optimizer.step() 时才会更新。"
+      "explain": "不关闭 gradient 时，前向计算会为 backpropagation 保存中间结果。推理不需要 backpropagation，这些开销白白浪费；parameter 只有在调用 optimizer.step() 时才会更新。"
     }
   ]
 }

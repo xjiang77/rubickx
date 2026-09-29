@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="rubickx-topic" content="1.6.1">
 <meta name="rubickx-derived-from" content="02_Knowledge/01-ai-applications/06-machine-learning-foundations/02 - AI - 反向传播：链式法则与计算图.md@2026-09-03">
-<meta name="description" content="先讲清反向传播为什么重要、是什么、从哪里来，再用五张图走一遍：前向、局部倍数、往回相乘、多路相加、一步步训练。">
+<meta name="description" content="反向传播为什么重要、是什么、从哪里来，再用 L = (x + 3)² 推演前向计算、局部导数、链式法则、多路径相加与梯度下降。">
 <title>反向传播 · ELI5 · Rubickx</title>
 <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
 <style id="eli5-base">
@@ -35,6 +35,11 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .ctx figure{margin:14px 0 0}
 .ctx svg{display:block;width:100%;height:auto}
 .intro{font-size:17px;line-height:1.7;margin:0 0 16px}
+.intro p{margin:0 0 6px}
+.intro ol{margin:4px 0 0;padding-left:1.4em}
+.formula{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:21px;line-height:1.9;background:var(--c-tint);border-radius:10px;padding:10px 16px;margin:14px 0 0;overflow-x:auto;white-space:nowrap}
+.formula var{font-style:italic}
+.formula .note{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;font-size:14px;color:var(--muted);margin-left:10px;white-space:normal}
 .flow{list-style:none;display:flex;gap:26px;padding:0;margin:14px 0 0}
 .flow li{flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;position:relative;background:var(--paper)}
 .flow li b{display:block;font-size:17px}
@@ -81,90 +86,111 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 </defs></svg>
 <div class="wrap">
   <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#06-machine-learning-foundations">Machine learning foundations</a><span>›</span><span>1.6.1</span></nav>
-  <h1>结果错了，每个数该改多少？</h1>
-  <p class="lede">反向传播：神经网络训练时，用来算出“每个参数该怎么改”的方法。</p>
+  <h1>反向传播：沿计算图求出每个参数的梯度</h1>
+  <p class="lede">神经网络训练中计算梯度的方法：从损失出发，沿计算图反向应用链式法则。</p>
   <p class="part">先弄清楚</p>
   <section class="context">
-    <div class="ctx why"><h2>为什么要懂它</h2><p>神经网络靠调整内部的数（<strong>参数</strong>）来学习：输出不对，就改参数。难点是参数太多，小模型有几百万个，大模型上千亿个，每一个都要知道往哪边改、改多少。反向传播能一次算出所有参数的答案，花的计算量和把输出算一遍是同一个量级。没有它，今天的深度学习模型训练不出来。</p></div>
-    <div class="ctx what"><h2>它是什么</h2><p>反向传播是训练循环里的一步：从“错了多少”出发，沿着计算的路线往回走，算出每个参数对结果的影响，也就是<strong>梯度</strong>。</p><ol class="flow" aria-label="训练循环四步"><li><b>前向</b><span>算出输出</span></li><li><b>算损失</b><span>离目标多远</span></li><li class="on"><b>反向传播</b><span>每个数怎么改</span></li><li><b>更新</b><span>每个数挪一步</span></li></ol><p class="flow-note">四步走完，回到第一步，重复很多次</p></div>
-    <div class="ctx origin"><h2>从哪里来</h2><p>这个方法不新。1970 年，Linnainmaa 提出了“反向求导”的算法；1982 年，Werbos 把它用在神经网络上；1986 年，Rumelhart、Hinton 和 Williams 用实验证明它能让网络的中间层学到有用的东西，方法从此流行。之后很多年，受算力和数据所限，只能训练小网络；2012 年起 GPU 让大网络的训练变得可行。今天，PyTorch 这类框架会自动做反向传播（autograd）。</p><ol class="timeline" aria-label="时间线"><li><span class="y">1970</span><span class="e">反向求导</span><span class="w">Linnainmaa</span></li><li><span class="y">1982</span><span class="e">用到神经网络</span><span class="w">Werbos</span></li><li><span class="y">1986</span><span class="e">实验证明有效</span><span class="w">Rumelhart 等</span></li><li><span class="y">2012</span><span class="e">GPU 训大网络</span><span class="w">AlexNet</span></li><li><span class="y">今天</span><span class="e">框架自动完成</span><span class="w">PyTorch 等</span></li></ol></div>
+    <div class="ctx why"><h2>为什么要懂它</h2><p>神经网络通过调整参数来减小损失。每次调整都要知道：某个参数增加一点，损失是增大还是减小、变化多少，也就是损失对这个参数的<strong>梯度</strong>。参数少则数百万、多则上千亿，逐个试探的代价无法承受。反向传播只需一次反向计算，就能得到全部参数的梯度，计算量与一次前向计算同一量级。</p><ol class="flow" aria-label="训练中的一次迭代"><li><b>前向</b><span>算出损失</span></li><li class="on"><b>反向传播</b><span>求出每个参数的梯度</span></li><li><b>更新</b><span>沿梯度反方向调整参数</span></li></ol><p class="flow-note">训练时这三步反复执行</p></div>
+    <div class="ctx what"><h2>它是什么</h2><p>反向传播是在<strong>计算图</strong>上求梯度的方法。以 L = (x + 3)² 为例：前向时依次算出 u = 5、L = 25；反向时从 ∂L/∂L = 1 开始，每经过一步就乘上这一步的局部导数，依次得到 ∂L/∂u = 10、∂L/∂x = 10。</p><figure><svg viewBox="0 50 800 255" role="img" aria-label="计算图 x 等于 2，加 3 得 u 等于 5，平方得 L 等于 25；反向依次得到 L 对 L 的导数 1、L 对 u 的导数 10、L 对 x 的导数 10"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+<line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
+<line class="fwd" x1="300" y1="150" x2="337" y2="150" marker-end="url(#af)"/>
+<rect class="box" x="340" y="110" width="130" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">u = 5</text>
+<line class="fwd" x1="470" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="159" text-anchor="middle">( )²</text>
+<line class="fwd" x1="585" y1="150" x2="627" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">L = 25</text>
+<text class="ts" x="400" y="70" text-anchor="middle" style="fill:var(--ink)">前向：依次算出每个变量的值 →</text>
+<rect class="hl" x="630" y="212" width="150" height="44" rx="8"/><text class="tc" x="705" y="243" text-anchor="middle" style="font-size:24px">∂L/∂L = 1</text>
+<rect class="hl" x="330" y="212" width="150" height="44" rx="8"/><text class="tc" x="405" y="243" text-anchor="middle" style="font-size:24px">∂L/∂u = 10</text>
+<rect class="hl" x="10" y="212" width="150" height="44" rx="8"/><text class="tc" x="85" y="243" text-anchor="middle" style="font-size:24px">∂L/∂x = 10</text>
+<line class="bwd" x1="628" y1="234" x2="484" y2="234" marker-end="url(#ab)"/><line class="bwd" x1="328" y1="234" x2="164" y2="234" marker-end="url(#ab)"/>
+<text class="ts" x="400" y="292" text-anchor="middle" style="fill:var(--c)">← 反向：从损失出发，逐步求出梯度</text></svg></figure></div>
+    <div class="ctx origin"><h2>从哪里来</h2><p>这个算法比深度学习早得多。1970 年，Linnainmaa 提出反向模式自动微分；1982 年，Werbos 将它用于训练神经网络；1986 年，Rumelhart、Hinton 和 Williams 通过实验表明，它能让网络的隐藏层学到有用的表示，此后广泛使用。受算力和数据限制，之后很长时间只能训练较小的网络；2012 年前后，GPU 训练使大型网络成为可能。如今 PyTorch 等框架会自动完成反向传播（autograd）。</p><ol class="timeline" aria-label="时间线"><li><span class="y">1970</span><span class="e">反向模式自动微分</span><span class="w">Linnainmaa</span></li><li><span class="y">1982</span><span class="e">用于训练神经网络</span><span class="w">Werbos</span></li><li><span class="y">1986</span><span class="e">实验表明隐藏层能学到表示</span><span class="w">Rumelhart 等</span></li><li><span class="y">2012</span><span class="e">GPU 训练大型网络</span><span class="w">AlexNet</span></li><li><span class="y">今天</span><span class="e">框架自动完成</span><span class="w">PyTorch 等</span></li></ol></div>
   </section>
-  <p class="part">用一个小例子看它怎么工作</p>
-  <p class="intro">下面把一个“模型”缩到只剩两步：输入 x，先加 3，再平方。把最后的输出当作“错了多少”（<strong>损失</strong>），越小越好。真实网络的结构一样，只是步骤和参数多得多。</p>
+  <p class="part">用一个例子推演一遍</p>
+  <div class="intro"><p>例子只有两步运算：输入 x = 2，先加 3 得到 u，再平方得到损失 L，即 L = (x + 3)²。真实网络的计算图有成千上万步、上亿个参数，求梯度的规则与这里相同。</p><p>这个例子要说明：</p><ol><li>梯度沿计算图反向传递，每经过一步，就乘上这一步的局部导数，这就是链式法则。</li><li>一个变量影响多条路径时，各条路径传回的梯度相加。</li><li>梯度的正负给出参数的调整方向，大小表示损失对它有多敏感。</li></ol></div>
   <main>
     <section class="screen">
-      <span class="step">1</span>
-      <figure><svg viewBox="0 95 800 150" role="img" aria-label="x 等于 2，第 1 步加 3 得到中间结果 5，第 2 步平方得到损失 25"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+      <span class="step">1 · 前向计算</span>
+      <figure><svg viewBox="0 95 800 150" role="img" aria-label="计算图：输入 x 等于 2，加 3 得中间变量 u 等于 5，平方得损失 L 等于 25"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
 <line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
-<line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
-<rect class="box" x="355" y="110" width="100" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">5</text>
-<line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
-<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
-<line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
-<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text><text class="ts" x="85" y="226" text-anchor="middle">输入</text><text class="ts" x="262" y="226" text-anchor="middle">第 1 步</text><text class="ts" x="405" y="226" text-anchor="middle">中间结果</text><text class="ts" x="547" y="226" text-anchor="middle">第 2 步</text><text class="ts" x="710" y="226" text-anchor="middle">损失</text></svg></figure>
-      <p>先从左往右算一遍：2 加 3 得 5，5 的平方得 25。这一步叫<strong>前向</strong>。损失是 25，我们想让它变小。</p>
+<line class="fwd" x1="300" y1="150" x2="337" y2="150" marker-end="url(#af)"/>
+<rect class="box" x="340" y="110" width="130" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">u = 5</text>
+<line class="fwd" x1="470" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="159" text-anchor="middle">( )²</text>
+<line class="fwd" x1="585" y1="150" x2="627" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">L = 25</text><text class="ts" x="85" y="226" text-anchor="middle">输入</text><text class="ts" x="262" y="226" text-anchor="middle">加 3</text><text class="ts" x="405" y="226" text-anchor="middle">中间变量</text><text class="ts" x="547" y="226" text-anchor="middle">平方</text><text class="ts" x="710" y="226" text-anchor="middle">损失</text></svg></figure>
+      <div class="formula"><var>u</var> = <var>x</var> + 3 = 5，&nbsp; <var>L</var> = <var>u</var>² = 25</div>
+      <p>从输入开始，按顺序算出每个中间变量，最后得到损失。反向传播要用到这些中间值，所以前向计算时会把它们保存下来。</p>
     </section>
     <section class="screen">
-      <span class="step">2</span>
-      <figure><svg viewBox="0 50 800 210" role="img" aria-label="加 3 这一步的放大倍数是 1，平方这一步在 5 处的放大倍数是 10"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+      <span class="step">2 · 局部导数</span>
+      <figure><svg viewBox="0 95 800 200" role="img" aria-label="加 3 这一步的局部导数是 1，平方这一步在 u 等于 5 处的局部导数是 10"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
 <line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
-<line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
-<rect class="box" x="355" y="110" width="100" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">5</text>
-<line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
-<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
-<line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
-<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text><text class="ts" x="400" y="78" text-anchor="middle" style="fill:var(--ink)">放大倍数：输入挪一点，输出挪几倍</text>
-<rect x="222" y="206" width="80" height="40" rx="8" class="hl"/><text class="tc" x="262" y="234" text-anchor="middle">×1</text>
-<rect x="502" y="206" width="90" height="40" rx="8" class="hl"/><text class="tc" x="547" y="234" text-anchor="middle">×10</text></svg></figure>
-      <p>想知道 x 挪一点点，损失会挪多少，先看每一步自己的<strong>放大倍数</strong>：加 3 时，输入挪多少，输出就挪多少（×1）；在 5 这里平方，输出大约挪 10 倍（×10）。</p>
+<line class="fwd" x1="300" y1="150" x2="337" y2="150" marker-end="url(#af)"/>
+<rect class="box" x="340" y="110" width="130" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">u = 5</text>
+<line class="fwd" x1="470" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="159" text-anchor="middle">( )²</text>
+<line class="fwd" x1="585" y1="150" x2="627" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">L = 25</text><text class="ts" x="85" y="226" text-anchor="middle">输入</text><text class="ts" x="262" y="226" text-anchor="middle">加 3</text><text class="ts" x="405" y="226" text-anchor="middle">中间变量</text><text class="ts" x="547" y="226" text-anchor="middle">平方</text><text class="ts" x="710" y="226" text-anchor="middle">损失</text><rect x="182" y="244" width="160" height="44" rx="8" class="hl"/><text class="tc" x="262" y="275" text-anchor="middle" style="font-size:24px">∂u/∂x = 1</text>
+<rect x="467" y="244" width="160" height="44" rx="8" class="hl"/><text class="tc" x="547" y="275" text-anchor="middle" style="font-size:24px">∂L/∂u = 10</text></svg></figure>
+      <div class="formula">∂<var>u</var>/∂<var>x</var> = 1，&nbsp; ∂<var>L</var>/∂<var>u</var> = 2<var>u</var> = 10</div>
+      <p>局部导数只描述一步运算：输入增加一点时，这一步的输出变化多少倍。加 3 的局部导数恒为 1；平方的局部导数是 2u，在 u = 5 处等于 10。</p>
     </section>
     <section class="screen">
-      <span class="step">3</span>
-      <figure><svg viewBox="0 0 800 300" role="img" aria-label="虚线箭头从损失往回走，沿途把倍数相乘：1 乘 10，再乘 1，x 的梯度是 10"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+      <span class="step">3 · 链式法则</span>
+      <figure><svg viewBox="0 10 800 250" role="img" aria-label="虚线从 L 反向传到 u，乘上平方的局部导数 10，得到 L 对 u 的梯度 10；再传到 x，乘上加 3 的局部导数 1，得到 L 对 x 的梯度 10"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
 <line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
-<line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
-<rect class="box" x="355" y="110" width="100" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">5</text>
-<line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
-<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
-<line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
-<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text><path class="bwd" d="M710,100 C710,40 560,40 547,100" marker-end="url(#ab)"/>
-<path class="bwd" d="M547,100 C530,30 290,30 262,100" marker-end="url(#ab)"/>
-<path class="bwd" d="M262,100 C250,50 110,50 85,100" marker-end="url(#ab)"/>
-<text class="tc" x="630" y="36" text-anchor="middle">1 × 10</text>
-<text class="tc" x="405" y="28" text-anchor="middle">10 × 1</text>
-<rect x="30" y="206" width="110" height="46" rx="8" class="hl"/><text class="tc" x="85" y="237" text-anchor="middle">= 10</text>
-<text class="ts" x="85" y="280" text-anchor="middle">x 的梯度</text></svg></figure>
-      <p>从损失往回走，把沿途的倍数<strong>乘起来</strong>：1 × 10 × 1 = 10。意思是：x 挪一点点，损失大约挪它的 10 倍。这个 10 就是 x 的<strong>梯度</strong>。</p>
+<line class="fwd" x1="300" y1="150" x2="337" y2="150" marker-end="url(#af)"/>
+<rect class="box" x="340" y="110" width="130" height="80" rx="12"/><text class="tb" x="405" y="160" text-anchor="middle">u = 5</text>
+<line class="fwd" x1="470" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
+<circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="159" text-anchor="middle">( )²</text>
+<line class="fwd" x1="585" y1="150" x2="627" y2="150" marker-end="url(#af)"/>
+<rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">L = 25</text><path class="bwd" d="M705,104 C690,30 430,30 412,104" marker-end="url(#ab)"/>
+<path class="bwd" d="M398,104 C380,30 110,30 92,104" marker-end="url(#ab)"/>
+<text class="tc" x="558" y="34" text-anchor="middle" style="font-size:24px">× 10（平方）</text>
+<text class="tc" x="245" y="34" text-anchor="middle" style="font-size:24px">× 1（加 3）</text>
+<rect x="326" y="206" width="158" height="46" rx="8" class="hl"/><text class="tc" x="405" y="238" text-anchor="middle" style="font-size:24px">∂L/∂u = 10</text>
+<rect x="6" y="206" width="158" height="46" rx="8" class="hl"/><text class="tc" x="85" y="238" text-anchor="middle" style="font-size:24px">∂L/∂x = 10</text>
+<rect x="630" y="206" width="150" height="46" rx="8" class="hl"/><text class="tc" x="705" y="238" text-anchor="middle" style="font-size:24px">∂L/∂L = 1</text></svg></figure>
+      <div class="formula">∂<var>L</var>/∂<var>x</var> = ∂<var>L</var>/∂<var>u</var> · ∂<var>u</var>/∂<var>x</var> = 10 × 1 = 10<span class="note">链式法则</span></div>
+      <p>从 L 出发反向传递，每经过一步就乘上这一步的局部导数。x 从 2 增加到 2.01 时，L 从 25 变为 25.1001，增加约 0.1，正好是 10 × 0.01，与算出的梯度一致。</p>
     </section>
     <section class="screen">
-      <span class="step">4</span>
-      <figure><svg viewBox="0 30 800 275" role="img" aria-label="a 等于 5，一条路乘 3，一条路平方，两路相加得 40；两条路带回的影响 3 和 10 相加得 13"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">a = 5</text>
+      <span class="step">4 · 多条路径</span>
+      <figure><svg viewBox="0 30 800 260" role="img" aria-label="a 等于 5，一条路径乘 3，一条路径平方，两者相加得 L 等于 40；两条路径的梯度 3 和 10 相加得 13"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">a = 5</text>
 <path class="fwd" d="M150,135 C200,80 220,70 262,70" marker-end="url(#af)"/><path class="fwd" d="M150,165 C200,220 220,230 262,230" marker-end="url(#af)"/>
 <circle class="op" cx="300" cy="70" r="36"/><text class="t" x="300" y="78" text-anchor="middle">×3</text>
-<circle class="op" cx="300" cy="230" r="36"/><text class="t" x="300" y="238" text-anchor="middle">平方</text>
+<circle class="op" cx="300" cy="230" r="36"/><text class="t" x="300" y="239" text-anchor="middle">( )²</text>
 <path class="fwd" d="M336,70 C420,70 440,120 482,140" marker-end="url(#af)"/><path class="fwd" d="M336,230 C420,230 440,180 482,160" marker-end="url(#af)"/>
 <circle class="op" cx="520" cy="150" r="36"/><text class="t" x="520" y="158" text-anchor="middle">+</text>
 <line class="fwd" x1="556" y1="150" x2="627" y2="150" marker-end="url(#af)"/>
-<rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">40</text>
-<text class="tc" x="200" y="52" text-anchor="middle">带回 3</text><text class="tc" x="240" y="290" text-anchor="middle">带回 10</text>
-<rect x="4" y="206" width="178" height="50" rx="8" class="hl"/><text class="tc" x="93" y="241" text-anchor="middle">3 + 10 = 13</text></svg></figure>
-      <p>一个数走了两条路，两条路带回来的影响要<strong>加起来</strong>，不能只留一条。真实网络里，一个参数常常同时影响很多条路。</p>
+<rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">L = 40</text>
+<text class="tc" x="420" y="52" text-anchor="middle" style="font-size:24px">梯度 3</text><text class="tc" x="420" y="272" text-anchor="middle" style="font-size:24px">梯度 2a = 10</text>
+<rect x="4" y="206" width="178" height="50" rx="8" class="hl"/><text class="tc" x="93" y="240" text-anchor="middle" style="font-size:24px">3 + 10 = 13</text></svg></figure>
+      <div class="formula"><var>L</var> = 3<var>a</var> + <var>a</var>²，&nbsp; ∂<var>L</var>/∂<var>a</var> = 3 + 2<var>a</var> = 3 + 10 = 13</div>
+      <p>a 同时经过“乘 3”和“平方”两条路径影响 L，两条路径各自传回一个梯度，a 的梯度是两者之和。只保留一条就会算错，这是手写自动微分最常见的错误。</p>
     </section>
     <section class="screen">
-      <span class="step">5</span>
-      <figure><svg viewBox="0 0 800 300" role="img" aria-label="损失随着一步步调整逐渐下降"><line class="fwd" x1="70" y1="40" x2="70" y2="262"/><line class="fwd" x1="70" y1="262" x2="770" y2="262" marker-end="url(#af)"/>
-<text class="ts" x="80" y="36">损失</text><text class="ts" x="760" y="290" text-anchor="end">一小步、一小步</text>
-<polyline points="90,70 170,120 250,160 330,190 410,212 490,228 570,238 650,244 730,247" fill="none" stroke="#2a63a5" stroke-width="3"/><circle cx="90" cy="70" r="5" fill="#2a63a5"/><circle cx="170" cy="120" r="5" fill="#2a63a5"/><circle cx="250" cy="160" r="5" fill="#2a63a5"/><circle cx="330" cy="190" r="5" fill="#2a63a5"/><circle cx="410" cy="212" r="5" fill="#2a63a5"/><circle cx="490" cy="228" r="5" fill="#2a63a5"/><circle cx="570" cy="238" r="5" fill="#2a63a5"/><circle cx="650" cy="244" r="5" fill="#2a63a5"/><circle cx="730" cy="247" r="5" fill="#2a63a5"/></svg></figure>
-      <p>x 的梯度是正的，说明 x 变大损失也变大，所以把 x 往小挪一点。每个参数都这样挪一小步，再算一遍，重复很多次，损失越来越小。这就是训练。</p>
+      <span class="step">5 · 梯度下降</span>
+      <figure><svg viewBox="0 10 800 315" role="img" aria-label="学习率 0.1 时损失随迭代下降：25、16、10.24，之后继续按 0.64 倍减小"><line class="fwd" x1="70" y1="44" x2="70" y2="250"/><line class="fwd" x1="70" y1="250" x2="770" y2="250" marker-end="url(#af)"/>
+<text class="ts" x="60" y="67" text-anchor="end">25</text><text class="ts" x="60" y="257" text-anchor="end">0</text>
+<text class="ts" x="90" y="282" text-anchor="middle">0</text><text class="ts" x="250" y="282" text-anchor="middle">2</text><text class="ts" x="410" y="282" text-anchor="middle">4</text><text class="ts" x="570" y="282" text-anchor="middle">6</text><text class="ts" x="730" y="282" text-anchor="middle">8</text>
+<text class="ts" x="420" y="314" text-anchor="middle">迭代次数 k</text><text class="ts" x="84" y="36">损失 L</text>
+<polyline points="90,60.0 170,128.4 250,172.2 330,200.2 410,218.1 490,229.6 570,236.9 650,241.6 730,244.7" fill="none" stroke="#2a63a5" stroke-width="3"/><circle cx="90" cy="60.0" r="5" fill="#2a63a5"/><circle cx="170" cy="128.4" r="5" fill="#2a63a5"/><circle cx="250" cy="172.2" r="5" fill="#2a63a5"/><circle cx="330" cy="200.2" r="5" fill="#2a63a5"/><circle cx="410" cy="218.1" r="5" fill="#2a63a5"/><circle cx="490" cy="229.6" r="5" fill="#2a63a5"/><circle cx="570" cy="236.9" r="5" fill="#2a63a5"/><circle cx="650" cy="241.6" r="5" fill="#2a63a5"/><circle cx="730" cy="244.7" r="5" fill="#2a63a5"/>
+<text class="tc" x="184" y="132" style="font-size:24px">16</text><text class="tc" x="264" y="172" style="font-size:24px">10.24</text></svg></figure>
+      <div class="formula"><var>x</var> ← <var>x</var> − η · ∂<var>L</var>/∂<var>x</var> = 2 − 0.1 × 10 = 1，&nbsp; <var>L</var> = (1 + 3)² = 16</div>
+      <p>梯度为正，说明 x 增大时 L 也增大，所以沿梯度的反方向更新 x。取学习率 η = 0.1，一步之后 x = 1，L 从 25 降到 16；此后每一步，L 都变为上一步的 0.64 倍。</p>
     </section>
   </main>
-  <aside class="limits"><h2>这个比喻在哪里不成立</h2><p>常有人把它比作“出了错，沿原路追责”。但梯度有正有负，说的是<strong>往哪边挪</strong>，不是谁犯了错；而且放大倍数只在当前位置附近准，一步挪太大，就不准了。</p></aside>
-  <p class="summary">反向传播＝从损失往回走，把每一步的放大倍数乘起来；同一个数走了几条路，就把几条路的影响加起来。</p>
-  <section class="try"><h2>去试试</h2><p>在 nanochat 的练习里亲手写一个标量自动微分引擎：<code>Value</code>、<code>backward()</code> 和一个小 MLP。verifier 用数值差分逐项核对你的梯度。实现要自己写，这页不给答案。</p><code>python3 01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd/test_micrograd.py</code></section>
-  <section class="deeper"><h2>想深入</h2><p>知识正文：《反向传播：链式法则与计算图》《Micrograd：标量自动微分引擎》（私有知识库）。公开来源：<a href="https://github.com/karpathy/micrograd">karpathy/micrograd</a> · <a href="https://www.youtube.com/watch?v=VMj-3S1tku0">视频讲解</a> · <a href="https://people.idsia.ch/~juergen/who-invented-backpropagation.html">反向传播的历史（Schmidhuber）</a>。</p></section>
+  <aside class="limits"><h2>适用边界</h2><p>局部导数只在当前取值附近成立，学习率过大时这种近似就会失效。本例取 η = 1，x 会从 2 跳到 −8，此时 u = −5，损失仍是 25，之后在两个值之间来回振荡。另外，梯度为 0 不一定说明已经学好，激活函数饱和或计算图被断开也会让梯度为 0。</p></aside>
+  <p class="summary">反向传播就是在计算图上从损失出发反向应用链式法则：每一步乘上局部导数，多条路径的梯度相加，得到损失对每个参数的梯度。</p>
+  <section class="try"><h2>去试试</h2><p>在 nanochat 的练习里亲手实现一个标量自动微分引擎：<code>Value</code>、<code>backward()</code> 和一个小型 MLP。verifier 用数值差分逐项核对梯度，方法和第 3 屏的验证相同。实现须自己完成，本页不提供答案。</p><code>python3 01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd/test_micrograd.py</code></section>
+  <section class="deeper"><h2>想深入</h2><p>知识正文：《反向传播：链式法则与计算图》《Micrograd：标量自动微分引擎》（私有知识库）。公开来源：<a href="https://github.com/karpathy/micrograd">karpathy/micrograd</a> · <a href="https://www.youtube.com/watch?v=VMj-3S1tku0">Karpathy 的视频讲解</a> · <a href="https://people.idsia.ch/~juergen/who-invented-backpropagation.html">Schmidhuber：Who Invented Backpropagation?</a></p></section>
   <footer>Rubickx · ELI5 · <a href="../../index.html#06-machine-learning-foundations">回到能力地图</a></footer>
 </div>
 </body>

@@ -35,6 +35,11 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .ctx figure{margin:14px 0 0}
 .ctx svg{display:block;width:100%;height:auto}
 .intro{font-size:17px;line-height:1.7;margin:0 0 16px}
+.intro p{margin:0 0 6px}
+.intro ol{margin:4px 0 0;padding-left:1.4em}
+.formula{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:21px;line-height:1.9;background:var(--c-tint);border-radius:10px;padding:10px 16px;margin:14px 0 0;overflow-x:auto;white-space:nowrap}
+.formula var{font-style:italic}
+.formula .note{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;font-size:14px;color:var(--muted);margin-left:10px;white-space:normal}
 .flow{list-style:none;display:flex;gap:26px;padding:0;margin:14px 0 0}
 .flow li{flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;position:relative;background:var(--paper)}
 .flow li b{display:block;font-size:17px}
@@ -85,8 +90,8 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
     <div class="ctx what"><h2>它是什么</h2><p>{一句话定义}</p><ol class="flow" aria-label="{全局流程}"><li class="on"><b>{步骤}</b><span>{说明}</span></li></ol><p class="flow-note">{可选}</p></div>
     <div class="ctx origin"><h2>从哪里来</h2><p>{历史或来由}</p><ol class="timeline" aria-label="时间线"><li><span class="y">{年份}</span><span class="e">{事件}</span><span class="w">{人物}</span></li></ol></div>
   </section>
-  <p class="part">用一个小例子看它怎么工作</p>
-  <p class="intro">{例子是什么、和真实情况的关系}</p>
+  <p class="part">用一个例子推演一遍</p>
+  <div class="intro"><p>{例子是什么、和真实情况的关系}</p><p>这个例子要说明：</p><ol><li>{直觉一}</li></ol></div>
   <main>
     <section class="screen">
       <span class="step">1</span>
@@ -95,7 +100,7 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
     </section>
     <!-- 3–6 屏，每屏一张图、一两句话 -->
   </main>
-  <aside class="limits"><h2>这个比喻在哪里不成立</h2><p>{类比的失效点}</p></aside>
+  <aside class="limits"><h2>适用边界</h2><p>{这个例子说明不了什么；用了类比时，写出类比在哪里失效}</p></aside>
   <p class="summary">{一句话总结}</p>
   <section class="try"><h2>去试试</h2><p>{实践说明}</p><code>{命令}</code></section>
   <section class="deeper"><h2>想深入</h2><p>知识正文：《{正文标题}》（私有知识库）。来源：{公开来源链接}</p></section>

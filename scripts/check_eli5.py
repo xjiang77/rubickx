@@ -89,6 +89,8 @@ def check_page(path, base):
     ]:
         if not re.search(pattern, html):
             errors.append(f'缺 {what}')
+    if not re.search(r'<div class="intro">.*?<ol>\s*<li>.*?</ol>.*?</div>', html, re.S):
+        errors.append('例子前缺 .intro：要说明例子是什么，并列出这个例子要说明的直觉')
     cap = path.parent.name
     if f'href="../../index.html#{cap}"' not in html:
         errors.append('缺回到能力地图的链接')

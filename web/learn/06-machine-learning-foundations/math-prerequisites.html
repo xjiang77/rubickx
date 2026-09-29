@@ -37,6 +37,9 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .intro{font-size:17px;line-height:1.7;margin:0 0 16px}
 .intro p{margin:0 0 6px}
 .intro ol{margin:4px 0 0;padding-left:1.4em}
+.ctx ol.steps{margin:10px 0 0;padding-left:1.5em;font-size:17px;line-height:1.7}
+.ctx ol.steps li{margin:0 0 6px;padding-left:2px}
+.ctx ol.steps b{color:var(--c)}
 .formula{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:21px;line-height:1.9;background:var(--c-tint);border-radius:10px;padding:10px 16px;margin:14px 0 0;overflow-x:auto;white-space:nowrap}
 .formula var{font-style:italic}
 .formula .note{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;font-size:14px;color:var(--muted);margin-left:10px;white-space:normal}
@@ -99,16 +102,16 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <div class="wrap">
   <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#06-machine-learning-foundations">Machine learning foundations</a><span>›</span><span>1.6.0</span></nav>
   <h1>数学前置：derivative（导数）、partial derivative（偏导数）与 gradient（梯度）、chain rule（链式法则）</h1>
-  <p class="lede">Backpropagation（反向传播）用到的三样数学，只讲它需要的部分，每个数字都能自己算出来。</p>
+  <p class="lede">Backpropagation（反向传播）所需的三项数学基础，只介绍其用到的部分，所有数值均可逐步核对。</p>
   <p class="flag">对应的知识正文由 agent 起草，尚待人工核验。</p>
-  <p class="part">先弄清楚</p>
+  <p class="part">概述</p>
   <section class="context">
-    <div class="ctx why"><h2>为什么要懂它</h2><p>Backpropagation 的每一步都在求导：每一步的 local derivative（局部导数）就是一个 derivative，要求出的 gradient 由 partial derivative 组成，把各步连起来的是 chain rule。这三样懂了，backpropagation 就只剩按顺序计算。本页只讲 backpropagation 需要的部分。</p><ol class="flow" aria-label="从数学前置到 backpropagation"><li><b>Derivative</b><span>改一点，变多少</span></li><li><b>Partial derivative 与 gradient</b><span>多个 parameter 往哪边调</span></li><li><b>Chain rule</b><span>多步运算怎样相乘</span></li><li class="on"><b>Backpropagation</b><span>一次求出全部 gradient</span></li></ol></div>
-    <div class="ctx what"><h2>它是什么</h2><p>三者都用同一个例子：预测模型 ŷ = w·x + b，误差 e = ŷ − y，<strong>loss function</strong>（损失函数）取 L = e²；取 x = 2、y = 10，<strong>parameter</strong>（参数）w = 3、b = 0，此时预测 6，误差 −4，<strong>loss</strong>（损失）16。<strong>Derivative</strong> 回答“输入改一点，输出变多少倍”；<strong>partial derivative</strong> 是多个 parameter 中只改一个时的 derivative；<strong>gradient</strong> 把所有 partial derivative 排成一个向量；<strong>chain rule</strong> 说明多步运算时 derivative 怎样相乘。</p><ol class="flow" aria-label="三个概念在本例中的取值"><li><b>Derivative</b><span>L 对 e：2e = −8</span></li><li><b>Gradient</b><span>∇L = (∂L/∂w, ∂L/∂b) = (−16, −8)</span></li><li><b>Chain rule</b><span>∂L/∂w = 2 × 1 × (−8) = −16</span></li></ol></div>
-    <div class="ctx origin"><h2>从哪里来</h2><p>17 世纪后期，牛顿和莱布尼茨各自建立了 calculus（微积分），dy/dx 这种写法来自莱布尼茨，chain rule 在这种写法下最直观。1847 年，Cauchy 提出沿负 gradient 方向逐步逼近的方法，这是 gradient descent（梯度下降）的早期形式。1970 年起，reverse-mode automatic differentiation（反向模式自动微分）把 chain rule 变成了可以自动执行的算法，也就是后来训练神经网络用的 backpropagation。</p><ol class="timeline" aria-label="时间线"><li><span class="y">17 世纪后期</span><span class="e">Calculus</span><span class="w">牛顿、莱布尼茨</span></li><li><span class="y">1847</span><span class="e">Gradient descent 的早期形式</span><span class="w">Cauchy</span></li><li><span class="y">1970</span><span class="e">Reverse-mode AD</span><span class="w">Linnainmaa</span></li></ol></div>
+    <div class="ctx why"><h2>背景与动机</h2><p>Backpropagation 的每一步都是求导运算：各运算的 local derivative（局部导数）是 derivative，要求的 gradient 由 partial derivative 组成，将各步连接起来的是 chain rule。掌握这三个概念后，backpropagation 可归结为按依赖顺序执行的乘法与加法。本页只介绍 backpropagation 所需的部分。</p><ol class="flow" aria-label="从数学前置到 backpropagation"><li><b>Derivative</b><span>局部变化率</span></li><li><b>Partial derivative 与 gradient</b><span>多个 parameter 的调整方向</span></li><li><b>Chain rule</b><span>复合运算的求导</span></li><li class="on"><b>Backpropagation</b><span>一次求出全部 gradient</span></li></ol></div>
+    <div class="ctx what"><h2>定义与示例</h2><p>三者都用于描述输入变化引起的输出变化：<strong>derivative</strong>（导数）是单变量函数在某一点的变化率；<strong>partial derivative</strong>（偏导数）是多变量函数中只改变一个变量时的变化率；<strong>gradient</strong>（梯度）是全部 partial derivative 组成的向量；<strong>chain rule</strong>（链式法则）指出复合运算的 derivative 等于各步 derivative 之积。示例沿用房价预测模型 ŷ = w·x + b，w 为单价，b 为基础价。</p><ol class="steps"><li><b>设定</b>：面积 x = 2（百平方米），成交价 y = 10（百万元）；<strong>parameter</strong>（参数）w = 3、b = 0，预测房价 6，误差 e = ŷ − y = −4；<strong>loss function</strong>（损失函数）取 L = e²，<strong>loss</strong>（损失）为 16。</li><li><b>Derivative</b>：L 对 e 的 derivative 为 2e = −8：误差增加 0.01 时，loss 约减少 0.08。</li><li><b>Gradient</b>：∇L = (∂L/∂w, ∂L/∂b) = (−16, −8)；两项均为负，因此 w 与 b 都应增大。</li><li><b>Chain rule</b>：∂L/∂w = ∂L/∂e · ∂e/∂ŷ · ∂ŷ/∂w = (−8) × 1 × 2 = −16。</li></ol></div>
+    <div class="ctx origin"><h2>历史沿革</h2><p>17 世纪后期，牛顿与莱布尼茨分别建立 calculus（微积分）；dy/dx 记法源自莱布尼茨，chain rule 在该记法下表达最为直接。1847 年，Cauchy 提出沿负 gradient 方向逐步逼近极值的方法，即 gradient descent（梯度下降）的早期形式。1970 年起，reverse-mode automatic differentiation（反向模式自动微分）将 chain rule 实现为可自动执行的算法，即后来用于训练神经网络的 backpropagation。</p><ol class="timeline" aria-label="时间线"><li><span class="y">17 世纪后期</span><span class="e">Calculus</span><span class="w">牛顿、莱布尼茨</span></li><li><span class="y">1847</span><span class="e">Gradient descent 的早期形式</span><span class="w">Cauchy</span></li><li><span class="y">1970</span><span class="e">Reverse-mode AD</span><span class="w">Linnainmaa</span></li></ol></div>
   </section>
-  <p class="part">用一个例子推演一遍</p>
-  <div class="intro"><p>例子只用一个样本 (x, y) = (2, 10)，parameter 从 w = 3、b = 0 开始。第 1 屏讲 derivative，第 2、3 屏讲 partial derivative、gradient 和 gradient descent，第 4 屏讲 chain rule。</p><p>这个例子要说明：</p><ol><li>Derivative 是局部的变化倍数：输入改一点，输出大约改“derivative × 改动量”。</li><li>Gradient 把每个 parameter 的 partial derivative 放在一起，指向 loss 增大最快的方向；沿反方向走，loss 下降。</li><li>多步运算的 derivative 等于各步 derivative 相乘；有多条路径时，各路径相加。</li></ol></div>
+  <p class="part">逐步推演</p>
+  <div class="intro"><p>示例只用一个样本 (x, y) = (2, 10)，即面积 200 平方米、成交价 1000 万元；parameter 初值为 w = 3、b = 0。第 1 屏介绍 derivative，第 2、3 屏介绍 partial derivative、gradient 与 gradient descent，第 4 屏介绍 chain rule。</p><p>本例说明以下要点：</p><ol><li>Derivative 是局部变化率：输入改变一个小量时，输出的改变量约为 derivative 与该小量之积。</li><li>Gradient 由各 parameter 的 partial derivative 组成，指向 loss 增大最快的方向；沿反方向移动，loss 下降。</li><li>复合运算的 derivative 等于各步 derivative 之积；存在多条路径时，各路径的结果相加。</li></ol></div>
   <main>
     <section class="screen" id="derivative">
       <span class="step">1 · Derivative</span>
@@ -120,7 +123,7 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <text class="tc" x="278" y="154" style="font-size:22px">e = −4，L = 16</text>
 <text class="tc" x="420" y="242" style="font-size:22px">tangent 斜率 −8</text></svg></figure>
       <div class="formula"><var>L</var>′(<var>e</var>) = 2<var>e</var> = −8，&nbsp; <var>L</var>(−3.99) ≈ 16 + (−8) × 0.01 = 15.92</div>
-      <p>Derivative 就是曲线在这一点的斜率（slope）。e 从 −4 增加到 −3.99，L 从 16 变为 15.9201，和用斜率估计的 16 − 0.08 几乎一样。改动越小，估计越准，这叫 local linear approximation（局部线性近似）。</p>
+      <p>Derivative 即曲线在该点的斜率（slope）。e 由 −4 增至 −3.99，L 由 16 变为 15.9201，与按斜率估计的 16 − 0.08 基本一致。改动越小，估计越准确，这称为 local linear approximation（局部线性近似）。</p>
     </section>
     <section class="screen" id="gradient">
       <span class="step">2 · Partial derivative 与 gradient</span>
@@ -132,7 +135,7 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <text class="ts" x="210" y="282" text-anchor="middle">∇L = (−16, −8)：loss 增大最快</text>
 <text class="tc" x="590" y="64" style="font-size:22px">−∇L：下降方向</text></svg></figure>
       <div class="formula">∂<var>L</var>/∂<var>w</var> = 2<var>e</var>·<var>x</var> = −16，&nbsp; ∂<var>L</var>/∂<var>b</var> = 2<var>e</var> = −8，&nbsp; ∇<var>L</var> = (−16, −8)</div>
-      <p>有两个 parameter 时，分别只改一个，得到两个 partial derivative；把它们排在一起就是 gradient。Gradient 指向 loss 增大最快的方向，沿相反方向走，loss 下降。两个 partial derivative 都为负，所以 w 和 b 都该调大，这与预测 6 小于答案 10 相符。</p>
+      <p>存在两个 parameter 时，分别只改变其中一个，得到两个 partial derivative；二者组成的向量即 gradient。Gradient 指向 loss 增大最快的方向，沿其反方向移动，loss 下降。两个 partial derivative 均为负，因此 w 与 b 都应增大，与预测房价 6 低于成交价 10 相符。</p>
     </section>
     <section class="screen">
       <span class="step">3 · Gradient descent</span>
@@ -141,22 +144,22 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <text class="tc" x="395" y="128" text-anchor="middle" style="font-size:22px">−η·∇L = (0.8, 0.4)</text><text class="ts" x="395" y="178" text-anchor="middle">η = 0.05</text>
 <rect class="hl" x="540" y="90" width="250" height="110" rx="12"/><text class="t" x="665" y="135" text-anchor="middle" style="font-size:22px">w = 3.8，b = 0.4</text><text class="tb" x="665" y="180" text-anchor="middle" style="font-size:26px">L = 4</text></svg></figure>
       <div class="formula">θ ← θ − η · ∇<var>L</var>：&nbsp; (3, 0) − 0.05 × (−16, −8) = (3.8, 0.4)</div>
-      <p>Gradient descent 每一步沿负 gradient 方向走一小段，步长由 learning rate（学习率）η 决定。取 η = 0.05，一步之后 loss 从 16 降到 4。</p>
+      <p>Gradient descent 每步沿负 gradient 方向移动一段距离，步长由 learning rate（学习率）η 决定。取 η = 0.05，一步后 loss 由 16 降至 4。</p>
     </section>
     <section class="screen" id="chain-rule">
       <span class="step">4 · Chain rule</span>
       <figure><svg viewBox="0 70 800 210" role="img" aria-label="链：w 乘 x 得预测，减 y 得误差，平方得 loss；三步的 local derivative 2、1、−8 相乘得 −16"><rect class="hl" x="10" y="110" width="120" height="64" rx="10"/><text class="tb" x="70" y="152" text-anchor="middle" style="font-size:26px">w = 3</text><line class="fwd" x1="130" y1="142" x2="222" y2="142" marker-end="url(#af)"/><text class="ts" x="178" y="96" text-anchor="middle">乘 x</text><text class="tc" x="178" y="210" text-anchor="middle" style="font-size:22px">×2</text><rect class="box" x="225" y="110" width="120" height="64" rx="10"/><text class="tb" x="285" y="152" text-anchor="middle" style="font-size:26px">ŷ = 6</text><line class="fwd" x1="345" y1="142" x2="437" y2="142" marker-end="url(#af)"/><text class="ts" x="392" y="96" text-anchor="middle">减 y</text><text class="tc" x="392" y="210" text-anchor="middle" style="font-size:22px">×1</text><rect class="box" x="440" y="110" width="120" height="64" rx="10"/><text class="tb" x="500" y="152" text-anchor="middle" style="font-size:26px">e = −4</text><line class="fwd" x1="560" y1="142" x2="652" y2="142" marker-end="url(#af)"/><text class="ts" x="608" y="96" text-anchor="middle">平方</text><text class="tc" x="608" y="210" text-anchor="middle" style="font-size:22px">×(−8)</text><rect class="hl" x="655" y="110" width="135" height="64" rx="10"/><text class="tb" x="722" y="152" text-anchor="middle" style="font-size:26px">L = 16</text><text class="tc" x="400" y="262" text-anchor="middle" style="font-size:22px">∂L/∂w = 2 × 1 × (−8) = −16</text></svg></figure>
       <div class="formula">∂<var>L</var>/∂<var>w</var> = ∂<var>L</var>/∂<var>e</var> · ∂<var>e</var>/∂<var>ŷ</var> · ∂<var>ŷ</var>/∂<var>w</var> = (−8) × 1 × 2 = −16</div>
-      <p>Loss 经过三步运算才依赖 w。每一步各有一个 derivative：乘 x 这一步是 2，减 y 这一步是 1，平方这一步是 −8。把它们乘起来，就是 loss 对 w 的 derivative。</p>
+      <p>Loss 经过三个运算才依赖 w，每个运算各有一个 derivative：乘以 x 为 2，减去 y 为 1，平方为 −8。三者之积即 loss 对 w 的 derivative。</p>
     </section>
   </main>
-  <aside class="limits"><h2>适用边界</h2><p>本页只讲标量和两个 parameter。真实网络的 parameter 是向量和矩阵，求导要用到 Jacobian（雅可比矩阵），框架会自动处理，原理与本页相同。Derivative 给的是局部近似，改动过大时就不准，这也是 learning rate 不能太大的原因。</p></aside>
-  <section class="uses"><h2>在 AI 工程里什么时候用得上</h2><ul><li><b>自己实现或修改一个运算时</b>用 numerical gradient（数值求导，常用 central difference 中心差分）核对 gradient 是否写对。PyTorch 提供 torch.autograd.gradcheck 做同样的事。</li><li><b>loss 来回振荡或变成 NaN</b>这往往说明一步走得太大，局部近似失效。先把 learning rate 调小一个数量级再看。</li><li><b>读论文或代码里的 ∂ 和 ∇</b>∂L/∂w 是只改 w 时 loss 的变化倍数；∇L 是所有这些倍数组成的向量，optimizer（优化器）按它更新 parameter。</li></ul></section>
-  <p class="summary">Derivative 是局部的变化倍数，gradient 是所有 parameter 的 partial derivative，chain rule 把多步运算的 derivative 相乘；backpropagation 就是把这三样按顺序用一遍。</p>
-  <section class="tree"><h2>知识树</h2><div class="branches"><div><h3>前置</h3><ul><li>函数与复合函数 <span class="todo">（中学数学，不单列）</span></li></ul></div><div><h3>本体</h3><ul><li><a href="#derivative">Derivative</a></li><li><a href="#gradient">Partial derivative 与 gradient</a></li><li><a href="#chain-rule">Chain rule</a></li></ul></div><div><h3>延展</h3><ul><li><a href="backprop-autodiff.html">Backpropagation</a></li><li>向量与矩阵求导（Jacobian） <span class="todo">（待写）</span></li></ul></div><div><h3>用在哪里</h3><ul><li>PyTorch training loop <span class="todo">（1.6.2，图解待写）</span></li><li>Learning rate 与 optimizer <span class="todo">（待写）</span></li></ul></div></div></section>
-  <section class="try"><h2>去试试</h2><p>运行数学前置的核对：10 个测试逐项验证本页的数字，包括 learning rate 过大时的振荡与发散。</p><code>make test-math
+  <aside class="limits"><h2>适用条件与局限</h2><p>本页只涉及标量与两个 parameter。真实网络的 parameter 为向量与矩阵，求导需要 Jacobian（雅可比矩阵），由框架自动处理，原理与本页相同。Derivative 给出的是局部近似，改动过大时误差增大，这也是 learning rate 不能过大的原因。</p></aside>
+  <section class="uses"><h2>工程应用</h2><ul><li><b>实现或修改一个运算</b>用 numerical gradient（数值梯度，常用 central difference 中心差分）核对 gradient 的实现。PyTorch 提供 torch.autograd.gradcheck 完成同样的检查。</li><li><b>loss 振荡或变为 NaN</b>这通常说明单步更新过大，局部近似失效。首先将 learning rate 降低一个数量级再观察。</li><li><b>阅读论文或代码中的 ∂ 与 ∇</b>∂L/∂w 表示只改变 w 时 loss 的变化率；∇L 是这些变化率组成的向量，optimizer（优化器）据此更新 parameter。</li></ul></section>
+  <p class="summary">Derivative 是局部变化率，gradient 是全部 parameter 的 partial derivative 组成的向量，chain rule 将复合运算的 derivative 表示为各步之积；backpropagation 即按顺序应用这三者。</p>
+  <section class="tree"><h2>知识树</h2><div class="branches"><div><h3>前置知识</h3><ul><li>函数与复合函数 <span class="todo">（中学数学，不单列）</span></li></ul></div><div><h3>核心概念</h3><ul><li><a href="#derivative">Derivative</a></li><li><a href="#gradient">Partial derivative 与 gradient</a></li><li><a href="#chain-rule">Chain rule</a></li></ul></div><div><h3>延伸主题</h3><ul><li><a href="backprop-autodiff.html">Backpropagation</a></li><li>向量与矩阵求导（Jacobian） <span class="todo">（待写）</span></li></ul></div><div><h3>应用场景</h3><ul><li>PyTorch training loop <span class="todo">（1.6.2，图解待写）</span></li><li>Learning rate 与 optimizer <span class="todo">（待写）</span></li></ul></div></div></section>
+  <section class="try"><h2>实践</h2><p>运行数学前置的核对：10 个测试逐项验证本页数值，包括 learning rate 过大时的振荡与发散。</p><code>make test-math
 python3 01-ai-applications/06-machine-learning-foundations/math-prerequisites/gradcheck.py</code></section>
-  <section class="deeper"><h2>想深入</h2><p>知识正文：《导数：变化率与局部线性近似》《偏导数与梯度：多个参数时往哪边调》《链式法则：复合运算怎样求导》（私有知识库，待核验）。公开来源：<a href="https://www.deeplearningbook.org/">Goodfellow 等《Deep Learning》§4.3、§6.5</a> · <a href="https://www.3blue1brown.com/topics/calculus">3Blue1Brown：微积分的本质</a>。</p></section>
+  <section class="deeper"><h2>参考资料</h2><p>知识正文：《导数：变化率与局部线性近似》《偏导数与梯度：多个参数时往哪边调》《链式法则：复合运算怎样求导》（私有知识库，待核验）。公开来源：<a href="https://www.deeplearningbook.org/">Goodfellow 等《Deep Learning》§4.3、§6.5</a> · <a href="https://www.3blue1brown.com/topics/calculus">3Blue1Brown：微积分的本质</a>。</p></section>
   <footer>Rubickx · ELI5 · <a href="../../index.html#06-machine-learning-foundations">回到能力地图</a></footer>
 </div>
 </body>

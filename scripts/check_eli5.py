@@ -4,6 +4,7 @@
 检查能机器判定的部分：自包含、基础样式与模板一致、屏数与图、文字预算、固定结尾、
 回链与元数据。讲得好不好、比喻贴不贴切，仍由人过目。
 """
+import json
 import re
 import sys
 from html.parser import HTMLParser
@@ -15,8 +16,13 @@ TEMPLATE = LEARN / '_template.html'
 BASE = re.compile(r'<style id="eli5-base">.*?</style>', re.S)
 CJK = re.compile(r'[一-鿿]')
 SCREEN_TEXT_BUDGET = 400   # 所有屏的说明文字合计汉字数上限
-CONTEXT_TEXT_BUDGET = 450  # 「先弄清楚」三块文字合计汉字数上限
+CONTEXT_TEXT_BUDGET = 600  # 「概述」三块文字（段落与步骤）合计汉字数上限
+CONTEXT_HEADINGS = {'why': '背景与动机', 'what': '定义与示例', 'origin': '历史沿革'}
+TREE_HEADINGS = ('前置知识', '核心概念', '延伸主题', '应用场景')
+# 口语化的旧标题：知识说明用名词性标题（见 SKILL.md「知识说明的专业文体」）
+COLLOQUIAL = ('为什么要懂它', '它是什么', '从哪里来', '先弄清楚', '用一个例子推演一遍', '去试试', '想深入', '什么时候用得上')
 MIN_SCREENS, MAX_SCREENS = 3, 6
+CAP_IDS = {c['id'] for c in json.loads((ROOT / 'web/capabilities.json').read_text())['capabilities']}
 
 
 class Page(HTMLParser):
@@ -29,6 +35,9 @@ class Page(HTMLParser):
         self.screen_text = []
         self.context_text = []
         self.ctx_blocks = set()
+        self.ctx_headings = {}
+        self.steps_in_what = 0
+        self._ctx_h2 = None
         self.external = []
         self.scripts_with_src = 0
         self.blocks = set()
@@ -46,6 +55,10 @@ class Page(HTMLParser):
             self.labelled_svgs += 1
         if tag == 'div' and 'ctx' in cls:
             self.ctx_blocks |= cls & {'why', 'what', 'origin'}
+        if tag == 'h2' and self.in_class('ctx'):
+            self._ctx_h2 = next((c for _, cs in self.stack for c in cs if c in CONTEXT_HEADINGS), None)
+        if tag == 'ol' and 'steps' in cls and self.in_class('what'):
+            self.steps_in_what += 1
         for c in ('limits', 'summary', 'try', 'deeper'):
             if c in cls:
                 self.blocks.add(c)
@@ -57,6 +70,8 @@ class Page(HTMLParser):
                 self.external.append(v)
 
     def handle_endtag(self, tag):
+        if tag == 'h2':
+            self._ctx_h2 = None
         for i in range(len(self.stack) - 1, -1, -1):
             if self.stack[i][0] == tag:
                 del self.stack[i:]
@@ -65,11 +80,34 @@ class Page(HTMLParser):
     def handle_data(self, data):
         if self.in_class('screen') and not any(t == 'svg' for t, _ in self.stack) and any(t == 'p' for t, _ in self.stack):
             self.screen_text.append(data)
-        if self.in_class('ctx') and not any(t == 'svg' for t, _ in self.stack) and any(t == 'p' for t, _ in self.stack):
+        if self.in_class('ctx') and not any(t == 'svg' for t, _ in self.stack) and any(t in ('p', 'li') for t, _ in self.stack):
             self.context_text.append(data)
+        if self._ctx_h2:
+            self.ctx_headings[self._ctx_h2] = self.ctx_headings.get(self._ctx_h2, '') + data
 
     def in_class(self, name):
         return any(name in cls for _, cls in self.stack)
+
+
+def check_links(path, html):
+    """站内链接必须指向真实存在的页面与锚点：术语链接、知识树都不能是空链接。"""
+    errors = []
+    for href in re.findall(r'<a [^>]*href="([^"]+)"', html):
+        if re.match(r'^(https?:|mailto:)', href):
+            continue
+        file_part, _, anchor = href.partition('#')
+        target = (path.parent / file_part).resolve() if file_part else path
+        if not target.exists():
+            errors.append(f'链接目标不存在 {href}')
+            continue
+        if target == ROOT / 'web/index.html':
+            # 能力地图的锚点由 map.js 按 capabilities.json 渲染
+            if anchor and anchor not in CAP_IDS:
+                errors.append(f'能力锚点不存在 {href}')
+            continue
+        if anchor and target.suffix == '.html' and not re.search(rf'id="{re.escape(anchor)}"', target.read_text()):
+            errors.append(f'链接锚点不存在 {href}')
+    return errors
 
 
 def check_page(path, base):
@@ -105,18 +143,29 @@ def check_page(path, base):
         errors.append(f'屏内说明 {n} 字，超过 {SCREEN_TEXT_BUDGET}')
     lacking = {'why', 'what', 'origin'} - p.ctx_blocks
     if lacking:
-        errors.append(f'「先弄清楚」缺 {sorted(lacking)}（为什么要懂它 / 它是什么 / 从哪里来）')
+        errors.append(f'「概述」缺 {sorted(lacking)}（背景与动机 / 定义与示例 / 历史沿革）')
+    for key, want in CONTEXT_HEADINGS.items():
+        if key in p.ctx_blocks and p.ctx_headings.get(key, '').strip() != want:
+            errors.append(f'.ctx.{key} 的标题应为「{want}」')
+    if not p.steps_in_what:
+        errors.append('「定义与示例」须用 <ol class="steps"> 分步说明应用示例')
+    if '<p class="part">概述</p>' not in html or '<p class="part">逐步推演</p>' not in html:
+        errors.append('分段标题应为「概述」「逐步推演」')
+    found = [w for w in COLLOQUIAL if f'>{w}' in html or f'{w}<' in html]
+    if found:
+        errors.append(f'仍有口语化标题 {found}')
     m = len(CJK.findall(''.join(p.context_text)))
     if m > CONTEXT_TEXT_BUDGET:
-        errors.append(f'「先弄清楚」{m} 字，超过 {CONTEXT_TEXT_BUDGET}')
-    for block, label in (('uses', '在 AI 工程里什么时候用得上'), ('tree', '知识树')):
-        if f'<section class="{block}"><h2>{label}</h2>' not in html:
+        errors.append(f'「概述」{m} 字，超过 {CONTEXT_TEXT_BUDGET}')
+    for block, label in (('limits', '适用条件与局限'), ('uses', '工程应用'), ('tree', '知识树'), ('try', '实践'), ('deeper', '参考资料')):
+        if not re.search(rf'<(section|aside) class="{block}"><h2>{label}</h2>', html):
             errors.append(f'缺「{label}」')
-    if '<section class="tree">' in html and not all(f'<h3>{h}</h3>' in html for h in ('前置', '本体', '延展', '用在哪里')):
-        errors.append('知识树须有前置、本体、延展、用在哪里四个方向')
+    if '<section class="tree">' in html and not all(f'<h3>{h}</h3>' in html for h in TREE_HEADINGS):
+        errors.append('知识树须有' + '、'.join(TREE_HEADINGS) + '四个方向')
     missing = {'limits', 'summary', 'try', 'deeper'} - p.blocks
     if missing:
         errors.append(f'缺固定结尾块 {sorted(missing)}')
+    errors += check_links(path, html)
     if p.external or p.scripts_with_src:
         errors.append(f'不能加载外部资源 {p.external}')
     return rel, (n, m), errors
@@ -132,7 +181,7 @@ def main():
             failed = True
             print(f'FAIL {rel}: ' + '；'.join(errors))
         else:
-            print(f'ok   {rel}（先弄清楚 {n[1]} 字，屏内 {n[0]} 字）')
+            print(f'ok   {rel}（概述 {n[1]} 字，屏内 {n[0]} 字）')
     if failed:
         sys.exit(1)
     print(f'ELI5 gate passed: {len(pages)} pages.')

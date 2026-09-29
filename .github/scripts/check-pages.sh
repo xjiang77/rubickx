@@ -8,6 +8,7 @@ PORT="${PAGES_CHECK_PORT:-8123}"
 python3 scripts/check_capabilities.py
 python3 scripts/check_topics.py
 python3 scripts/check_eli5.py
+python3 scripts/check_quiz.py
 python3 scripts/render_skills_map.py --check
 
 required_files=(
@@ -16,6 +17,11 @@ required_files=(
   "$ROOT/favicon.svg"
   "$ROOT/map.js"
   "$ROOT/capabilities.json"
+  "$ROOT/topics.json"
+  "$ROOT/quiz/index.html"
+  "$ROOT/quiz/quiz.js"
+  "$ROOT/quiz/quiz.css"
+  "$ROOT/quiz/banks/index.json"
 )
 
 for file in "${required_files[@]}"; do

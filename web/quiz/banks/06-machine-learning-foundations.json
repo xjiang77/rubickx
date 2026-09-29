@@ -1,0 +1,216 @@
+{
+  "capability": "06-machine-learning-foundations",
+  "version": 1,
+  "status": "sample",
+  "updated": "2026-09-29",
+  "note": "样板题库：覆盖 1.6.1–1.6.3，由知识库正文派生；1.6.4 待正文补齐后再出题。",
+  "questions": [
+    {
+      "id": "ml-001",
+      "topic": "1.6.1",
+      "type": "single",
+      "scenario": false,
+      "prompt": "f(x) = (x + 3)²，x = 2。x 的梯度是多少？",
+      "options": [
+        "5",
+        "10",
+        "25",
+        "2"
+      ],
+      "answer": [
+        1
+      ],
+      "explain": "从结果往回走：平方这一步在 5 处的局部倍数是 2 × 5 = 10，加 3 这一步的倍数是 1，相乘得 10。"
+    },
+    {
+      "id": "ml-002",
+      "topic": "1.6.1",
+      "type": "single",
+      "scenario": true,
+      "prompt": "变量 a 同时参与两条计算路径，反向传播时两条路径带回的梯度分别是 3 和 10。a.grad 应该是多少？",
+      "options": [
+        "13",
+        "10：后算的那条覆盖先算的",
+        "30",
+        "6.5：两条取平均"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "同一个变量参与多条路径时，梯度要累加而不是覆盖：3 + 10 = 13。手写 autograd 最常见的 bug 就是这里用了赋值。"
+    },
+    {
+      "id": "ml-003",
+      "topic": "1.6.1",
+      "type": "single",
+      "scenario": false,
+      "prompt": "某一层的梯度一直是 0。下面哪个判断最稳妥？",
+      "options": [
+        "模型已经学完了",
+        "可能是激活函数饱和，或计算图在这里被断开，需要检查",
+        "一定是学习率太大",
+        "说明这层参数不重要，可以删掉"
+      ],
+      "answer": [
+        1
+      ],
+      "explain": "梯度为 0 不一定是不学习：激活饱和、图被断开（例如误用 detach）都会导致梯度为 0。先查梯度路径，再下结论。"
+    },
+    {
+      "id": "ml-004",
+      "topic": "1.6.1",
+      "type": "multi",
+      "scenario": false,
+      "prompt": "反向传播时，一个操作节点算自己的梯度，需要知道哪些东西？（多选）",
+      "options": [
+        "自己的局部导数",
+        "从上游（更靠近损失的一侧）传回来的梯度",
+        "整个网络的完整公式",
+        "损失函数的具体形式"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explain": "链式法则的好处就在这里：每个节点只需要局部导数和上游梯度，二者相乘就是自己的梯度，不需要知道全局公式。"
+    },
+    {
+      "id": "ml-005",
+      "topic": "1.6.2",
+      "type": "single",
+      "scenario": true,
+      "prompt": "训练循环里漏写了 optimizer.zero_grad()。最可能出现什么现象？",
+      "options": [
+        "梯度在多个 batch 之间不断累加，更新越来越偏、训练不稳定",
+        "程序直接报错退出",
+        "参数完全不再更新",
+        "没有任何影响"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "PyTorch 的 .grad 默认累加。不清零，每一步用的都是历史梯度之和；除非你是刻意做梯度累积，否则训练会失控。"
+    },
+    {
+      "id": "ml-006",
+      "topic": "1.6.2",
+      "type": "single",
+      "scenario": false,
+      "prompt": "tensor.detach() 做的是什么？",
+      "options": [
+        "切断梯度路径：之后的计算不会再把梯度传回它之前的部分",
+        "把 tensor 移到 CPU",
+        "释放这块显存",
+        "冻结优化器的学习率"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "detach 适合有意停止反传（例如 target 网络、日志统计），不适合随手修 bug：它可能正是某层梯度为 0 的原因。"
+    },
+    {
+      "id": "ml-007",
+      "topic": "1.6.2",
+      "type": "single",
+      "scenario": true,
+      "prompt": "训练循环写成了：前向 → 算损失 → optimizer.zero_grad() → optimizer.step() → loss.backward()（反向放到了更新之后）。会发生什么？",
+      "options": [
+        "参数基本不会被更新：step 时梯度刚被清空，反向算出的梯度又在下一轮开头被清掉",
+        "和正常顺序完全等价",
+        "PyTorch 会自动调整顺序",
+        "学习率会翻倍"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "step 只读取当时 .grad 里的值。这个顺序下，每次 step 看到的都是刚清空的梯度，而 backward 算出的梯度还没被用上就在下一轮被清掉。正确顺序是：前向 → 损失 → 清零 → 反向 → 更新。"
+    },
+    {
+      "id": "ml-008",
+      "topic": "1.6.2",
+      "type": "multi",
+      "scenario": false,
+      "prompt": "调试训练问题时，Tensor 的哪些属性最常需要检查？（多选）",
+      "options": [
+        "shape",
+        "dtype",
+        "device",
+        "学习率"
+      ],
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "explain": "Tensor 是带 shape、dtype、device 的数值容器，三者不匹配是最常见的报错与静默错误来源。学习率属于优化器，不是 Tensor 的属性。"
+    },
+    {
+      "id": "ml-009",
+      "topic": "1.6.3",
+      "type": "single",
+      "scenario": true,
+      "prompt": "你手上已有大量（prompt、更好的回答、更差的回答）偏好对，目标是调整语气和拒答边界，并且想要最简单的训练链路。首选哪种方法？",
+      "options": [
+        "DPO",
+        "RLHF（训练 reward model 再用 PPO）",
+        "GRPO + RLVR",
+        "继续预训练"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "已有偏好对、目标是取舍与风格时，DPO 直接用偏好对优化策略，不需要单独的 reward model，链路最短、最稳定。"
+    },
+    {
+      "id": "ml-010",
+      "topic": "1.6.3",
+      "type": "single",
+      "scenario": false,
+      "prompt": "GRPO 相比 PPO，省掉了什么？",
+      "options": [
+        "critic（价值网络）：改用同一题一组回答之间的相对好坏来估计优势",
+        "奖励信号",
+        "reference model",
+        "采样"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "GRPO 对每个 prompt 采样一组回答，用（该回答奖励 − 组均值）/ 组标准差当优势值，于是不再需要额外的价值网络。"
+    },
+    {
+      "id": "ml-011",
+      "topic": "1.6.3",
+      "type": "single",
+      "scenario": true,
+      "prompt": "用 LLM-as-judge 当奖励做强化学习：judge 打分一路上升，但人工抽查发现真实正确率没有变化。最可能的原因是？",
+      "options": [
+        "Reward hacking：模型学会迎合 judge（更长、更自信、格式更漂亮），而不是变得更对",
+        "测试集泄漏到了训练集",
+        "学习率太低",
+        "judge 打分太严格"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "奖励与真实目标之间有缝隙，RL 就会找到那条缝。对策是让奖励尽量闭环到可验证的结果，并做人工抽查与对抗校验。"
+    },
+    {
+      "id": "ml-012",
+      "topic": "1.6.3",
+      "type": "single",
+      "scenario": false,
+      "prompt": "RLVR（可验证奖励的强化学习）最适合哪类任务？",
+      "options": [
+        "答案能被机器判对错的任务：单元测试、数学答案匹配、格式校验",
+        "写作风格的打磨",
+        "开放式对话里的“有用程度”",
+        "陪伴类对话的语气"
+      ],
+      "answer": [
+        0
+      ],
+      "explain": "RLVR 的奖励来自可自动判定的正确性信号，适用域就是判定器存在的地方。判定器有洞时，模型会学会只过测试的退化解。"
+    }
+  ]
+}

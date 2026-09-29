@@ -1,0 +1,5 @@
+{
+  "banks": [
+    {"capability": "06-machine-learning-foundations", "path": "banks/06-machine-learning-foundations.json"}
+  ]
+}

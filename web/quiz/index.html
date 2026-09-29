@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AI Engineering Skills Map 的能力测验：随机抽题、逐题讲解，历次成绩保存在本机浏览器，可导出导入。">
+  <title>能力测验 · AI Engineering Skills Map</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./quiz.css">
+  <script src="./quiz.js" defer></script>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="crumb" aria-label="位置"><a href="../index.html">AI Engineering Skills Map</a><span>›</span><span>能力测验</span></nav>
+    <h1>能力测验</h1>
+    <p class="lede">测的是理解，不是记忆。每次随机抽题，答完一题就讲一题；历次成绩只存在这台设备的浏览器里。</p>
+    <noscript><p class="notice">测验需要 JavaScript。题库是公开的 JSON，可在仓库 <code>web/quiz/banks/</code> 中查看。</p></noscript>
+    <p id="notice" class="notice" hidden></p>
+
+    <section id="result" class="card" hidden aria-live="polite">
+      <h2 id="score"></h2>
+      <div id="result-topics"></div>
+      <div class="actions"><button id="again" type="button" class="primary">再测一次</button><a href="#" id="to-map">回到这个能力</a></div>
+    </section>
+
+    <section id="picker" class="card" hidden>
+      <label for="capability">选择能力</label>
+      <select id="capability"></select>
+      <p id="bank-meta" class="meta"></p>
+      <div class="actions"><button id="start" type="button" class="primary">开始测验</button></div>
+    </section>
+
+    <section id="question" class="card" hidden aria-live="polite">
+      <div class="q-head"><span id="progress" class="meta"></span><span id="q-topic" class="chip"></span><span id="q-kind" class="chip"></span></div>
+      <h2 id="q-prompt"></h2>
+      <p id="q-hint" class="meta"></p>
+      <form id="q-form"><fieldset id="q-options"><legend class="sr-only">选项</legend></fieldset></form>
+      <div id="feedback" class="feedback" hidden></div>
+      <div class="actions"><button id="submit" type="button" class="primary" disabled>提交</button><button id="next" type="button" class="primary" hidden>下一题</button></div>
+    </section>
+
+    <section id="history" class="card" hidden>
+      <h2>历史</h2>
+      <div id="history-body"></div>
+      <div class="actions small">
+        <button id="export" type="button">导出历史 JSON</button>
+        <label class="file">导入历史 JSON<input id="import" type="file" accept="application/json,.json"></label>
+      </div>
+      <p class="meta">换设备或清理浏览器数据前，先导出。导入会与现有记录合并，重复的记录只保留一份。</p>
+    </section>
+
+    <footer>Rubickx · 能力测验 · <a href="../index.html">回到能力地图</a></footer>
+  </div>
+</body>
+</html>

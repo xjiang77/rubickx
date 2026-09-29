@@ -7,6 +7,12 @@
     if (!response.ok) throw new Error('目录加载失败');
     const data = await response.json();
     const byId = new Map(data.capabilities.map(c => [c.id, c]));
+    // topic 目录与测验清单是增强信息：加载失败时能力图照常可用。
+    const optional = async url => { try { const r = await fetch(url); return r.ok ? await r.json() : null; } catch { return null; } };
+    const [topicDoc, quizIndex] = await Promise.all([optional('./topics.json'), optional('./quiz/banks/index.json')]);
+    const topicsByCap = new Map();
+    (topicDoc?.topics || []).forEach(t => { if (!topicsByCap.has(t.capability)) topicsByCap.set(t.capability, []); topicsByCap.get(t.capability).push(t); });
+    const quizCaps = new Set((quizIndex?.banks || []).map(b => b.capability));
     const map = document.querySelector('#interactive-map');
     const pillars = document.querySelector('#pillars');
     const capabilities = document.querySelector('#capabilities');
@@ -87,6 +93,26 @@
           const row = element('li');
           row.append(icon(p.icon), element('code', p.id), element('span', p.description, 'practice-description'));
           row.append(link(p.id === 'agent-workflows' ? '工作流说明 ↗' : p.status === 'scaffold' ? '练习骨架 ↗' : '源码 ↗', base + p.path));
+          list.append(row);
+        });
+        content.append(list);
+      }
+      const topics = topicsByCap.get(c.id) || [];
+      if (topics.length) {
+        const s = topicDoc.states;
+        const head = element('div', '', 'topic-head');
+        head.append(element('h4', `Topics · ${topics.length}`), element('span', '知识正文 · ELI5 图解 · 实践', 'topic-legend'));
+        if (quizCaps.has(c.id)) head.append(link('能力测验 →', `./quiz/#${c.id}`, 'quiz-link'));
+        content.append(head);
+        const list = element('ol', '', 'topic-list');
+        topics.forEach(t => {
+          const row = element('li');
+          const chips = element('span', '', 'topic-states');
+          chips.append(element('span', '知识 ' + s.knowledge[t.knowledge.state], `chip ${t.knowledge.state}`));
+          chips.append(t.eli5 ? link('ELI5 图解', './' + t.eli5.path.replace(/^web\//, ''), 'chip present') : element('span', 'ELI5 ' + s.eli5.missing, 'chip missing'));
+          const p = t.practice;
+          chips.append(p.state === 'missing' ? element('span', '实践 ' + s.practice.missing, 'chip missing') : link('实践 ' + s.practice[p.state] + ' ↗', base + p.paths[0], `chip ${p.state}`));
+          row.append(element('span', t.id, 'topic-id'), element('span', t.title, 'topic-title'), chips);
           list.append(row);
         });
         content.append(list);

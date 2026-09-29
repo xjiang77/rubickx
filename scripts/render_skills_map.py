@@ -12,7 +12,19 @@ BASE = 'https://github.com/xjiang77/rubickx/tree/main/'
 
 def render():
     data = json.loads((ROOT / 'web/capabilities.json').read_text())
+    topic_doc = json.loads((ROOT / 'web/topics.json').read_text())
+    states = topic_doc['states']
     esc = html.escape
+
+    def topic_list(cap_id):
+        items = []
+        for t in topic_doc['topics']:
+            if t['capability'] != cap_id:
+                continue
+            eli5 = (f'<a href="./{quote(t["eli5"]["path"][len("web/"):])}">ELI5 图解</a>'
+                    if t['eli5'] else f'ELI5 {states["eli5"]["missing"]}')
+            items.append(f'<li><code>{t["id"]}</code> {esc(t["title"])} · 知识{states["knowledge"][t["knowledge"]["state"]]} · {eli5} · 实践{states["practice"][t["practice"]["state"]]}</li>')
+        return f'<ol class="topic-list-static">{"".join(items)}</ol>' if items else ''
     groups = []
     for pillar in data['pillars']:
         lines = [f'<section class="directory-group"><h2>{esc(pillar["title"])}</h2>']
@@ -20,7 +32,7 @@ def render():
             if c['pillar'] != pillar['id']:
                 continue
             source = 'Andrew Ng 原框架' if c['origin'] == 'andrew' else 'Rubickx 扩展'
-            lines.append(f'<article id="directory-{c["id"]}"><h3><a href="#directory-{c["id"]}" data-capability="{c["id"]}">{esc(c["title"])}</a> / {esc(c["zh"])}</h3><p class="meta">{source} · {data["statuses"][c["status"]]}</p><p>{esc(c["description"])}</p><p>{esc(c["boundary"])}</p><a href="{BASE}{quote(c["path"] + "/README.md")}">能力说明 README</a></article>')
+            lines.append(f'<article id="directory-{c["id"]}"><h3><a href="#directory-{c["id"]}" data-capability="{c["id"]}">{esc(c["title"])}</a> / {esc(c["zh"])}</h3><p class="meta">{source} · {data["statuses"][c["status"]]}</p><p>{esc(c["description"])}</p><p>{esc(c["boundary"])}</p>{topic_list(c["id"])}<a href="{BASE}{quote(c["path"] + "/README.md")}">能力说明 README</a></article>')
         groups.append('\n'.join(lines) + '</section>')
     practices = []
     for p in data['practices'].values():

@@ -1,0 +1,1867 @@
+{
+  "version": 1,
+  "source": "dragon-vault Goals/skills-map-landing/plan.md §3（2026-09-29 冻结）",
+  "note": "knowledge.notes 是私有知识库里的路径，只作标识，不生成公开链接；state 由 vault 侧检查同步。",
+  "states": {
+    "knowledge": {
+      "missing": "缺正文",
+      "unverified": "待核验",
+      "verified": "已核验"
+    },
+    "practice": {
+      "missing": "待建",
+      "partial": "部分",
+      "present": "已有"
+    },
+    "eli5": {
+      "missing": "待写",
+      "present": "已发布"
+    }
+  },
+  "topics": [
+    {
+      "id": "1.1.1",
+      "slug": "tokenization",
+      "capability": "01-llm-foundations",
+      "title": "Tokenization：文本怎样变成 token",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/01-tokenizer"
+        ],
+        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/01-tokenizer && pytest test_impl.py",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.1.2",
+      "slug": "transformer-attention",
+      "capability": "01-llm-foundations",
+      "title": "Transformer 与注意力",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/01-llm-foundations/01 - AI - Transformer 与 LLM：注意力、目标与规模.md",
+          "02_Knowledge/01-ai-applications/01-llm-foundations/02 - AI - Transformer 架构变体：从瓶颈到收敛.md",
+          "02_Knowledge/01-ai-applications/02 - AI - LLM 三层栈心智模型：内核、推理与 Harness.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/03-model",
+          "01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/addition-transformer"
+        ],
+        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/03-model && pytest test_impl.py",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.1.3",
+      "slug": "finetune-vs-context",
+      "capability": "01-llm-foundations",
+      "title": "微调还是上下文工程",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/01-llm-foundations/03 - AI - LoRA 与参数高效微调.md",
+          "02_Knowledge/01-ai-applications/01-llm-foundations/04 - AI - Fine-tuning 与 Context Engineering 的取舍.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "在 addition-transformer 上对照 LoRA 与改提示"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.1.4",
+      "slug": "multimodal",
+      "capability": "01-llm-foundations",
+      "title": "多模态与视觉语言模型",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/01-llm-foundations/05 - AI - 多模态与视觉语言模型.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "CPU 可跑的玩具级图文对比学习"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.1.5",
+      "slug": "safety-alignment",
+      "capability": "01-llm-foundations",
+      "title": "安全与对齐基础",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/01-llm-foundations/06 - AI - 安全与对齐基础.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "拒答与越狱小评测集，复用 1.4 的 grader"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.2.1",
+      "slug": "evidence-grounding",
+      "capability": "02-grounding-models-with-data",
+      "title": "证据接地：回答要能指回来源",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/02-grounding-models-with-data/01 - AI - Grounding：证据接地.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "grounding-lab：引用校验"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.2.2",
+      "slug": "retrieval-evidence-selection",
+      "capability": "02-grounding-models-with-data",
+      "title": "按需检索与证据选择",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/02-grounding-models-with-data/02 - AI - Just-in-Time Retrieval：按需检索.md",
+          "02_Knowledge/01-ai-applications/02-grounding-models-with-data/03 - AI - 检索与证据：Just-in-Time Retrieval 与证据选择.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "grounding-lab：BM25 加小向量索引，top-k 与重排"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.2.3",
+      "slug": "graphrag-vs-vector",
+      "capability": "02-grounding-models-with-data",
+      "title": "GraphRAG 与 Vector RAG 选型",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/02-grounding-models-with-data/04 - AI - GraphRAG 与 Vector RAG 选型：信号、成本与失败模式.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "grounding-lab：同一问题集，两种索引对照"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.2.4",
+      "slug": "rag-debugging",
+      "capability": "02-grounding-models-with-data",
+      "title": "RAG 调试阶梯",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/02-grounding-models-with-data/05 - AI - RAG 调试阶梯：症状、分段隔离与快速修复.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "grounding-lab：注入故障，分段定位"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.1",
+      "slug": "agent-loop-runtime",
+      "capability": "03-building-agentic-systems",
+      "title": "Agent loop 与运行时",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/01 - AI - Agent 运行时：从不可信提案到可问责动作.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/04 - AI - ReAct Pattern (Reasoning + Acting).md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/09 - Framework - Agent loop (Gather → Act → Verify).md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s01-the-agent-loop",
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s02-tool-use"
+        ],
+        "verify": "make check",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.2",
+      "slug": "planning-reflection",
+      "capability": "03-building-agentic-systems",
+      "title": "规划与自我反思",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/05 - AI - Reflexion Pattern (Agent Self-Reflection).md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/06 - AI - Plan-and-Execute Pattern.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s03-todo-write"
+        ],
+        "verify": "make check",
+        "plan": "Reflexion 待补"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.3",
+      "slug": "multi-agent-subagents",
+      "capability": "03-building-agentic-systems",
+      "title": "多 agent 与子代理",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/07 - AI - 多 Agent 设计模式：何时升级、如何分工与怎样收口.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/03-harness-engineering/04 - AI - Harness 模式：子代理与后台任务.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s04-subagent",
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s09-agent-teams",
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s10-team-protocols",
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s11-autonomous-agents"
+        ],
+        "verify": "make check",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.4",
+      "slug": "accountability-receipts",
+      "capability": "03-building-agentic-systems",
+      "title": "可问责：收据、证据指针与可靠性",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/02 - AI - Agent 可问责性：收据、证据与不可复现性.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/03 - AI - Agent 可靠性模式：重试、断路与降级.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/08 - AI - Data Access Policy as Context：Identity、Scope 与 Enforcement.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/10 - CE - Receipt 与审计框架.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/01-agent-runtime/11 - CE - Evidence Pointer 体系.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "动作收据与 evidence pointer 记录器"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.5",
+      "slug": "context-budget-compaction",
+      "capability": "03-building-agentic-systems",
+      "title": "上下文预算、腐烂与压实",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/01 - AI - Context Engineering：定义、边界与原则.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/02 - AI - Attention Budget：上下文预算与分配.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/03 - AI - Context Rot：上下文腐烂.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/04 - AI - Compaction：上下文压实.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/09 - AI - Context Bloat 诊断与稳定化.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/11 - AI - Agent Context Management (Compression Strategies).md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s06-context-compact"
+        ],
+        "verify": "make check",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.6",
+      "slug": "instructions-memory-handoff",
+      "capability": "03-building-agentic-systems",
+      "title": "指令、示例、记忆与交接",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/05 - AI - Prompt 与指令设计：从行为宪法到输出契约.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/06 - AI - Few-shot 与示例设计.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/07 - AI - 记忆与状态：会话内到跨会话.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/08 - AI - Handoff：交接与子代理摘要.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s05-skill-loading"
+        ],
+        "verify": "make check",
+        "plan": "跨会话记忆待补"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.7",
+      "slug": "prompt-injection",
+      "capability": "03-building-agentic-systems",
+      "title": "Prompt injection",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/02-context-engineering/10 - AI - Prompt Injection：提示注入.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "注入用例集，挂在 agent-loop 上跑"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.3.8",
+      "slug": "harness-patterns",
+      "capability": "03-building-agentic-systems",
+      "title": "Harness 模式",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/03-harness-engineering/01 - Eng - Agent Harness Engineering：Constraints、Context、Feedback 与 Entropy.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/03-harness-engineering/02 - AI - Harness 模式：工作流自动化.md",
+          "02_Knowledge/01-ai-applications/03-building-agentic-systems/03-harness-engineering/03 - AI - Harness 模式：文件系统即持久记忆.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s07-task-system",
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s08-background-tasks",
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s12-worktree-task-isolation"
+        ],
+        "verify": "make check",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.4.1",
+      "slug": "eval-anatomy",
+      "capability": "04-evaluation-driven-development",
+      "title": "Eval 解剖：Task、Trial、Grader 与 pass@k",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/01 - AI - Agent Evals 解剖：Task、Trial、Grader 与 pass@k.md",
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/09 - Framework - Agent Evals：Harness 与失败分类.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "agent-evals，被测对象是 agent-loop"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.4.2",
+      "slug": "fixtures-determinism",
+      "capability": "04-evaluation-driven-development",
+      "title": "夹具、确定性与仿真环境",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/02 - AI - Agent 评测中的上下文工程.md",
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/03 - AI - Agent 评测夹具契约：快照、桩件与确定性.md",
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/06 - AI - Agent 仿真评测环境：世界模型、DSL 与确定性.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "agent-evals：快照与桩件"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.4.3",
+      "slug": "failure-taxonomy-minimization",
+      "capability": "04-evaluation-driven-development",
+      "title": "失败分类与样本最小化",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/04 - AI - Agent 失败分类：标签、行动性与一致性.md",
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/05 - AI - 失败样本最小化：缩减、归因与回归用例.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "agent-evals：失败标签与自动缩减"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.4.4",
+      "slug": "metamorphic-property-evals",
+      "capability": "04-evaluation-driven-development",
+      "title": "变形测试与性质评测",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/10 - Framework - Agent 变形测试与性质评测：不变量、变换与判定器.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "agent-evals：变换与判定器"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.4.5",
+      "slug": "rag-data-agent-evals",
+      "capability": "04-evaluation-driven-development",
+      "title": "RAG 与 Data agent 的评测",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/07 - AI - Data Agent Evals：Execution Correctness、Semantic Validity 与 Safety.md",
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/11 - Framework - RAG 最小回归套件：Coverage、Noise 与 Grounding.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "复用 grounding-lab 的回归套件"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.4.6",
+      "slug": "verification-governance",
+      "capability": "04-evaluation-driven-development",
+      "title": "验证治理：Verdict 与 Gate",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/04-evaluation-driven-development/08 - AI - Agent 验证治理矩阵：Verdict 五态与 Gate DAG.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "agent-evals：五态裁决与 Gate DAG"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.5.1",
+      "slug": "inference-kv-cache",
+      "capability": "05-operating-in-production",
+      "title": "推理优化与 KV cache",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/05-operating-in-production/01-inference-and-serving/00 - Eng - GPU 与本地模型推理.md",
+          "02_Knowledge/01-ai-applications/05-operating-in-production/01-inference-and-serving/01 - AI - 推理优化：Roofline、量化与投机解码.md",
+          "02_Knowledge/01-ai-applications/05-operating-in-production/01-inference-and-serving/02 - AI - KV-Cache Deep Dive.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/06-engine"
+        ],
+        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/06-engine && pytest test_impl.py",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.5.2",
+      "slug": "serving-scheduler",
+      "capability": "05-operating-in-production",
+      "title": "Serving 调度与背压",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/05-operating-in-production/01-inference-and-serving/03 - AI - LLM Serving Runtime：Scheduler、KV Cache 与 Backpressure.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "连续批处理调度模拟器"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.5.3",
+      "slug": "gateway-boundary",
+      "capability": "05-operating-in-production",
+      "title": "LLM Gateway：边界与协议归一",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/05-operating-in-production/02-llm-gateway/01 - AI - LLM Gateway：Boundary、Control Plane 与 Data Plane.md",
+          "02_Knowledge/01-ai-applications/05-operating-in-production/02-llm-gateway/02 - AI - LLM Gateway Protocol Normalization：Canonical Model、Adapters 与 Loss.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "llm-gateway（Go，mock provider）"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.5.4",
+      "slug": "gateway-routing-resilience",
+      "capability": "05-operating-in-production",
+      "title": "Gateway 路由与韧性",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/05-operating-in-production/02-llm-gateway/03 - AI - LLM Gateway Routing：Aliases、Capabilities 与 Policy.md",
+          "02_Knowledge/01-ai-applications/05-operating-in-production/02-llm-gateway/04 - AI - LLM Gateway Resilience：Deadline、Retry 与 Fallback.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "llm-gateway"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.5.5",
+      "slug": "gateway-cache-governance",
+      "capability": "05-operating-in-production",
+      "title": "Gateway 缓存、治理与观测",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/05-operating-in-production/02-llm-gateway/05 - AI - LLM Gateway Caching：Prompt Identity、Affinity 与 Isolation.md",
+          "02_Knowledge/01-ai-applications/05-operating-in-production/02-llm-gateway/06 - AI - LLM Gateway Governance and Observability：Identity、Cost 与 Evidence.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "llm-gateway"
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.6.1",
+      "slug": "backprop-autodiff",
+      "capability": "06-machine-learning-foundations",
+      "title": "反向传播与自动微分",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/06-machine-learning-foundations/02 - AI - 反向传播：链式法则与计算图.md",
+          "02_Knowledge/01-ai-applications/06-machine-learning-foundations/03 - AI - Micrograd：标量自动微分引擎.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd"
+        ],
+        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd && pytest",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.6.2",
+      "slug": "pytorch-training-loop",
+      "capability": "06-machine-learning-foundations",
+      "title": "PyTorch 训练循环",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/06-machine-learning-foundations/04 - AI - PyTorch 基础：Tensor、Autograd 与训练循环.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/04-optim",
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/05-train"
+        ],
+        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/05-train && pytest test_impl.py",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.6.3",
+      "slug": "post-training",
+      "capability": "06-machine-learning-foundations",
+      "title": "后训练与偏好学习",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/01-ai-applications/06-machine-learning-foundations/05 - AI - 后训练与偏好学习：RLHF、DPO、GRPO 与 RLVR.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/07-sft",
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/08-rl"
+        ],
+        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/07-sft && pytest test_impl.py",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "1.6.4",
+      "slug": "pretraining-data-eval",
+      "capability": "06-machine-learning-foundations",
+      "title": "预训练数据与模型评测",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/02-data",
+          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/09-eval"
+        ],
+        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/02-data && pytest test_impl.py",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.1.1",
+      "slug": "api-contracts",
+      "capability": "01-building-full-stack-applications",
+      "title": "API 契约与调用语义",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/01-building-full-stack-applications/01 - Eng - API Design：接口契约与调用语义.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "带契约测试与幂等键的小服务"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.1.2",
+      "slug": "end-to-end-slice",
+      "capability": "01-building-full-stack-applications",
+      "title": "从前端到存储的端到端切片",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter/lab"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/system-design test",
+        "plan": "以 rate-limiter lab 的 ui 与 server 为起点"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.2.1",
+      "slug": "data-contracts-quality",
+      "capability": "02-managing-data",
+      "title": "数据契约与质量",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/01 - Framework - Data Fitness for Use Gate.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/02 - Data - 数据契约与质量治理：Schema、SLA 与演进.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/03 - Data - dbt 数据质量测试与 Guardrails.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "data-pipeline-lab：schema 契约与质量测试"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.2.2",
+      "slug": "ingestion-cdc-processing",
+      "capability": "02-managing-data",
+      "title": "摄入、CDC 与批流处理",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/04 - Data - 数据摄入与 CDC：批流入口、变更捕获与幂等.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/06 - Data - Batch Dataflow：Partition、Shuffle、Recomputation 与 Scheduling.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/07 - Data - 实时分析与流处理：窗口、状态与端到端延迟.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "data-pipeline-lab：CDC 与幂等"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.2.3",
+      "slug": "modeling-platforms",
+      "capability": "02-managing-data",
+      "title": "建模与平台选型",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/05 - Data - 数据建模与存储范式：湖仓、数仓与 NoSQL.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/08 - Data - 分析平台选型：Lakehouse、Cloud Warehouse 与开放表格式.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/09 - Data - 数据编排与成本治理：Airflow、Dagster 与平台预算.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/01-data-systems/10 - Data - 特征平台与 ML 数据基础设施.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "data-pipeline-lab：同一数据，两种建模对照"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.2.4",
+      "slug": "storage-engines-redis",
+      "capability": "02-managing-data",
+      "title": "存储引擎与 Redis",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/02-managing-data/02-storage-and-redis/00 - Eng - Storage Engines：LSM vs B-Tree.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/02-storage-and-redis/01 - Eng - Redis：契约、状态与运维.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/02-storage-and-redis/02 - Eng - Redis Hotkey：识别、缓解与预防.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/02-storage-and-redis/03 - Eng - Redis Internals：数据结构与编码.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/02-storage-and-redis/04 - Eng - Redis Terms：数据、集群与运维术语.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/system-design/systems/02-mini-redis"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/system-design test",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.2.5",
+      "slug": "replication-partitioning",
+      "capability": "02-managing-data",
+      "title": "复制与分区",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/02-managing-data/03-distributed-data/00 - Eng - Replication：Leader、Lag 与 Conflict.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/03-distributed-data/01 - Eng - Partitioning：Routing、Skew 与 Rebalancing.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/systems-foundations/l4-distributed-semantics"
+        ],
+        "verify": "cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations && go test -race ./... && go vet ./...",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.2.6",
+      "slug": "consistency-transactions",
+      "capability": "02-managing-data",
+      "title": "一致性与事务",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/02-managing-data/03-distributed-data/02 - Eng - Consistency Models：History 与可见性.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/03-distributed-data/03 - Eng - Transaction Isolation：Anomaly、MVCC 与 Serializability.md",
+          "02_Knowledge/02-se-fundamentals/02-managing-data/03-distributed-data/04 - Eng - Distributed Transactions：Commit、Saga 与 Reconciliation.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/systems-foundations/l4-distributed-semantics"
+        ],
+        "verify": "cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations && go test -race ./... && go vet ./...",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.1",
+      "slug": "boundaries-decisions",
+      "capability": "03-designing-system-architectures",
+      "title": "边界与架构决策",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/00 - Eng - DDD：领域建模与边界.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/01 - Eng - State Modeling：所有权、生命周期与数据语义.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/02 - Eng - ADR：架构决策记录.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/03 - Eng - Information Hiding：变化假设与模块边界.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/04 - Eng - Engineering Trade-offs：质量属性、场景与 ADR.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/05 - Eng - Architecture Design：Drivers、Tactics 与 Views.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/06 - Eng - Codebase Topology：Monorepo vs Multi-repo.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/01-boundaries-and-decisions/07 - Eng - Go vs Rust：工程取舍.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "模块边界检查与 ADR 样例"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.2",
+      "slug": "design-patterns",
+      "capability": "03-designing-system-architectures",
+      "title": "设计模式（创建、结构、行为）",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/00 - MOC - Design Patterns：创建、结构与行为.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/01 - Eng - Creational Patterns：创建策略与对象生命周期.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/02 - Eng - Factory Method：延迟具体创建.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/03 - Eng - Abstract Factory：一致对象族.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/04 - Eng - Builder：分步构建与验证.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/05 - Eng - Prototype：配置克隆与隔离.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/06 - Eng - Singleton：进程内唯一实例.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/07 - Eng - Structural Patterns：边界、组合与共享.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/08 - Eng - Adapter：边界转换与契约隔离.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/09 - Eng - Facade：子系统入口与编排边界.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/10 - Eng - Decorator：可组合横切行为.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/11 - Eng - Proxy：访问控制与延迟加载.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/12 - Eng - Composite：树形结构与一致操作.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/13 - Eng - Bridge：抽象与实现独立演化.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/14 - Eng - Flyweight：共享内在状态.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/15 - Eng - Behavioral Patterns：协作、状态与算法.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/16 - Eng - Strategy：可替换决策算法.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/17 - Eng - State：状态驱动行为与转移.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/18 - Eng - Template Method：固定骨架与可变步骤.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/19 - Eng - Command：请求对象化与可逆执行.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/20 - Eng - Chain of Responsibility：有序处理链.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/21 - Eng - Observer：状态通知与订阅生命周期.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/22 - Eng - Mediator：集中协作协议.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/23 - Eng - Iterator：遍历协议与游标边界.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/24 - Eng - Memento：快照与封装恢复.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/25 - Eng - Visitor：稳定结构上的新操作.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/01-design-patterns/26 - Eng - Interpreter：小型语言与语法树.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/patterns/01-design-patterns"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.3",
+      "slug": "reliability-patterns",
+      "capability": "03-designing-system-architectures",
+      "title": "可靠性模式",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/00 - Eng - Reliability Patterns：时间、故障与过载.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/01 - Eng - Timeout：截止时间与未知结果.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/02 - Eng - Retry：重试预算与退避.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/03 - Eng - Circuit Breaker：失败隔离与恢复探测.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/04 - Eng - Bulkhead：资源分区与故障 containment.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/05 - Eng - Load Shedding：过载拒绝与 Goodput.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/06 - Eng - Hedged Requests：尾延迟与冗余请求.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/02-reliability-patterns/07 - Eng - Adaptive Pacing：服务端令牌、饱和控制与抗振荡.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/patterns/02-reliability-patterns"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify",
+        "plan": "缺 Adaptive Pacing"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.4",
+      "slug": "data-messaging-patterns",
+      "capability": "03-designing-system-architectures",
+      "title": "数据与消息模式",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/00 - Eng - Data & Messaging Patterns：提交、投递与重放.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/01 - Eng - Transactional Outbox：提交与发布.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/02 - Eng - Idempotent Consumer & Inbox：重复投递与效果去重.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/03 - Eng - Saga：跨边界补偿与恢复.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/04 - Eng - Publisher-Subscriber：一对多事件分发.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/05 - Eng - Dead Letter Channel：隔离、诊断与重放.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/06 - Eng - CQRS：写模型与读投影.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/07 - Eng - Event Sourcing：事件事实与状态重建.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/03-data-and-messaging-patterns/08 - Eng - Canonicalization：跨语言确定性与规范字节.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/patterns/03-data-messaging-patterns"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify",
+        "plan": "缺 Canonicalization"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.5",
+      "slug": "concurrency-patterns",
+      "capability": "03-designing-system-architectures",
+      "title": "并发模式",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/04-concurrency-patterns/00 - Eng - Concurrency Patterns：容量、所有权与取消.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/04-concurrency-patterns/01 - Eng - Bounded Producer-Consumer：容量与背压.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/04-concurrency-patterns/02 - Eng - Worker Pool：受控并行与收口.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/04-concurrency-patterns/03 - Eng - Pipeline：分阶段处理与取消.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/04-concurrency-patterns/04 - Eng - Fan-out & Fan-in：并行分发与结果合并.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/04-concurrency-patterns/05 - Eng - Future & Promise：结果句柄与完成语义.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/02-patterns/04-concurrency-patterns/06 - Eng - Structured Concurrency & Cancellation：任务所有权.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/03-distributed-coordination/04 - Eng - Concurrency & Parallelism：执行模型与失败语义.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/patterns/04-concurrency-patterns",
+          "02-se-fundamentals/03-designing-system-architectures/systems-foundations/l0-execution-model"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/patterns verify",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.6",
+      "slug": "distributed-coordination",
+      "capability": "03-designing-system-architectures",
+      "title": "分布式协调：CAP、共识与故障检测",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/03-distributed-coordination/00 - Eng - Distributed Systems：时间、故障与状态.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/03-distributed-coordination/01 - Eng - CAP & PACELC：分区下的约束与权衡.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/03-distributed-coordination/02 - Eng - Consensus：Quorum、Leader 与 State Machine.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/03-distributed-coordination/03 - Eng - Liveness and Failure Detection：Heartbeat、Lease 与 Suspect State.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/systems-foundations/l4-distributed-semantics"
+        ],
+        "verify": "cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations && go test -race ./... && go vet ./...",
+        "plan": "共识待补"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.7",
+      "slug": "network-path-protocols",
+      "capability": "03-designing-system-architectures",
+      "title": "网络路径与协议",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/00 - Eng - End-to-End Network Path：从名称解析到应用响应.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/01 - Eng - IP Connectivity：IPv4、IPv6、Routing、NAT、ICMP 与 MTU.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/02 - Eng - Transport Semantics：TCP、UDP、QUIC、Flow Control 与 Backpressure.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/03 - Eng - DNS & Service Discovery：递归、缓存、分流与失败语义.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/04 - Eng - Traffic Intermediation：Proxy、Gateway、Load Balancer、Tunnel 与 VPN.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/05 - Eng - NAT Traversal and Remote Access：ICE、STUN、TURN 与 Relay.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/06 - Eng - HTTP2 Multiplexing & h2c：Frame、Stream、Connection Reuse 与 Deadline 语义.md",
+          "02_Knowledge/02-se-fundamentals/03-designing-system-architectures/04-network-foundations/07 - Eng - PAC：从代理选择到请求路径、失败边界与验证.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-01",
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-02",
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-04"
+        ],
+        "verify": "make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify",
+        "plan": "h2c 练习已于 2026-09-28 放弃，待决定重做或移出"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.3.8",
+      "slug": "system-design-cases",
+      "capability": "03-designing-system-architectures",
+      "title": "系统设计案例",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter",
+          "02-se-fundamentals/03-designing-system-architectures/system-design/systems/02-mini-redis"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/system-design test",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.4.1",
+      "slug": "identity-tls-federation",
+      "capability": "04-making-systems-secure-and-reliable",
+      "title": "身份、TLS 与联邦登录",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/01 - Eng - Network & Security：Identity、Device、Access 与 Evidence.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/02 - Eng - Network & Security Terms：身份、终端、访问与证据术语.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/03 - Eng - TLS & PKI：身份、信任链、mTLS 与证书生命周期.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/04 - Eng - SSO and Federation：OIDC、SAML、Kerberos 与协议选型.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/05 - Eng - Identity Lifecycle：Directory、Provisioning、Authentication 与 Authorization.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-03",
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-07",
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-08"
+        ],
+        "verify": "make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.4.2",
+      "slug": "continuous-trust-access",
+      "capability": "04-making-systems-secure-and-reliable",
+      "title": "持续信任与企业接入",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/06 - Eng - Continuous Trust：PDP、PEP、Posture、Session、SSF 与 CAEP.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/07 - Eng - Enterprise Access Network：ZTNA、NAC、SSE、SASE、Segmentation 与 Egress.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/08 - Eng - Distributed Enforcement Lifecycle：Endpoint、DLP、Policy Revision 与 Effective State.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/09 - Eng - Endpoint Security Controls：EDR、DLP、Posture 与 Compliance.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-09",
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-10"
+        ],
+        "verify": "make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.4.3",
+      "slug": "detection-abuse-control",
+      "capability": "04-making-systems-secure-and-reliable",
+      "title": "检测、响应与滥用控制",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/10 - Eng - Detection to Recovery：Telemetry、Signal、Decision、Action、Ack 与 Evidence.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/01-network-and-security/11 - CE - 安全与限流.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-05",
+          "02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/labs/LAB-NETSEC-06"
+        ],
+        "verify": "make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.4.4",
+      "slug": "threat-failure-modeling",
+      "capability": "04-making-systems-secure-and-reliable",
+      "title": "威胁建模与失败建模",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/02-testing-and-failure-analysis/00 - Eng - Threat Modeling：Assets、Trust Boundaries 与 Mitigations.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/02-testing-and-failure-analysis/01 - Eng - Failure Modeling：Failure Modes、Propagation 与 Controls.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "为一个现有 lab 写威胁模型，缓解项对应到测试"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.4.5",
+      "slug": "testing-diagnosis",
+      "capability": "04-making-systems-secure-and-reliable",
+      "title": "测试策略与诊断推理",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/02-testing-and-failure-analysis/02 - Eng - Testing Strategy：不变量、测试层与失败模式.md",
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/02-testing-and-failure-analysis/03 - Eng - Diagnostic Reasoning：假设、证据与因果.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "故障注入加\"假设—证据\"记录"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.4.6",
+      "slug": "fail-closed-governance",
+      "capability": "04-making-systems-secure-and-reliable",
+      "title": "Fail-closed 治理",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/04-making-systems-secure-and-reliable/02-testing-and-failure-analysis/04 - Eng - Fail-Closed Governance：收据、低基数与证据指针.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "数据缺失时拒绝的最小策略引擎"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.5.1",
+      "slug": "reversible-delivery",
+      "capability": "05-scaling-and-operating-in-production",
+      "title": "小步可逆交付、CI/CD 与 Feature Flag",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/01-delivery-and-rollout/00 - Eng - Small Reversible Change：切片、验证与回滚.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/01-delivery-and-rollout/01 - Eng - CI-CD：Artifact、Gate 与渐进发布.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/01-delivery-and-rollout/02 - Eng - Feature Flags：控制面、灰度与清理.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "02-se-fundamentals/05-scaling-and-operating-in-production/git-course"
+        ],
+        "verify": "make verify-learning-git-gate1",
+        "plan": "git-course 只覆盖版本控制基础；flag、灰度与回滚模拟待建"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.5.2",
+      "slug": "observability-metrics",
+      "capability": "05-scaling-and-operating-in-production",
+      "title": "可观测性与指标口径",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/02-runtime-evidence/00 - Eng - Runtime Evidence：生产证据与发布决策.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/02-runtime-evidence/01 - Eng - Observability：信号、关联与诊断.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/02-runtime-evidence/02 - Eng - Metrics Semantics：口径、分母与归因.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/02-runtime-evidence/05 - Eng - Network Observability：Packet、Flow、Log、Trace 与 Evidence.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "给 rate-limiter 加 trace 与 metric，并校对口径"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.5.3",
+      "slug": "experiments-slo",
+      "capability": "05-scaling-and-operating-in-production",
+      "title": "在线实验与 SLO 护栏",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/02-runtime-evidence/03 - Eng - Online Experiments：Randomization、Exposure 与 Decision Gate.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/02-runtime-evidence/04 - Eng - SLO Guardrails：预算、燃烧率与停止条件.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "燃烧率告警与实验判定模拟"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.5.4",
+      "slug": "capacity-rate-limiting",
+      "capability": "05-scaling-and-operating-in-production",
+      "title": "容量、限流与编排",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/03-capacity-and-control/00 - Eng - Capacity Planning：Workload、Headroom 与 Load Evidence.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/03-capacity-and-control/01 - Eng - Rate Limiting：策略、状态与失败语义.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/03-capacity-and-control/02 - Eng - Container Orchestration：Artifact、调度与控制循环.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/03-designing-system-architectures/system-design/systems/01-rate-limiter"
+        ],
+        "verify": "make -C 02-se-fundamentals/03-designing-system-architectures/system-design test",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.5.5",
+      "slug": "incident-postmortem",
+      "capability": "05-scaling-and-operating-in-production",
+      "title": "事故响应与复盘",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/04-incident-and-learning/00 - Eng - Incident Response：分级、缓解与恢复.md",
+          "02_Knowledge/02-se-fundamentals/05-scaling-and-operating-in-production/04-incident-and-learning/01 - Eng - Postmortem：因果复盘与防线升级.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "在 rate-limiter 上做一次演练，产出复盘"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.6.1",
+      "slug": "complexity-arrays-hashing",
+      "capability": "06-algorithms-and-data-structures",
+      "title": "复杂度与数组、哈希",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "02-se-fundamentals/06-algorithms-and-data-structures/algo/problems"
+        ],
+        "verify": "make -C 02-se-fundamentals/06-algorithms-and-data-structures/algo test",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.6.2",
+      "slug": "dynamic-array-hashmap",
+      "capability": "06-algorithms-and-data-structures",
+      "title": "动态数组与哈希表的实现",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "02-se-fundamentals/06-algorithms-and-data-structures/algo/structures"
+        ],
+        "verify": "make -C 02-se-fundamentals/06-algorithms-and-data-structures/algo test",
+        "plan": "dynamicarray、hashmap 仍有 TODO"
+      },
+      "eli5": null
+    },
+    {
+      "id": "2.6.3",
+      "slug": "pattern-families",
+      "capability": "06-algorithms-and-data-structures",
+      "title": "后续模式族（双指针、滑窗、树、图、DP）",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "按题单扩充"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.1.1",
+      "slug": "spec-plan-execute-rollback",
+      "capability": "01-directing-the-workflow",
+      "title": "Spec → Plan → 执行 → 回退",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/01-directing-the-workflow/01 - Eng - Coding Agent 工作流：每步投入多少、什么时候退回.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "03-coding-agents/01-directing-the-workflow/README.md"
+        ],
+        "verify": "make check check-trpc test-unit test-harness",
+        "plan": "只有仓库配置与 verifier 清单"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.1.2",
+      "slug": "plan-review-loop",
+      "capability": "01-directing-the-workflow",
+      "title": "计划评审与批注循环",
+      "knowledge": {
+        "notes": [],
+        "state": "missing"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "spec 与 plan 模板，加字段检查脚本"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.2.1",
+      "slug": "autonomy-boundaries-loops",
+      "capability": "02-enabling-agent-autonomy",
+      "title": "自治边界与循环层级",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/02-enabling-agent-autonomy/01 - Eng - Agent 自治边界：三条检查标准（背压）.md",
+          "02_Knowledge/03-coding-agents/02-enabling-agent-autonomy/02 - Eng - Loop Engineering：自主 agent 的四层嵌套循环.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "给 agent-loop 加背压闸门（测试、类型、lint）"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.2.2",
+      "slug": "human-in-the-loop",
+      "capability": "02-enabling-agent-autonomy",
+      "title": "Human-in-the-loop",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/02-enabling-agent-autonomy/03 - AI - Human-in-the-Loop Patterns for Agents.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "agent-loop 的审批门与权限模式"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.2.3",
+      "slug": "parallel-agents-isolation",
+      "capability": "02-enabling-agent-autonomy",
+      "title": "并行 agent、隔离与注意力",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/02-enabling-agent-autonomy/04 - Eng - 并行 Agent 与人的注意力：分解、隔离与权限.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop/s12-worktree-task-isolation"
+        ],
+        "verify": "make check",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.3.1",
+      "slug": "review-ladder",
+      "capability": "03-reviewing-the-work",
+      "title": "审查阶梯：行为验证与功能验证",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/03-reviewing-the-work/01 - Eng - Agent 产出的审查阶梯：行为验证、功能验证与人工介入.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "agent 产出的自动审查脚本（测试、diff 规模、截图比对）"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.3.2",
+      "slug": "verification-gates-ci",
+      "capability": "03-reviewing-the-work",
+      "title": "把验证闸门接进 CI",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/03-reviewing-the-work/01 - Eng - Agent 产出的审查阶梯：行为验证、功能验证与人工介入.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "PR 级 gate（hook 加 CI）"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.4.1",
+      "slug": "capability-surfaces",
+      "capability": "04-customizing-the-agent-and-its-environment",
+      "title": "能力面：MCP、Skills、Hooks、Rules",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/04-customizing-the-agent-and-its-environment/01 - Eng - Agent Capability Surfaces：MCP、Skills、Hooks、Rules 与 Evals.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "rubickx 自用的 MCP server 与 hook"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.4.2",
+      "slug": "skill-systems",
+      "capability": "04-customizing-the-agent-and-its-environment",
+      "title": "技能系统：发现、注入与治理",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/04-customizing-the-agent-and-its-environment/02 - AI - Agent 技能系统：发现、注入与治理.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "skills/eli5-rubickx，本计划自己要用的 skill"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.4.3",
+      "slug": "resident-context",
+      "capability": "04-customizing-the-agent-and-its-environment",
+      "title": "常驻上下文的维护",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/04-customizing-the-agent-and-its-environment/03 - Eng - 常驻上下文的维护：CLAUDE.md、跨 session 状态与 agent 债务.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "仓库根的 CLAUDE.md / AGENTS.md，加过期检查"
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.5.1",
+      "slug": "coding-agent-architecture",
+      "capability": "05-coding-agent-foundations",
+      "title": "Coding agent 的架构",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/05-coding-agent-foundations/01 - AI - Claude Code Agent Architecture (learn-claude-code).md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "present",
+        "paths": [
+          "01-ai-applications/03-building-agentic-systems/agent-loop"
+        ],
+        "verify": "make check",
+        "plan": null
+      },
+      "eli5": null
+    },
+    {
+      "id": "3.5.2",
+      "slug": "failure-modes-signals",
+      "capability": "05-coding-agent-foundations",
+      "title": "失败模式与介入信号",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/03-coding-agents/05-coding-agent-foundations/02 - AI - Coding Agent 失败模式与介入信号.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "四类失败的复现场景与检测信号"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.1.1",
+      "slug": "value-invariants",
+      "capability": "01-driving-the-build-loop",
+      "title": "Value 与 Invariants",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/01-driving-the-build-loop/01 - Eng - Value & Invariants：工程价值与不变量.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "tool",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "停止条件模板与检查器"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.1.2",
+      "slug": "need-to-evidence",
+      "capability": "01-driving-the-build-loop",
+      "title": "需求到证据的追溯",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/01-driving-the-build-loop/02 - Eng - Need-to-Evidence Traceability：需求、验证与确认.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "tool",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "对 rubickx 自身做需求到测试的追溯检查，以 topics.json 为需求表"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.1.3",
+      "slug": "next-step-in-build-loop",
+      "capability": "01-driving-the-build-loop",
+      "title": "构建循环的下一步",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/01-driving-the-build-loop/03 - Eng - 构建循环的下一步：原型、MVP、小批量与实验.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "case-study",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "案例：Skills Map 首页那一轮"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.2.1",
+      "slug": "ai-suitability-gate",
+      "capability": "02-making-product-decisions",
+      "title": "AI 适用性与风险闸门",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/02-making-product-decisions/01 - Framework - AI Suitability and Risk Gate.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "tool",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "闸门问卷 CLI，输出 Proceed / Constrain / Pilot / Stop"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.2.2",
+      "slug": "spec-without-spec",
+      "capability": "02-making-product-decisions",
+      "title": "无 spec 时怎么起 spec",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/02-making-product-decisions/02 - Framework - 无 spec 时怎么起 spec：用户证据、设计与经济性.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "tool",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "最小 spec 字段与证据等级检查器"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.3.1",
+      "slug": "explaining-feasibility",
+      "capability": "03-communicating-and-leading",
+      "title": "向非工程背景的人解释技术可行性",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/03-communicating-and-leading/01 - Eng - 向非工程背景的人解释技术可行性.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "tool",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "可行性三分类清单工具，加一次真实解释的复盘"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.4.1",
+      "slug": "choosing-and-owning",
+      "capability": "04-high-agency-ownership",
+      "title": "选题与端到端负责",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/04-high-agency-ownership/01 - Eng - 无人指派时的选题与端到端负责.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "tool",
+        "state": "missing",
+        "paths": [],
+        "verify": null,
+        "plan": "选题四问评分表；案例：本目标的选题与收尾复盘"
+      },
+      "eli5": null
+    },
+    {
+      "id": "4.5.1",
+      "slug": "material-disposition",
+      "capability": "05-content-curation-decisions",
+      "title": "材料的处置判断",
+      "knowledge": {
+        "notes": [
+          "02_Knowledge/04-shaping-the-build/05-content-curation-decisions/01 - Eng - 材料的处置判断：用途、复用与来源.md"
+        ],
+        "state": "unverified"
+      },
+      "practice": {
+        "kind": "code",
+        "state": "partial",
+        "paths": [
+          "04-shaping-the-build/05-content-curation-decisions/harness"
+        ],
+        "verify": "make test-harness",
+        "plan": "缺\"不值得沉淀\"的反例"
+      },
+      "eli5": null
+    }
+  ]
+}

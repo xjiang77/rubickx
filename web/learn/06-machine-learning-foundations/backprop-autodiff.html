@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="rubickx-topic" content="1.6.1">
 <meta name="rubickx-derived-from" content="02_Knowledge/01-ai-applications/06-machine-learning-foundations/02 - AI - 反向传播：链式法则与计算图.md@2026-09-03">
-<meta name="description" content="用五张图看懂反向传播：前向计算、局部放大倍数、往回相乘、多路相加与一步步训练。">
+<meta name="description" content="先讲清反向传播为什么重要、是什么、从哪里来，再用五张图走一遍：前向、局部倍数、往回相乘、多路相加、一步步训练。">
 <title>反向传播 · ELI5 · Rubickx</title>
 <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
 <style id="eli5-base">
@@ -27,6 +27,29 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .screen svg{display:block;width:100%;height:auto;max-height:340px}
 .screen p{font-size:19px;line-height:1.65;margin:14px 0 0}
 .step{display:inline-block;font-size:12px;font-weight:600;color:var(--c);background:var(--c-tint);border-radius:4px;padding:2px 8px;margin-bottom:10px}
+.part{font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted);margin:34px 0 12px}
+.context{display:grid;gap:14px;margin:0 0 8px}
+.ctx{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 22px}
+.ctx h2{font-size:17px;margin:0 0 6px;color:var(--c)}
+.ctx p{font-size:17px;line-height:1.7;margin:0}
+.ctx figure{margin:14px 0 0}
+.ctx svg{display:block;width:100%;height:auto}
+.intro{font-size:17px;line-height:1.7;margin:0 0 16px}
+.flow{list-style:none;display:flex;gap:26px;padding:0;margin:14px 0 0}
+.flow li{flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;position:relative;background:var(--paper)}
+.flow li b{display:block;font-size:17px}
+.flow li span{display:block;font-size:14px;color:var(--muted)}
+.flow li.on{border-color:var(--c);background:var(--c-tint)}
+.flow li:not(:last-child)::after{content:"→";position:absolute;right:-20px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.flow-note{font-size:14px;color:var(--muted);text-align:center;margin:8px 0 0}
+.timeline{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.timeline li{padding:26px 6px 0;text-align:center;position:relative;min-width:0}
+.timeline li::before{content:"";position:absolute;top:9px;left:0;right:0;border-top:2px solid var(--ink)}
+.timeline li::after{content:"";position:absolute;top:3px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--c)}
+.timeline .y{display:block;font-weight:600;color:var(--c);font-size:17px}
+.timeline .e{display:block;font-size:15px}
+.timeline .w{display:block;font-size:13px;color:var(--muted)}
+@media(max-width:640px){.flow{flex-direction:column;gap:20px}.flow li:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%)}.timeline{grid-template-columns:1fr}.timeline li{text-align:left;padding:0 0 12px 28px}.timeline li::before{top:0;bottom:0;left:6px;right:auto;border-top:0;border-left:2px solid var(--ink)}.timeline li::after{top:4px;left:0;margin-left:0}}
 .limits,.summary,.try,.deeper{border-radius:12px;padding:16px 20px;margin:18px 0 0;line-height:1.65;font-size:16px}
 .limits{border:1px dashed var(--line);color:var(--muted)}
 .summary{background:var(--c-tint);font-size:19px;font-weight:500}
@@ -59,12 +82,19 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <div class="wrap">
   <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#06-machine-learning-foundations">Machine learning foundations</a><span>›</span><span>1.6.1</span></nav>
   <h1>结果错了，每个数该改多少？</h1>
-  <p class="lede">反向传播：从结果往回走，算出每个数对结果的影响。</p>
+  <p class="lede">反向传播：神经网络训练时，用来算出“每个参数该怎么改”的方法。</p>
+  <p class="part">先弄清楚</p>
+  <section class="context">
+    <div class="ctx why"><h2>为什么要懂它</h2><p>神经网络靠调整内部的数（<strong>参数</strong>）来学习：输出不对，就改参数。难点是参数太多，小模型有几百万个，大模型上千亿个，每一个都要知道往哪边改、改多少。反向传播能一次算出所有参数的答案，花的计算量和把输出算一遍是同一个量级。没有它，今天的深度学习模型训练不出来。</p></div>
+    <div class="ctx what"><h2>它是什么</h2><p>反向传播是训练循环里的一步：从“错了多少”出发，沿着计算的路线往回走，算出每个参数对结果的影响，也就是<strong>梯度</strong>。</p><ol class="flow" aria-label="训练循环四步"><li><b>前向</b><span>算出输出</span></li><li><b>算损失</b><span>离目标多远</span></li><li class="on"><b>反向传播</b><span>每个数怎么改</span></li><li><b>更新</b><span>每个数挪一步</span></li></ol><p class="flow-note">四步走完，回到第一步，重复很多次</p></div>
+    <div class="ctx origin"><h2>从哪里来</h2><p>这个方法不新。1970 年，Linnainmaa 提出了“反向求导”的算法；1982 年，Werbos 把它用在神经网络上；1986 年，Rumelhart、Hinton 和 Williams 用实验证明它能让网络的中间层学到有用的东西，方法从此流行。之后很多年，受算力和数据所限，只能训练小网络；2012 年起 GPU 让大网络的训练变得可行。今天，PyTorch 这类框架会自动做反向传播（autograd）。</p><ol class="timeline" aria-label="时间线"><li><span class="y">1970</span><span class="e">反向求导</span><span class="w">Linnainmaa</span></li><li><span class="y">1982</span><span class="e">用到神经网络</span><span class="w">Werbos</span></li><li><span class="y">1986</span><span class="e">实验证明有效</span><span class="w">Rumelhart 等</span></li><li><span class="y">2012</span><span class="e">GPU 训大网络</span><span class="w">AlexNet</span></li><li><span class="y">今天</span><span class="e">框架自动完成</span><span class="w">PyTorch 等</span></li></ol></div>
+  </section>
+  <p class="part">用一个小例子看它怎么工作</p>
+  <p class="intro">下面把一个“模型”缩到只剩两步：输入 x，先加 3，再平方。把最后的输出当作“错了多少”（<strong>损失</strong>），越小越好。真实网络的结构一样，只是步骤和参数多得多。</p>
   <main>
     <section class="screen">
       <span class="step">1</span>
-      <figure><svg viewBox="0 95 800 145" role="img" aria-label="x 等于 2，加 3 得 5，再平方得 25，箭头从左指向右"><g>
-<rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+      <figure><svg viewBox="0 95 800 150" role="img" aria-label="x 等于 2，第 1 步加 3 得到中间结果 5，第 2 步平方得到损失 25"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
 <line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
 <line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
@@ -72,14 +102,12 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
 <line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
-<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text>
-</g><text class="ts" x="710" y="226" text-anchor="middle">结果</text></svg></figure>
-      <p>数字从左往右，一步步算出结果。这叫<strong>前向</strong>。</p>
+<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text><text class="ts" x="85" y="226" text-anchor="middle">输入</text><text class="ts" x="262" y="226" text-anchor="middle">第 1 步</text><text class="ts" x="405" y="226" text-anchor="middle">中间结果</text><text class="ts" x="547" y="226" text-anchor="middle">第 2 步</text><text class="ts" x="710" y="226" text-anchor="middle">损失</text></svg></figure>
+      <p>先从左往右算一遍：2 加 3 得 5，5 的平方得 25。这一步叫<strong>前向</strong>。损失是 25，我们想让它变小。</p>
     </section>
     <section class="screen">
       <span class="step">2</span>
-      <figure><svg viewBox="0 95 800 165" role="img" aria-label="加 3 这一步的放大倍数是 1，平方这一步在 5 处的放大倍数是 10"><g>
-<rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+      <figure><svg viewBox="0 50 800 210" role="img" aria-label="加 3 这一步的放大倍数是 1，平方这一步在 5 处的放大倍数是 10"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
 <line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
 <line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
@@ -87,16 +115,14 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
 <line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
-<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text>
-</g><rect x="222" y="206" width="80" height="40" rx="8" class="hl"/><text class="tc" x="262" y="234" text-anchor="middle">×1</text>
-<rect x="502" y="206" width="90" height="40" rx="8" class="hl"/><text class="tc" x="547" y="234" text-anchor="middle">×10</text>
-</svg></figure>
-      <p>想知道 x 挪一点点，结果会挪多少，先看每一步自己的<strong>放大倍数</strong>：加 3 时，输入挪多少，输出就挪多少（×1）；在 5 这里平方，输出大约挪 10 倍（×10）。</p>
+<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text><text class="ts" x="400" y="78" text-anchor="middle" style="fill:var(--ink)">放大倍数：输入挪一点，输出挪几倍</text>
+<rect x="222" y="206" width="80" height="40" rx="8" class="hl"/><text class="tc" x="262" y="234" text-anchor="middle">×1</text>
+<rect x="502" y="206" width="90" height="40" rx="8" class="hl"/><text class="tc" x="547" y="234" text-anchor="middle">×10</text></svg></figure>
+      <p>想知道 x 挪一点点，损失会挪多少，先看每一步自己的<strong>放大倍数</strong>：加 3 时，输入挪多少，输出就挪多少（×1）；在 5 这里平方，输出大约挪 10 倍（×10）。</p>
     </section>
     <section class="screen">
       <span class="step">3</span>
-      <figure><svg viewBox="0 0 800 300" role="img" aria-label="虚线箭头从结果往回走，沿途把倍数相乘：1 乘 10，再乘 1，x 的影响是 10"><g>
-<rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="虚线箭头从损失往回走，沿途把倍数相乘：1 乘 10，再乘 1，x 的梯度是 10"><rect class="box" x="20" y="110" width="130" height="80" rx="12"/><text class="tb" x="85" y="160" text-anchor="middle">x = 2</text>
 <line class="fwd" x1="150" y1="150" x2="222" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="262" cy="150" r="38"/><text class="t" x="262" y="158" text-anchor="middle">+3</text>
 <line class="fwd" x1="300" y1="150" x2="352" y2="150" marker-end="url(#af)"/>
@@ -104,15 +130,14 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <line class="fwd" x1="455" y1="150" x2="507" y2="150" marker-end="url(#af)"/>
 <circle class="op" cx="547" cy="150" r="38"/><text class="t" x="547" y="158" text-anchor="middle">平方</text>
 <line class="fwd" x1="585" y1="150" x2="637" y2="150" marker-end="url(#af)"/>
-<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text>
-</g><path class="bwd" d="M710,100 C710,40 560,40 547,100" marker-end="url(#ab)"/>
+<rect class="hl" x="640" y="110" width="140" height="80" rx="12"/><text class="tb" x="710" y="160" text-anchor="middle">25</text><path class="bwd" d="M710,100 C710,40 560,40 547,100" marker-end="url(#ab)"/>
 <path class="bwd" d="M547,100 C530,30 290,30 262,100" marker-end="url(#ab)"/>
 <path class="bwd" d="M262,100 C250,50 110,50 85,100" marker-end="url(#ab)"/>
 <text class="tc" x="630" y="36" text-anchor="middle">1 × 10</text>
 <text class="tc" x="405" y="28" text-anchor="middle">10 × 1</text>
 <rect x="30" y="206" width="110" height="46" rx="8" class="hl"/><text class="tc" x="85" y="237" text-anchor="middle">= 10</text>
-<text class="ts" x="85" y="276" text-anchor="middle">x 的影响</text></svg></figure>
-      <p>从结果往回走，把沿途的倍数<strong>乘起来</strong>：x 挪一点点，结果大约挪它的 10 倍。这个 10 就是 x 的<strong>梯度</strong>。</p>
+<text class="ts" x="85" y="280" text-anchor="middle">x 的梯度</text></svg></figure>
+      <p>从损失往回走，把沿途的倍数<strong>乘起来</strong>：1 × 10 × 1 = 10。意思是：x 挪一点点，损失大约挪它的 10 倍。这个 10 就是 x 的<strong>梯度</strong>。</p>
     </section>
     <section class="screen">
       <span class="step">4</span>
@@ -126,20 +151,20 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <rect class="hl" x="630" y="110" width="150" height="80" rx="12"/><text class="tb" x="705" y="160" text-anchor="middle">40</text>
 <text class="tc" x="200" y="52" text-anchor="middle">带回 3</text><text class="tc" x="240" y="290" text-anchor="middle">带回 10</text>
 <rect x="4" y="206" width="178" height="50" rx="8" class="hl"/><text class="tc" x="93" y="241" text-anchor="middle">3 + 10 = 13</text></svg></figure>
-      <p>一个数走了两条路，两条路带回来的影响要<strong>加起来</strong>，不能只留一条。</p>
+      <p>一个数走了两条路，两条路带回来的影响要<strong>加起来</strong>，不能只留一条。真实网络里，一个参数常常同时影响很多条路。</p>
     </section>
     <section class="screen">
       <span class="step">5</span>
-      <figure><svg viewBox="0 0 800 300" role="img" aria-label="曲线随着一步步调整逐渐下降"><line class="fwd" x1="70" y1="40" x2="70" y2="262"/><line class="fwd" x1="70" y1="262" x2="770" y2="262" marker-end="url(#af)"/>
-<text class="ts" x="80" y="36">离目标有多远</text><text class="ts" x="760" y="290" text-anchor="end">一小步、一小步</text>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="损失随着一步步调整逐渐下降"><line class="fwd" x1="70" y1="40" x2="70" y2="262"/><line class="fwd" x1="70" y1="262" x2="770" y2="262" marker-end="url(#af)"/>
+<text class="ts" x="80" y="36">损失</text><text class="ts" x="760" y="290" text-anchor="end">一小步、一小步</text>
 <polyline points="90,70 170,120 250,160 330,190 410,212 490,228 570,238 650,244 730,247" fill="none" stroke="#2a63a5" stroke-width="3"/><circle cx="90" cy="70" r="5" fill="#2a63a5"/><circle cx="170" cy="120" r="5" fill="#2a63a5"/><circle cx="250" cy="160" r="5" fill="#2a63a5"/><circle cx="330" cy="190" r="5" fill="#2a63a5"/><circle cx="410" cy="212" r="5" fill="#2a63a5"/><circle cx="490" cy="228" r="5" fill="#2a63a5"/><circle cx="570" cy="238" r="5" fill="#2a63a5"/><circle cx="650" cy="244" r="5" fill="#2a63a5"/><circle cx="730" cy="247" r="5" fill="#2a63a5"/></svg></figure>
-      <p>训练就是：朝让结果变好的方向，把每个数挪一小步，再算一遍，重复很多次。</p>
+      <p>x 的梯度是正的，说明 x 变大损失也变大，所以把 x 往小挪一点。每个参数都这样挪一小步，再算一遍，重复很多次，损失越来越小。这就是训练。</p>
     </section>
   </main>
   <aside class="limits"><h2>这个比喻在哪里不成立</h2><p>常有人把它比作“出了错，沿原路追责”。但梯度有正有负，说的是<strong>往哪边挪</strong>，不是谁犯了错；而且放大倍数只在当前位置附近准，一步挪太大，就不准了。</p></aside>
-  <p class="summary">反向传播＝从结果往回走，把每一步的放大倍数乘起来；同一个数走了几条路，就把几条路的影响加起来。</p>
+  <p class="summary">反向传播＝从损失往回走，把每一步的放大倍数乘起来；同一个数走了几条路，就把几条路的影响加起来。</p>
   <section class="try"><h2>去试试</h2><p>在 nanochat 的练习里亲手写一个标量自动微分引擎：<code>Value</code>、<code>backward()</code> 和一个小 MLP。verifier 用数值差分逐项核对你的梯度。实现要自己写，这页不给答案。</p><code>python3 01-ai-applications/06-machine-learning-foundations/nanochat/from-scratch/micrograd/test_micrograd.py</code></section>
-  <section class="deeper"><h2>想深入</h2><p>知识正文：《反向传播：链式法则与计算图》《Micrograd：标量自动微分引擎》（私有知识库）。公开来源：<a href="https://github.com/karpathy/micrograd">karpathy/micrograd</a> · <a href="https://www.youtube.com/watch?v=VMj-3S1tku0">视频讲解</a>。</p></section>
+  <section class="deeper"><h2>想深入</h2><p>知识正文：《反向传播：链式法则与计算图》《Micrograd：标量自动微分引擎》（私有知识库）。公开来源：<a href="https://github.com/karpathy/micrograd">karpathy/micrograd</a> · <a href="https://www.youtube.com/watch?v=VMj-3S1tku0">视频讲解</a> · <a href="https://people.idsia.ch/~juergen/who-invented-backpropagation.html">反向传播的历史（Schmidhuber）</a>。</p></section>
   <footer>Rubickx · ELI5 · <a href="../../index.html#06-machine-learning-foundations">回到能力地图</a></footer>
 </div>
 </body>

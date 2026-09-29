@@ -27,6 +27,29 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .screen svg{display:block;width:100%;height:auto;max-height:340px}
 .screen p{font-size:19px;line-height:1.65;margin:14px 0 0}
 .step{display:inline-block;font-size:12px;font-weight:600;color:var(--c);background:var(--c-tint);border-radius:4px;padding:2px 8px;margin-bottom:10px}
+.part{font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted);margin:34px 0 12px}
+.context{display:grid;gap:14px;margin:0 0 8px}
+.ctx{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 22px}
+.ctx h2{font-size:17px;margin:0 0 6px;color:var(--c)}
+.ctx p{font-size:17px;line-height:1.7;margin:0}
+.ctx figure{margin:14px 0 0}
+.ctx svg{display:block;width:100%;height:auto}
+.intro{font-size:17px;line-height:1.7;margin:0 0 16px}
+.flow{list-style:none;display:flex;gap:26px;padding:0;margin:14px 0 0}
+.flow li{flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;position:relative;background:var(--paper)}
+.flow li b{display:block;font-size:17px}
+.flow li span{display:block;font-size:14px;color:var(--muted)}
+.flow li.on{border-color:var(--c);background:var(--c-tint)}
+.flow li:not(:last-child)::after{content:"→";position:absolute;right:-20px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.flow-note{font-size:14px;color:var(--muted);text-align:center;margin:8px 0 0}
+.timeline{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.timeline li{padding:26px 6px 0;text-align:center;position:relative;min-width:0}
+.timeline li::before{content:"";position:absolute;top:9px;left:0;right:0;border-top:2px solid var(--ink)}
+.timeline li::after{content:"";position:absolute;top:3px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--c)}
+.timeline .y{display:block;font-weight:600;color:var(--c);font-size:17px}
+.timeline .e{display:block;font-size:15px}
+.timeline .w{display:block;font-size:13px;color:var(--muted)}
+@media(max-width:640px){.flow{flex-direction:column;gap:20px}.flow li:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%)}.timeline{grid-template-columns:1fr}.timeline li{text-align:left;padding:0 0 12px 28px}.timeline li::before{top:0;bottom:0;left:6px;right:auto;border-top:0;border-left:2px solid var(--ink)}.timeline li::after{top:4px;left:0;margin-left:0}}
 .limits,.summary,.try,.deeper{border-radius:12px;padding:16px 20px;margin:18px 0 0;line-height:1.65;font-size:16px}
 .limits{border:1px dashed var(--line);color:var(--muted)}
 .summary{background:var(--c-tint);font-size:19px;font-weight:500}
@@ -56,6 +79,14 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
   <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#{CAPABILITY_ID}">{能力英文名}</a><span>›</span><span>{TOPIC_ID}</span></nav>
   <h1>{用一个问题当标题}</h1>
   <p class="lede">{一句话：读完这页你会看懂什么}</p>
+  <p class="part">先弄清楚</p>
+  <section class="context">
+    <div class="ctx why"><h2>为什么要懂它</h2><p>{它解决什么问题；不懂它会在哪里卡住}</p></div>
+    <div class="ctx what"><h2>它是什么</h2><p>{一句话定义}</p><ol class="flow" aria-label="{全局流程}"><li class="on"><b>{步骤}</b><span>{说明}</span></li></ol><p class="flow-note">{可选}</p></div>
+    <div class="ctx origin"><h2>从哪里来</h2><p>{历史或来由}</p><ol class="timeline" aria-label="时间线"><li><span class="y">{年份}</span><span class="e">{事件}</span><span class="w">{人物}</span></li></ol></div>
+  </section>
+  <p class="part">用一个小例子看它怎么工作</p>
+  <p class="intro">{例子是什么、和真实情况的关系}</p>
   <main>
     <section class="screen">
       <span class="step">1</span>

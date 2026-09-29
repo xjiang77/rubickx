@@ -15,6 +15,7 @@ TEMPLATE = LEARN / '_template.html'
 BASE = re.compile(r'<style id="eli5-base">.*?</style>', re.S)
 CJK = re.compile(r'[一-鿿]')
 SCREEN_TEXT_BUDGET = 400   # 所有屏的说明文字合计汉字数上限
+CONTEXT_TEXT_BUDGET = 450  # 「先弄清楚」三块文字合计汉字数上限
 MIN_SCREENS, MAX_SCREENS = 3, 6
 
 
@@ -26,6 +27,8 @@ class Page(HTMLParser):
         self.figures = 0
         self.labelled_svgs = 0
         self.screen_text = []
+        self.context_text = []
+        self.ctx_blocks = set()
         self.external = []
         self.scripts_with_src = 0
         self.blocks = set()
@@ -41,6 +44,8 @@ class Page(HTMLParser):
             self.figures += 1
         if tag == 'svg' and self.in_class('screen') and a.get('role') == 'img' and a.get('aria-label'):
             self.labelled_svgs += 1
+        if tag == 'div' and 'ctx' in cls:
+            self.ctx_blocks |= cls & {'why', 'what', 'origin'}
         for c in ('limits', 'summary', 'try', 'deeper'):
             if c in cls:
                 self.blocks.add(c)
@@ -60,6 +65,8 @@ class Page(HTMLParser):
     def handle_data(self, data):
         if self.in_class('screen') and not any(t == 'svg' for t, _ in self.stack) and any(t == 'p' for t, _ in self.stack):
             self.screen_text.append(data)
+        if self.in_class('ctx') and not any(t == 'svg' for t, _ in self.stack) and any(t == 'p' for t, _ in self.stack):
+            self.context_text.append(data)
 
     def in_class(self, name):
         return any(name in cls for _, cls in self.stack)
@@ -94,12 +101,18 @@ def check_page(path, base):
     n = len(CJK.findall(''.join(p.screen_text)))
     if n > SCREEN_TEXT_BUDGET:
         errors.append(f'屏内说明 {n} 字，超过 {SCREEN_TEXT_BUDGET}')
+    lacking = {'why', 'what', 'origin'} - p.ctx_blocks
+    if lacking:
+        errors.append(f'「先弄清楚」缺 {sorted(lacking)}（为什么要懂它 / 它是什么 / 从哪里来）')
+    m = len(CJK.findall(''.join(p.context_text)))
+    if m > CONTEXT_TEXT_BUDGET:
+        errors.append(f'「先弄清楚」{m} 字，超过 {CONTEXT_TEXT_BUDGET}')
     missing = {'limits', 'summary', 'try', 'deeper'} - p.blocks
     if missing:
         errors.append(f'缺固定结尾块 {sorted(missing)}')
     if p.external or p.scripts_with_src:
         errors.append(f'不能加载外部资源 {p.external}')
-    return rel, n, errors
+    return rel, (n, m), errors
 
 
 def main():
@@ -112,7 +125,7 @@ def main():
             failed = True
             print(f'FAIL {rel}: ' + '；'.join(errors))
         else:
-            print(f'ok   {rel}（屏内 {n} 字）')
+            print(f'ok   {rel}（先弄清楚 {n[1]} 字，屏内 {n[0]} 字）')
     if failed:
         sys.exit(1)
     print(f'ELI5 gate passed: {len(pages)} pages.')

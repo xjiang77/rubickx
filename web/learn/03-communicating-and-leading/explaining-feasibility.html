@@ -44,15 +44,18 @@ h1{font-size:clamp(28px,6vw,44px);line-height:1.2;letter-spacing:-.5px;margin:18
 .ctx h3{font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--muted);margin:16px 0 0}
 .ctx .formula{font-size:18px;margin-top:8px}
 .ctx .formula .fl{display:block}
-.ctx .tbl{overflow-x:auto;margin:8px 0 2px}
-.ctx .tbl table{border-collapse:collapse;font-size:14px;line-height:1.4}
-.ctx .tbl th,.ctx .tbl td{border-bottom:1px solid var(--line);padding:5px 10px;text-align:right;white-space:nowrap}
-.ctx .tbl th{color:var(--muted);font-weight:600;font-size:13px}
-.ctx .tbl th small{display:block;font-weight:400}
-.ctx .tbl.text table{width:100%}
-.ctx .tbl.text th,.ctx .tbl.text td{text-align:left;white-space:normal;vertical-align:top}
-.ctx .tbl.text tbody th{white-space:nowrap}
-@media(max-width:640px){.ctx .tbl th,.ctx .tbl td{padding:4px 5px;font-size:13px}.ctx .formula{font-size:16px;white-space:normal;line-height:1.6}.ctx .formula .fl{margin:0 0 8px}.ctx .formula .note{display:block;margin:0}}
+.units{font-size:15px;line-height:1.6;color:var(--ink);background:var(--c-tint);border-left:3px solid var(--c);border-radius:0 8px 8px 0;padding:8px 12px;margin:10px 0 0}
+.units b{color:var(--c)}
+.screen .tbl{margin-top:12px}
+.tbl{overflow-x:auto;margin:8px 0 2px}
+.tbl table{border-collapse:collapse;font-size:14px;line-height:1.4}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:5px 10px;text-align:right;white-space:nowrap}
+.tbl th{color:var(--muted);font-weight:600;font-size:13px}
+.tbl th small{display:block;font-weight:400}
+.tbl.text table{width:100%}
+.tbl.text th,.tbl.text td{text-align:left;white-space:normal;vertical-align:top}
+.tbl.text tbody th{white-space:nowrap}
+@media(max-width:640px){.tbl th,.tbl td{padding:4px 5px;font-size:13px}.ctx .formula{font-size:16px;white-space:normal;line-height:1.6}.ctx .formula .fl{margin:0 0 8px}.ctx .formula .note{display:block;margin:0}}
 .formula{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:21px;line-height:1.9;background:var(--c-tint);border-radius:10px;padding:10px 16px;margin:14px 0 0;overflow-x:auto;white-space:nowrap}
 .formula var{font-style:italic}
 .formula .note{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif;font-size:14px;color:var(--muted);margin-left:10px;white-space:normal}

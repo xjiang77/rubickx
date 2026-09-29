@@ -174,6 +174,12 @@ def check_page(path, base):
     if missing:
         errors.append(f'缺固定结尾块 {sorted(missing)}')
     errors += check_links(path, html)
+    # 缩小单位（以“百／千／万 …”为单位）时，必须在「定义与示例」里先给单位说明
+    if re.search(r'以 ?\d+ ?(平方米|万元|元|米|公里|克|千克|秒|分钟|小时|次) ?为 1 个单位|（[百千]\S{1,4}）', html) and '<p class="units">' not in html:
+        errors.append('缩小单位时须有 <p class="units"> 单位说明，写在任何数值之前')
+    what = re.search(r'<div class="ctx what">(.*?)</div>\s*<div class="ctx origin">', html, re.S)
+    if what and '<p class="units">' in what.group(1) and what.group(1).index('<p class="units">') > what.group(1).index('<ol class="steps">'):
+        errors.append('单位说明须在示例步骤之前')
     if p.external or p.scripts_with_src:
         errors.append(f'不能加载外部资源 {p.external}')
     return rel, (n, m), errors

@@ -36,9 +36,10 @@ rubickx/
 │   ├── 06-algorithms-and-data-structures/
 │   │   └── algo/
 ├── 03-coding-agents/
-│   ├── 01-agent-workflows/
+│   ├── 01-directing-the-workflow/ … 05-coding-agent-foundations/
 ├── 04-shaping-the-build/
-│   ├── 01-content-curation-decisions/
+│   ├── 01-driving-the-build-loop/ … 04-high-agency-ownership/
+│   ├── 05-content-curation-decisions/
 │   │   └── harness/
 ├── deps/  web/  tests/  .github/
 └── Makefile  README.md  根配置
@@ -46,7 +47,7 @@ rubickx/
 
 ## Skills Map
 
-The [capability catalog](web/capabilities.json) and pillar READMEs preserve 11 Andrew Ng subskills plus 3 Rubickx extensions. Nanochat remains a scaffold; placeholders do not imply coverage.
+The [capability catalog](web/capabilities.json) and pillar READMEs preserve all 20 Andrew Ng subskills from the four posts plus 2 Rubickx extensions (Algorithms and data structures, Content curation decisions). Nanochat remains a scaffold; placeholders do not imply coverage.
 
 | Ng skill | Track directory | Content | Verification |
 | --- | --- | --- | --- |
@@ -59,8 +60,8 @@ The [capability catalog](web/capabilities.json) and pillar READMEs preserve 11 A
 | Software engineering fundamentals | [`02-se-fundamentals/03-designing-system-architectures/system-design/`](02-se-fundamentals/03-designing-system-architectures/system-design/) | System-design components and HTTP / Redis lab | `make -C 02-se-fundamentals/03-designing-system-architectures/system-design test` |
 | Software engineering fundamentals | [`02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/`](02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/) | 10 loopback network-security labs | `make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify` |
 | Software engineering fundamentals | [`02-se-fundamentals/03-designing-system-architectures/systems-foundations/`](02-se-fundamentals/03-designing-system-architectures/systems-foundations/) | Go execution-model and distributed-semantics experiments | `cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations && go test -race ./... && go vet ./...` |
-| Using coding agents | [`03-coding-agents/01-agent-workflows/`](03-coding-agents/01-agent-workflows/) | Agent workflow, configuration, and verifier inventory | See the README verifier inventory |
-| Shaping the build | [`04-shaping-the-build/01-content-curation-decisions/harness/`](04-shaping-the-build/01-content-curation-decisions/harness/) | Content-curation decisions: cases and grader | `make test-harness` |
+| Using coding agents | [`03-coding-agents/01-directing-the-workflow/`](03-coding-agents/01-directing-the-workflow/) | Agent workflow, configuration, and verifier inventory | See the README verifier inventory |
+| Shaping the build | [`04-shaping-the-build/05-content-curation-decisions/harness/`](04-shaping-the-build/05-content-curation-decisions/harness/) | Content-curation decisions: cases and grader | `make test-harness` |
 
 ## Getting Started
 
@@ -165,12 +166,12 @@ Quick commands:
 
 ```bash
 make harness-list
-make harness-init RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo
-make harness-init RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/git-only CASE=git-pro-book
-make harness-grade RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo
+make harness-init RUN=04-shaping-the-build/05-content-curation-decisions/harness/runs/demo
+make harness-init RUN=04-shaping-the-build/05-content-curation-decisions/harness/runs/git-only CASE=git-pro-book
+make harness-grade RUN=04-shaping-the-build/05-content-curation-decisions/harness/runs/demo
 ```
 
-See [harness/README.md](04-shaping-the-build/01-content-curation-decisions/harness/README.md) for the contract, scoring model, and case set.
+See [harness/README.md](04-shaping-the-build/05-content-curation-decisions/harness/README.md) for the contract, scoring model, and case set.
 
 ## Project Landing Page
 

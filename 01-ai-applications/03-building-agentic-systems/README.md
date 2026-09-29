@@ -17,7 +17,7 @@
 
 ## 跨能力链接
 
-- [Agent workflows](../../03-coding-agents/01-agent-workflows/README.md)
+- [Agent workflows](../../03-coding-agents/01-directing-the-workflow/README.md)
 - [Evaluation-driven development](../04-evaluation-driven-development/README.md)
 
 ## 验证入口

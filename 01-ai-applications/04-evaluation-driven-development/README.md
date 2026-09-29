@@ -17,9 +17,9 @@
 ## 跨能力链接
 
 - [Machine learning foundations](../06-machine-learning-foundations/README.md)
-- [Content curation decisions](../../04-shaping-the-build/01-content-curation-decisions/README.md)
+- [Content curation decisions](../../04-shaping-the-build/05-content-curation-decisions/README.md)
 - [Nanochat eval](../06-machine-learning-foundations/nanochat/systems/09-eval)
-- [策展 harness（机制参考）](../../04-shaping-the-build/01-content-curation-decisions/harness)
+- [策展 harness（机制参考）](../../04-shaping-the-build/05-content-curation-decisions/harness)
 
 ## 验证入口
 

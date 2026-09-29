@@ -29,7 +29,7 @@
       "zh": "使用 coding agents",
       "color": "purple",
       "icon": "code",
-      "source": "https://x.com/AndrewYNg/status/2088302050706686198"
+      "source": "https://x.com/AndrewYNg/status/2095890279865721217"
     },
     {
       "id": "04-shaping-the-build",
@@ -37,7 +37,7 @@
       "zh": "决定构建什么",
       "color": "orange",
       "icon": "tool",
-      "source": "https://x.com/AndrewYNg/status/2088302050706686198"
+      "source": "https://x.com/AndrewYNg/status/2098459474608672916"
     }
   ],
   "capabilities": [
@@ -93,7 +93,7 @@
         "agent-loop-trpc"
       ],
       "related": [
-        "01-agent-workflows",
+        "01-directing-the-workflow",
         "04-evaluation-driven-development"
       ]
     },
@@ -112,7 +112,7 @@
       "practices": [],
       "related": [
         "06-machine-learning-foundations",
-        "01-content-curation-decisions"
+        "05-content-curation-decisions"
       ]
     },
     {
@@ -267,17 +267,17 @@
       ]
     },
     {
-      "id": "01-agent-workflows",
+      "id": "01-directing-the-workflow",
       "pillar": "03-coding-agents",
-      "path": "03-coding-agents/01-agent-workflows",
-      "title": "Agent workflows",
-      "zh": "Agent 工作流",
-      "origin": "rubickx",
-      "source": null,
+      "path": "03-coding-agents/01-directing-the-workflow",
+      "title": "Directing the workflow",
+      "zh": "把控工作流",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2095890279865721217",
       "status": "partial",
-      "description": "用明确任务、context 与 verifier 指导 coding agent 工作。",
-      "boundary": "Rubickx 扩展；只有本仓库的配置与验证清单，不代表通用工作流课程已完成。",
-      "next": "在真实任务中记录 spec、执行、验证和人工审查的证据。",
+      "description": "把握 spec、计划、执行与回退的节奏，给 agent 明确的任务、上下文与 verifier。",
+      "boundary": "只有本仓库的 agent 配置与 verifier 清单，不代表通用工作流课程已完成。",
+      "next": "为 spec 与 plan 写模板和字段检查，在真实任务中记录执行、验证与人工审查的证据。",
       "practices": [
         "agent-workflows"
       ],
@@ -286,9 +286,146 @@
       ]
     },
     {
-      "id": "01-content-curation-decisions",
+      "id": "02-enabling-agent-autonomy",
+      "pillar": "03-coding-agents",
+      "path": "03-coding-agents/02-enabling-agent-autonomy",
+      "title": "Enabling agent autonomy",
+      "zh": "赋予自治",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2095890279865721217",
+      "status": "planned",
+      "description": "决定给 agent 多少自治：背压检查、循环层级、人在哪里介入，以及并行与隔离。",
+      "boundary": "本能力没有独立主归属实现；agent-loop 的 s09–s12 属于 Building agentic systems，只作关联。",
+      "next": "给 agent-loop 加背压闸门与审批门，并写明各自拦下了什么。",
+      "practices": [],
+      "related": [
+        "03-building-agentic-systems",
+        "01-directing-the-workflow"
+      ]
+    },
+    {
+      "id": "03-reviewing-the-work",
+      "pillar": "03-coding-agents",
+      "path": "03-coding-agents/03-reviewing-the-work",
+      "title": "Reviewing the work",
+      "zh": "审查产出",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2095890279865721217",
+      "status": "planned",
+      "description": "审查 agent 的产出：自动验证做到哪一步，什么时候看代码，什么时候只看行为。",
+      "boundary": "尚无针对 agent 产出的审查脚本或 PR 级验证闸门。",
+      "next": "写 agent 产出的自动审查脚本，并接入 CI。",
+      "practices": [],
+      "related": [
+        "04-evaluation-driven-development"
+      ]
+    },
+    {
+      "id": "04-customizing-the-agent-and-its-environment",
+      "pillar": "03-coding-agents",
+      "path": "03-coding-agents/04-customizing-the-agent-and-its-environment",
+      "title": "Customizing the agent and its environment",
+      "zh": "定制 Agent 与环境",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2095890279865721217",
+      "status": "planned",
+      "description": "用 MCP、skills、hooks 与常驻上下文，定制 agent 和它的工作环境。",
+      "boundary": "仓库根的 skills 目录收了几个参考 skill，但还没有本仓库自用、带测试的定制。",
+      "next": "新增本仓库自用的 skill 与常驻上下文文件，并检查它们是否过期。",
+      "practices": [],
+      "related": [
+        "03-building-agentic-systems"
+      ]
+    },
+    {
+      "id": "05-coding-agent-foundations",
+      "pillar": "03-coding-agents",
+      "path": "03-coding-agents/05-coding-agent-foundations",
+      "title": "Coding agent foundations",
+      "zh": "Coding agent 原理",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2095890279865721217",
+      "status": "planned",
+      "description": "理解 coding agent 的循环、工具、检索与上下文，以及它常见的失败方式。",
+      "boundary": "agent-loop 移植了 learn-claude-code，但主归属在 Building agentic systems；本能力尚无失败模式的复现场景。",
+      "next": "复现几类常见失败，并记录可观察的介入信号。",
+      "practices": [],
+      "related": [
+        "03-building-agentic-systems"
+      ]
+    },
+    {
+      "id": "01-driving-the-build-loop",
       "pillar": "04-shaping-the-build",
-      "path": "04-shaping-the-build/01-content-curation-decisions",
+      "path": "04-shaping-the-build/01-driving-the-build-loop",
+      "title": "Driving the build loop",
+      "zh": "驱动构建循环",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2098459474608672916",
+      "status": "planned",
+      "description": "反复决定下一步：做原型、MVP、小批量发布还是实验，以及什么时候停。",
+      "boundary": "尚无停止条件或需求到证据的追溯工具。",
+      "next": "对本仓库做一次需求到测试的追溯检查。",
+      "practices": [],
+      "related": [
+        "05-scaling-and-operating-in-production"
+      ]
+    },
+    {
+      "id": "02-making-product-decisions",
+      "pillar": "04-shaping-the-build",
+      "path": "04-shaping-the-build/02-making-product-decisions",
+      "title": "Making product decisions",
+      "zh": "做产品决策",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2098459474608672916",
+      "status": "planned",
+      "description": "在 spec 没覆盖或没有 spec 时做产品判断：用户证据、设计与经济性，以及该不该用 AI。",
+      "boundary": "尚无适用性闸门或 spec 检查工具。",
+      "next": "把 AI 适用性闸门做成带测试的问卷工具。",
+      "practices": [],
+      "related": [
+        "01-driving-the-build-loop"
+      ]
+    },
+    {
+      "id": "03-communicating-and-leading",
+      "pillar": "04-shaping-the-build",
+      "path": "04-shaping-the-build/03-communicating-and-leading",
+      "title": "Communicating and leading",
+      "zh": "沟通与领导",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2098459474608672916",
+      "status": "planned",
+      "description": "与非工程角色对齐，解释一件事技术上能不能做、代价多大、能否保证正确。",
+      "boundary": "尚无工具或案例复盘。",
+      "next": "做可行性三分类清单，并复盘一次真实的解释。",
+      "practices": [],
+      "related": [
+        "02-making-product-decisions"
+      ]
+    },
+    {
+      "id": "04-high-agency-ownership",
+      "pillar": "04-shaping-the-build",
+      "path": "04-shaping-the-build/04-high-agency-ownership",
+      "title": "High-agency ownership",
+      "zh": "高主动性所有权",
+      "origin": "andrew",
+      "source": "https://x.com/AndrewYNg/status/2098459474608672916",
+      "status": "planned",
+      "description": "没人指派时选题，并端到端负责到底，按创造的价值衡量结果。",
+      "boundary": "尚无选题工具或案例复盘。",
+      "next": "做选题评分表，并复盘 Skills Map 这条线的选题与收尾。",
+      "practices": [],
+      "related": [
+        "01-driving-the-build-loop"
+      ]
+    },
+    {
+      "id": "05-content-curation-decisions",
+      "pillar": "04-shaping-the-build",
+      "path": "04-shaping-the-build/05-content-curation-decisions",
       "title": "Content curation decisions",
       "zh": "内容策展决策",
       "origin": "rubickx",
@@ -380,7 +517,7 @@
     },
     "agent-workflows": {
       "id": "agent-workflows",
-      "path": "03-coding-agents/01-agent-workflows/README.md",
+      "path": "03-coding-agents/01-directing-the-workflow/README.md",
       "description": "本仓库的工作流、配置与 verifier 清单",
       "verify": "make check check-trpc test-unit test-harness",
       "icon": "terminal",
@@ -388,7 +525,7 @@
     },
     "harness": {
       "id": "harness",
-      "path": "04-shaping-the-build/01-content-curation-decisions/harness",
+      "path": "04-shaping-the-build/05-content-curation-decisions/harness",
       "description": "内容策展决策：cases 与 grader",
       "verify": "make test-harness",
       "icon": "tool",

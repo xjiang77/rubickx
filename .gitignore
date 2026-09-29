@@ -198,7 +198,7 @@ out/
 .task_outputs/
 .tasks/
 .teams/
-04-shaping-the-build/01-content-curation-decisions/harness/runs/
+04-shaping-the-build/05-content-curation-decisions/harness/runs/
 02-se-fundamentals/05-scaling-and-operating-in-production/git-course/node_modules/
 02-se-fundamentals/05-scaling-and-operating-in-production/git-course/dist/
 02-se-fundamentals/05-scaling-and-operating-in-production/git-course/test-results/

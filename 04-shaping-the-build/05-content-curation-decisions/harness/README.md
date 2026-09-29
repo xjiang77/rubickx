@@ -43,25 +43,25 @@ harness/
 列出 case：
 
 ```bash
-PYTHONPATH=04-shaping-the-build python3 -m harness.run list-cases
+PYTHONPATH=04-shaping-the-build/05-content-curation-decisions python3 -m harness.run list-cases
 ```
 
 初始化一个 run：
 
 ```bash
-PYTHONPATH=04-shaping-the-build python3 -m harness.run init-run --run-dir 04-shaping-the-build/01-content-curation-decisions/harness/runs/manual
+PYTHONPATH=04-shaping-the-build/05-content-curation-decisions python3 -m harness.run init-run --run-dir 04-shaping-the-build/05-content-curation-decisions/harness/runs/manual
 ```
 
 只初始化单个 case：
 
 ```bash
-PYTHONPATH=04-shaping-the-build python3 -m harness.run init-run --run-dir 04-shaping-the-build/01-content-curation-decisions/harness/runs/git-only --case git-pro-book
+PYTHONPATH=04-shaping-the-build/05-content-curation-decisions python3 -m harness.run init-run --run-dir 04-shaping-the-build/05-content-curation-decisions/harness/runs/git-only --case git-pro-book
 ```
 
 评分：
 
 ```bash
-PYTHONPATH=04-shaping-the-build python3 -m harness.run grade --run-dir 04-shaping-the-build/01-content-curation-decisions/harness/runs/manual
+PYTHONPATH=04-shaping-the-build/05-content-curation-decisions python3 -m harness.run grade --run-dir 04-shaping-the-build/05-content-curation-decisions/harness/runs/manual
 ```
 
 ## 当前 case

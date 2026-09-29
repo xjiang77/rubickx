@@ -36,9 +36,10 @@ rubickx/
 │   ├── 06-algorithms-and-data-structures/
 │   │   └── algo/
 ├── 03-coding-agents/
-│   ├── 01-agent-workflows/
+│   ├── 01-directing-the-workflow/ … 05-coding-agent-foundations/
 ├── 04-shaping-the-build/
-│   ├── 01-content-curation-decisions/
+│   ├── 01-driving-the-build-loop/ … 04-high-agency-ownership/
+│   ├── 05-content-curation-decisions/
 │   │   └── harness/
 ├── deps/  web/  tests/  .github/
 └── Makefile  README.md  根配置
@@ -46,7 +47,7 @@ rubickx/
 
 ## Skills Map
 
-能力目录与状态见 [capabilities.json](web/capabilities.json) 和各 pillar README；11 项 Andrew 原能力全部保留，另有 3 项 Rubickx 扩展。Nanochat 为练习骨架，placeholder 不代表能力已覆盖。
+能力目录与状态见 [capabilities.json](web/capabilities.json) 和各 pillar README；Andrew Ng 四篇长文的 20 项原能力全部保留，另有 2 项 Rubickx 扩展（Algorithms and data structures、Content curation decisions）。Nanochat 为练习骨架，placeholder 不代表能力已覆盖。
 
 | Ng 技能 | Track 目录 | 内容 | 验证（仓库根目录执行） |
 | --- | --- | --- | --- |
@@ -59,8 +60,8 @@ rubickx/
 | Software engineering fundamentals | [`02-se-fundamentals/03-designing-system-architectures/system-design/`](02-se-fundamentals/03-designing-system-architectures/system-design/) | 系统设计组件与 HTTP / Redis lab | `make -C 02-se-fundamentals/03-designing-system-architectures/system-design test` |
 | Software engineering fundamentals | [`02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/`](02-se-fundamentals/04-making-systems-secure-and-reliable/network-security/) | 10 个 loopback 网络安全 labs | `make -C 02-se-fundamentals/04-making-systems-secure-and-reliable/network-security verify` |
 | Software engineering fundamentals | [`02-se-fundamentals/03-designing-system-architectures/systems-foundations/`](02-se-fundamentals/03-designing-system-architectures/systems-foundations/) | Go 执行模型与分布式语义实验 | `cd 02-se-fundamentals/03-designing-system-architectures/systems-foundations && go test -race ./... && go vet ./...` |
-| Using coding agents | [`03-coding-agents/01-agent-workflows/`](03-coding-agents/01-agent-workflows/) | 本仓库的 agent 工作流、配置与 verifier 清单 | 见 README 的 verifier 清单 |
-| Shaping the build | [`04-shaping-the-build/01-content-curation-decisions/harness/`](04-shaping-the-build/01-content-curation-decisions/harness/) | 内容策展决策：cases + grader | `make test-harness` |
+| Using coding agents | [`03-coding-agents/01-directing-the-workflow/`](03-coding-agents/01-directing-the-workflow/) | 本仓库的 agent 工作流、配置与 verifier 清单 | 见 README 的 verifier 清单 |
+| Shaping the build | [`04-shaping-the-build/05-content-curation-decisions/harness/`](04-shaping-the-build/05-content-curation-decisions/harness/) | 内容策展决策：cases + grader | `make test-harness` |
 
 ## 快速开始
 
@@ -170,16 +171,16 @@ npm run dev
 make harness-list
 
 # 初始化一个 run 目录
-make harness-init RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo
+make harness-init RUN=04-shaping-the-build/05-content-curation-decisions/harness/runs/demo
 
 # 只跑一个 case
-make harness-init RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/git-only CASE=git-pro-book
+make harness-init RUN=04-shaping-the-build/05-content-curation-decisions/harness/runs/git-only CASE=git-pro-book
 
 # 填完输出后评分
-make harness-grade RUN=04-shaping-the-build/01-content-curation-decisions/harness/runs/demo
+make harness-grade RUN=04-shaping-the-build/05-content-curation-decisions/harness/runs/demo
 ```
 
-当前 harness 使用 deterministic fixtures 和 heuristic grader，细节见 [harness/README.md](04-shaping-the-build/01-content-curation-decisions/harness/README.md)。
+当前 harness 使用 deterministic fixtures 和 heuristic grader，细节见 [harness/README.md](04-shaping-the-build/05-content-curation-decisions/harness/README.md)。
 
 ## 项目静态网页
 

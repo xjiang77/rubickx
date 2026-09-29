@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(
     0,
-    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "04-shaping-the-build/01-content-curation-decisions"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "04-shaping-the-build/05-content-curation-decisions"),
 )
 
 from harness.run import grade_run, init_run

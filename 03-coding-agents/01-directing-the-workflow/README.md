@@ -1,14 +1,14 @@
-# Agent workflows
+# Directing the workflow
 
-Agent 工作流。用明确任务、context 与 verifier 指导 coding agent 工作。
+把控工作流。把握 spec、计划、执行与回退的节奏，给 agent 明确的任务、上下文与 verifier。
 
 ## 来源
 
-Rubickx 扩展：本地分类，不归因于 Andrew 已发表的细分能力。
+[Andrew Ng 原文](https://x.com/AndrewYNg/status/2095890279865721217)。本目录原名 `01-agent-workflows`（Rubickx 扩展），2026-09-29 并入 Ng 原框架的这项能力。
 
 ## 当前状态
 
-**已有局部实践**。Rubickx 扩展；只有本仓库的配置与验证清单，不代表通用工作流课程已完成。
+**已有局部实践**。只有本仓库的 agent 配置与 verifier 清单，不代表通用工作流课程已完成。
 
 ## 主归属实践
 
@@ -26,7 +26,7 @@ Rubickx 扩展：本地分类，不归因于 Andrew 已发表的细分能力。
 
 ## 下一步
 
-在真实任务中记录 spec、执行、验证和人工审查的证据。
+为 spec 与 plan 写模板和字段检查，在真实任务中记录执行、验证与人工审查的证据。
 
 ---
 
@@ -67,7 +67,7 @@ agent 改完代码后能自己跑、自己判断对错的命令。给 agent 的�
 - `01-ai-applications/06-machine-learning-foundations/nanochat/systems/*/spec.md`：每个系统的 IO 契约与验收标准，实现前先写。
 - `02-se-fundamentals/03-designing-system-architectures/patterns/*/NOTES.md` 与 `catalog.json`：每个 pattern 的判断与 contract，四语言实现必须满足同一 contract。
 - `02-se-fundamentals/03-designing-system-architectures/system-design/systems/*/DESIGN.md`：系统设计的取舍记录。
-- `04-shaping-the-build/01-content-curation-decisions/harness/cases/*.json`：给 agent 的 deterministic task spec。
+- `04-shaping-the-build/05-content-curation-decisions/harness/cases/*.json`：给 agent 的 deterministic task spec。
 
 ## 工作约定（来自 agent-orchestrator.yaml）
 

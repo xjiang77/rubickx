@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """命中目标：给定基向量 b1、b2 与目标 t，输入系数 (a, b)，看 a·b1 + b·b2 落在哪里。
 
-运行：python3 02_hit_the_target.py            # 默认关卡
-      python3 02_hit_the_target.py --level 2  # 换基
+运行：python3 hit_the_target.py            # 默认关卡
+      python3 hit_the_target.py --level 2  # 换基
 每一关的答案就是 t 在基 {b1, b2} 下的坐标。命中即通关；输入 q 退出。
 """
 import sys

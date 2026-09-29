@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ASCII 画板：向量、首尾相接的加法、数乘，以及共线向量的张成。
 
-运行：python3 01_draw_vectors.py
+运行：python3 draw_vectors.py
 每一幕对应知识正文 02 的一个示例；看完再改下面的向量试试。
 """
 from canvas import Canvas, show

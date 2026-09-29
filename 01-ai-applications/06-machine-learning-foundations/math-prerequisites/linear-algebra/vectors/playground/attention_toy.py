@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """attention 玩具：三个 value 向量，手调 score，看 softmax 权重与输出点怎样在三角形内移动。
 
-运行：python3 04_attention_toy.py
+运行：python3 attention_toy.py
 输出 = Σ softmax(score)_i · v_i。softmax 权重非负且和为 1，所以输出永远落在三个 value 向量
 围成的三角形内（含边界）；score 拉大只会把输出推向某个顶点，推不出三角形。
 """
@@ -17,6 +17,12 @@ def softmax(scores):
     e = [math.exp(s - m) for s in scores]
     z = sum(e)
     return [x / z for x in e]
+
+
+def attention_output(scores):
+    """给定三个 score，返回 (softmax 权重, 输出向量)。输出 = Σ 权重_i · value_i。"""
+    weights = softmax(scores)
+    return weights, output(weights)
 
 
 def output(weights):

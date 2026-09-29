@@ -8,7 +8,7 @@
 
 1. **学**：该步的说明与公式（Markdown 单元格）。
 2. **玩**：运行演示——字符画板、命中目标、像素字母混合、attention 玩具（代码单元格，只看不写；同样的程序也可在 `playground/` 下直接运行）。
-3. **做**：在 `vectors.py` 中手写该步要求的函数，回到 notebook 重新执行「做」单元格确认状态。
+3. **做**：在 `vectors.py` 中手写该步要求的函数，回到 notebook 重新执行「做」单元格确认状态写法与骨架一致：类型标注、Google 风格 docstring、`Examples` 里的 doctest（`python3 -m doctest vectors.py -v` 可单独运行）。
 4. **测**：该步的验证单元格；骨架状态下失败是预期结果。
 
 全部通过后运行总验证器 `make test-linalg`，再做题库中的选择题。交付前用 Restart Kernel and Run All Cells 确认从头能跑通；提交前清除输出。
@@ -35,7 +35,7 @@
 make test-linalg   # 或 python3 01-ai-applications/06-machine-learning-foundations/math-prerequisites/linear-algebra/vectors/test_vectors.py
 ```
 
-验证器用正文 02 的数值（[7, 4] = 2·[3, 1] + 1·[1, 2]，[8, 1] = 2·[1, 2] + 3·[2, −1]，[4, 2] 在基 {[1, 1], [1, −1]} 下坐标 (3, 1)，[1, 2, 3] 在 span{[1, 0, 1], [0, 1, 1]} 内而 [1, 2, 4] 不在，[1, 1, 2] = [1, 0, 1] + [0, 1, 1]，attention 实例 [0.9, 0.4]）逐项检查；安装了 numpy 时另做 200 组随机对拍。骨架状态下验证器预期失败，不得标记 skip。
+验证器用正文 02 的数值（[7, 4] = 2·[3, 1] + 1·[1, 2]，[8, 1] = 2·[1, 2] + 3·[2, −1]，[4, 2] 在基 {[1, 1], [1, −1]} 下坐标 (3, 1)，[1, 2, 3] 在 span{[1, 0, 1], [0, 1, 1]} 内而 [1, 2, 4] 不在，[1, 1, 2] = [1, 0, 1] + [0, 1, 1]，attention 实例 [0.9, 0.4]）逐项检查；安装了 numpy 时另做 200 组随机对拍；最后运行 `vectors.py` 与 playground 各模块的 doctest。骨架状态下验证器预期失败，不得标记 skip。
 
 ## 与学习的连接
 

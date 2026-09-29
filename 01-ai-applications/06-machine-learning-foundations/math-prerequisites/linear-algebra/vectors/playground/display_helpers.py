@@ -1,6 +1,4 @@
-"""notebook 里的展示助手：颜色色块、实现状态检查。只用标准库与 IPython.display。"""
-
-from IPython.display import HTML
+"""notebook 里的展示助手：颜色色块、实现状态检查。只用标准库；IPython 只在显示时导入。"""
 
 
 def color_swatches(*items):
@@ -20,6 +18,8 @@ def color_swatches(*items):
             f'<div style="width:110px;height:60px;border-radius:8px;background:rgb({r},{g},{b})"></div>'
             f'{label}<br><small>({r}, {g}, {b})</small></div>'
         )
+    from IPython.display import HTML  # 延迟导入：没有 IPython 的环境也能导入本模块
+
     return HTML("".join(parts))
 
 

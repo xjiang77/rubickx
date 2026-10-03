@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="rubickx-topic" content="1.6.5">
 <meta name="rubickx-derived-from" content="02_Knowledge/01-ai-applications/06-machine-learning-foundations/01-linear-algebra/02 - AI - 向量与空间：三种视角、线性组合与基.md@2026-09-29">
-<meta name="description" content="向量的三种视角、加法与数乘，以及由这两种运算生成的 linear combination、span 与 basis；所有数值均可逐步核对。">
+<meta name="description" content="向量的三种视角、加法与数乘，由这两种运算生成的 linear combination、span 与 basis，以及判断共线的 2×2 determinant；所有数值均可逐步核对。">
 <title>Vector、linear combination 与 basis · ELI5 · Rubickx</title>
 <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
 <style id="eli5-base">
@@ -119,16 +119,16 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
 <div class="wrap">
   <nav class="crumb" aria-label="位置"><a href="../../index.html">AI Engineering Skills Map</a><span>›</span><a href="../../index.html#06-machine-learning-foundations">Machine learning foundations</a><span>›</span><span>1.6.5</span></nav>
   <h1>Vector（向量）、linear combination（线性组合）与 basis（基）：线性代数的起点</h1>
-  <p class="lede">Vector 的三种视角、两种运算，以及由运算生成的 span（张成）与 basis；对应《Essence of Linear Algebra》第 1–2 集，所有数值均可逐步核对。</p>
-  <p class="flag">对应的知识正文由 agent 起草，尚待人工核验。</p>
+  <p class="lede">Vector 的三种视角、两种运算，以及由运算生成的 span（张成）与 basis；对应《Essence of Linear Algebra》第 1–2 集，第 5 屏补充第 6 集的 2×2 determinant；所有数值均可逐步核对。</p>
+  <p class="flag">对应的知识正文由 agent 起草，尚待人工核验。第 5 屏的 determinant 取自公开来源（3Blue1Brown 第 6 集），知识正文 04 尚未建立。</p>
   <p class="part">概述</p>
   <section class="context">
-    <div class="ctx why"><h2>背景</h2><p>语言模型内部的数据与 parameter（参数）都以 vector 与 matrix（矩阵）存储：token 的 embedding 是 vector，attention 的输出是 value vector 的 linear combination，LoRA 的权重更新落在少数几个 vector 的 span 内。Vector 的两种运算以及由此定义的 span 与 basis，是后续 matrix、determinant（行列式）与 eigenvector（特征向量）的前提。本页只介绍第 1–2 集的内容。</p><ol class="flow" aria-label="从 vector 到 matrix"><li><b>Vector</b><span>加法与数乘</span></li><li><b>Linear combination</b><span>缩放后相加</span></li><li><b>Span 与 basis</b><span>能到达的范围与坐标</span></li><li class="on"><b>Matrix</b><span>下一页：linear transformation</span></li></ol></div>
+    <div class="ctx why"><h2>背景</h2><p>语言模型内部的数据与 parameter（参数）都以 vector 与 matrix（矩阵）存储：token 的 embedding 是 vector，attention 的输出是 value vector 的 linear combination，LoRA 的权重更新落在少数几个 vector 的 span 内。Vector 的两种运算以及由此定义的 span 与 basis，是后续 matrix、determinant（行列式）与 eigenvector（特征向量）的前提。本页介绍第 1–2 集的内容，第 5 屏先给出判断共线的 2×2 determinant。</p><ol class="flow" aria-label="从 vector 到 matrix"><li><b>Vector</b><span>加法与数乘</span></li><li><b>Linear combination</b><span>缩放后相加</span></li><li><b>Span 与 basis</b><span>能到达的范围与坐标</span></li><li class="on"><b>Matrix</b><span>下一页：linear transformation</span></li></ol></div>
     <div class="ctx what"><h2>定义与示例</h2><p><strong>Vector</strong> 是一类数学对象，其上定义了两种运算——两个 vector 相加，以及 vector 乘以一个数（scalar，标量）——且运算结果仍是 vector。几何上它是从原点出发的箭头，由长度与方向决定；数值上它是有序的数字列表，顺序与长度均有意义。示例采用屏幕颜色：一种颜色由红、绿、蓝三个分量表示，是一个三维 vector。</p><h3>示例</h3><ol class="steps"><li><b>表示</b>：把颜色记为三个 0 到 255 的数。红色为 (255, 0, 0)，黄色为 (255, 255, 0)。</li><li><b>数乘</b>：红色乘以 0.5，每个分量减半，得到 (127.5, 0, 0)，即亮度减半的红。</li><li><b>相加</b>：0.5 倍红色与 0.5 倍黄色逐分量相加，得到 (255, 127.5, 0)，屏幕上显示为橙色。缩放后相加的结果称为 linear combination。</li><li><b>Span</b>：只用红与绿两种颜色，无论系数怎样取，蓝分量始终为 0，能配出的颜色只占全部颜色中的一个平面，这个平面就是红与绿的 span。</li><li><b>Basis</b>：红、绿、蓝任一种都配不出另外两种，称为 linearly independent（线性无关）；三者又能配出全部颜色，因此构成颜色空间的一个 basis，(R, G, B) 即颜色在这组 basis 下的坐标。</li></ol><h3>公式</h3><div class="formula"><span class="fl"><var>v</var> + <var>w</var> = [<var>v</var>₁ + <var>w</var>₁, <var>v</var>₂ + <var>w</var>₂, <var>v</var>₃ + <var>w</var>₃]，&nbsp; <var>c</var>·<var>v</var> = [<var>c</var><var>v</var>₁, <var>c</var><var>v</var>₂, <var>c</var><var>v</var>₃]<span class="note">加法与数乘均逐分量进行</span></span><span class="fl"><var>a</var>·<var>v</var> + <var>b</var>·<var>w</var><span class="note">linear combination</span></span><span class="fl">0.5·(255, 0, 0) + 0.5·(255, 255, 0) = (255, 127.5, 0)</span></div><figure><svg viewBox="0 0 800 150" role="img" aria-label="三个色块：0.5 倍红色加 0.5 倍黄色等于橙色，下方标注各自的 RGB 分量"><rect x="40" y="20" width="150" height="70" rx="10" fill="rgb(255,0,0)"/><text class="t" x="115" y="120" text-anchor="middle" style="font-size:20px">(255, 0, 0)</text><text class="tb" x="230" y="65" text-anchor="middle" style="font-size:26px">× 0.5 +</text><rect x="270" y="20" width="150" height="70" rx="10" fill="rgb(255,255,0)"/><text class="t" x="345" y="120" text-anchor="middle" style="font-size:20px">(255, 255, 0)</text><text class="tb" x="470" y="65" text-anchor="middle" style="font-size:26px">× 0.5 =</text><rect x="520" y="20" width="150" height="70" rx="10" fill="rgb(255,128,0)"/><text class="t" x="595" y="120" text-anchor="middle" style="font-size:20px">(255, 127.5, 0)</text><text class="ts" x="595" y="142" text-anchor="middle">橙色</text></svg></figure></div>
     <div class="ctx origin"><h2>起源与发展</h2><p>Vector 一词来自 Hamilton 1843 年的 quaternion（四元数）。Grassmann 1844 年的《扩张论》已定义 linear independence、span 与维数，但长期无人理解；Peano 1888 年给出 vector space（向量空间）的公理化定义，1920 年前后由 Banach、Noether 等人各自重新发现；Halmos 1942 年的教材确立了以 vector space 为起点的现代讲法。</p><ol class="timeline" aria-label="时间线"><li><span class="y">1843</span><span class="e">Quaternion 与 vector 一词</span><span class="w">Hamilton</span></li><li><span class="y">1844</span><span class="e">Linear independence、span、维数</span><span class="w">Grassmann</span></li><li><span class="y">1888</span><span class="e">Vector space 公理</span><span class="w">Peano</span></li><li><span class="y">约 1920</span><span class="e">概念被重新发现</span><span class="w">Banach、Noether 等</span></li><li><span class="y">1942</span><span class="e">《有限维向量空间》</span><span class="w">Halmos</span></li></ol></div>
   </section>
   <p class="part">逐步推演</p>
-  <div class="intro"><p>推演在平面上进行，使用两个 vector v = [3, 1] 与 w = [1, 2]（知识正文 02 的例子），第 4 屏扩展到三维。屏幕上的一格为 1 个单位。</p><p>本例说明以下要点：</p><ol><li>坐标是对 basis vector 的缩放：(3, −2) 表示 3 倍的 î 加 −2 倍的 ĵ。</li><li>Linear combination 的几何意义是首尾相接：缩放后的箭头依次接上，终点即结果。</li><li>Span 由 vector 是否共线决定；basis 要求 linearly independent 且 span 整个空间。</li></ol></div>
+  <div class="intro"><p>推演在平面上进行，使用两个 vector v = [3, 1] 与 w = [1, 2]（知识正文 02 的例子），第 4 屏扩展到三维，第 5 屏回到平面。屏幕上的一格为 1 个单位。</p><p>本例说明以下要点：</p><ol><li>坐标是对 basis vector 的缩放：(3, −2) 表示 3 倍的 î 加 −2 倍的 ĵ。</li><li>Linear combination 的几何意义是首尾相接：缩放后的箭头依次接上，终点即结果。</li><li>Span 由 vector 是否共线决定；basis 要求 linearly independent 且 span 整个空间。</li><li>消元得到的系数 d 是 v 与 w 围成的平行四边形的有向面积，d = 0 即共线。</li></ol></div>
   <main>
     <section class="screen" id="coordinates">
       <span class="step">1 · 坐标即缩放 basis vector</span>
@@ -182,16 +182,41 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
       <div class="formula">(1, 1, 2) = 1·(1, 0, 1) + 1·(0, 1, 1)，&nbsp; 故 <var>v</var>₁、<var>v</var>₂、<var>v</var>₃ linearly dependent，span 是一张平面</div>
       <p>去掉某个 vector 而 span 不变，这组 vector 即 linearly dependent；每个 vector 都为 span 增加一个维度，则 linearly independent。既 linearly independent 又 span 整个空间的一组 vector 称为 basis，此时每个 vector 的坐标唯一。</p>
     </section>
+    <section class="screen" id="determinant">
+      <span class="step">5 · 消元与 determinant</span>
+      <figure><svg viewBox="0 0 800 300" role="img" aria-label="左侧：方程组 3a + b = 7 与 a + 2b = 4 消元，a 的系数为 3·2 − 1·1 = 5；右侧：v = (3, 1) 与 w = (1, 2) 围成的平行四边形放在 4 × 3 的外框中，外框面积 12 减去六块空白共 7，得到面积 5"><text class="ts" x="30" y="44">消元：第一式 × 2 − 第二式 × 1</text>
+<text class="t" x="30" y="90" style="font-size:26px">3a + b = 7</text>
+<text class="t" x="30" y="130" style="font-size:26px">a + 2b = 4</text>
+<line x1="30" y1="148" x2="380" y2="148" stroke="#d9dedb" stroke-width="2"/>
+<text class="tc" x="30" y="190" style="font-size:24px">(3·2 − 1·1)·a = 7·2 − 4·1</text>
+<text class="tb" x="30" y="236" style="font-size:30px">5a = 10，a = 2</text>
+<text class="ts" x="30" y="280">a 的系数 5 即 d</text>
+<rect x="480" y="80" width="240" height="180" fill="none" stroke="#1f2523" stroke-width="1.5" stroke-dasharray="6 4"/>
+<polygon class="op" points="480,260 660,260 660,200"/><polygon class="op" points="660,260 720,260 720,200 660,200"/><polygon class="op" points="660,200 720,200 720,80"/>
+<polygon class="op" points="540,140 540,80 720,80"/><polygon class="op" points="480,140 540,140 540,80 480,80"/><polygon class="op" points="480,260 540,140 480,140"/>
+<polygon class="hl" points="480,260 660,200 720,80 540,140"/>
+<line x1="480" y1="260" x2="660" y2="200" stroke="#1f2523" stroke-width="3" marker-end="url(#af)"/>
+<line x1="480" y1="260" x2="540" y2="140" stroke="#2a63a5" stroke-width="3" marker-end="url(#ab)"/>
+<text class="ts" x="600" y="252" text-anchor="middle">1.5</text><text class="ts" x="690" y="238" text-anchor="middle">1</text><text class="ts" x="702" y="168" text-anchor="middle">1</text>
+<text class="ts" x="600" y="104" text-anchor="middle">1.5</text><text class="ts" x="510" y="118" text-anchor="middle">1</text><text class="ts" x="494" y="186" text-anchor="middle">1</text>
+<text class="tc" x="600" y="180" text-anchor="middle">d = 5</text>
+<text class="t" x="640" y="198" style="font-size:22px">v</text><text class="tc" x="534" y="198" style="font-size:22px">w</text>
+<text class="ts" x="600" y="66" text-anchor="middle">外框 4 × 3 = 12</text><text class="ts" x="728" y="84">(4, 3)</text>
+<text class="tc" x="600" y="292" text-anchor="middle" style="font-size:22px">12 − 7 = 5</text></svg></figure>
+      <div class="formula"><var>d</var> = <var>v</var><sub>x</sub><var>w</var><sub>y</sub> − <var>v</var><sub>y</sub><var>w</var><sub>x</sub> = 3·2 − 1·1 = 5</div>
+      <div class="formula">v 换成 t：7·2 − 4·1 = 10 = 2·<var>d</var>，故 <var>a</var> = 2；&nbsp; u = (6, 2)：3·2 − 1·6 = 0</div>
+      <p>消元时第一式乘 w<sub>y</sub>、第二式乘 w<sub>x</sub> 后相减，b 被消去，a 的系数为 d，本例 5a = 10。几何上 d 是 v 与 w 围成的平行四边形的有向面积：外框 12 减去六块空白 7。把 v 换成 t 计算同一式，w 与自身围成的面积为 0，结果为 a·d。d = 0 时 v 与 w 共线，方程组没有唯一解。</p>
+    </section>
   </main>
-  <aside class="limits"><h2>适用条件与局限</h2><p>本页只处理二维、三维与实数 scalar；n 维与其他数域的推广见 abstract vector space（抽象向量空间）。Basis 不唯一，î 与 ĵ 只是最常用的一组；同一个 vector 在不同 basis 下坐标不同。判断多个 vector 是否 linearly independent，一般需要计算 rank（秩）或 determinant，"随机三个 vector 几乎一定 linearly independent"是概率性的说法。</p></aside>
+  <aside class="limits"><h2>适用条件与局限</h2><p>本页只处理二维、三维与实数 scalar；n 维与其他数域的推广见 abstract vector space（抽象向量空间）。Basis 不唯一，î 与 ĵ 只是最常用的一组；同一个 vector 在不同 basis 下坐标不同。判断多个 vector 是否 linearly independent，一般需要计算 rank（秩）或 determinant，"随机三个 vector 几乎一定 linearly independent"是概率性的说法。第 5 屏只讨论 2×2 determinant；三维对应 3×3 determinant（平行六面体的有向体积），系统讲解待知识正文 04。</p></aside>
   <section class="uses"><h2>工程应用</h2><ul><li><b>Embedding 是 vector</b>语言模型把每个 token 映射为一个 d 维 vector，模型内部各层传递的也是同样维数的 vector；分量的含义由训练决定，不对应可命名的属性。</li><li><b>Attention 的输出是 linear combination</b>Attention(Q, K, V) 的每一行是 V 各行的 linear combination，系数由 softmax 给出，非负且和为 1，因此输出落在 value vector 的 span 内，并且位于它们围成的区域之中。</li><li><b>LoRA 的更新落在低维 span 内</b>LoRA 把权重更新写成 B·A，B 只有 r 列；更新矩阵的每一列都是这 r 个列 vector 的 linear combination，因此全部列位于维数不超过 r 的子空间内，这正是"低秩"的含义。</li></ul></section>
   <p class="summary">Vector 由加法与数乘定义；缩放后相加得到 linear combination，全部组合构成 span；linearly independent 且 span 整个空间的一组 vector 是 basis，坐标即对 basis 的缩放系数。</p>
-  <section class="tree"><h2>知识树</h2><div class="branches"><div><h3>前置知识</h3><ul><li>坐标系与有序数组 <span class="todo">（中学数学，不单列）</span></li></ul></div><div><h3>核心概念</h3><ul><li><a href="#coordinates">坐标与 basis vector</a></li><li><a href="#combination">Linear combination</a></li><li><a href="#span">Span</a></li><li><a href="#basis">Linearly independent 与 basis</a></li></ul></div><div><h3>延伸主题</h3><ul><li>Matrix 与 linear transformation <span class="todo">（1.6.5 下一页，待写）</span></li><li>Rank、column space 与 null space <span class="todo">（待写）</span></li><li><a href="math-prerequisites.html#gradient">Gradient 是 partial derivative 组成的 vector</a></li></ul></div><div><h3>应用场景</h3><ul><li>Attention：value vector 的加权平均 <span class="todo">（1.1.2，图解待写）</span></li><li>LoRA：低秩更新 <span class="todo">（1.1.3，图解待写）</span></li><li><a href="backprop-autodiff.html">Backpropagation</a></li></ul></div></div></section>
+  <section class="tree"><h2>知识树</h2><div class="branches"><div><h3>前置知识</h3><ul><li>坐标系与有序数组 <span class="todo">（中学数学，不单列）</span></li></ul></div><div><h3>核心概念</h3><ul><li><a href="#coordinates">坐标与 basis vector</a></li><li><a href="#combination">Linear combination</a></li><li><a href="#span">Span</a></li><li><a href="#basis">Linearly independent 与 basis</a></li><li><a href="#determinant">2×2 determinant 与共线判定</a></li></ul></div><div><h3>延伸主题</h3><ul><li>Matrix 与 linear transformation <span class="todo">（1.6.5 下一页，待写）</span></li><li>Rank、column space 与 null space <span class="todo">（待写）</span></li><li><a href="math-prerequisites.html#gradient">Gradient 是 partial derivative 组成的 vector</a></li></ul></div><div><h3>应用场景</h3><ul><li>Attention：value vector 的加权平均 <span class="todo">（1.1.2，图解待写）</span></li><li>LoRA：低秩更新 <span class="todo">（1.1.3，图解待写）</span></li><li><a href="backprop-autodiff.html">Backpropagation</a></li></ul></div></div></section>
   <section class="try"><h2>实践</h2><p>先运行 playground 看 vector 在动：终端画板、命中目标、像素字母混合、attention 玩具；再闭卷实现 <code>vectors.py</code> 的九个函数，用验证器逐项核对本页与知识正文的数值。</p><code>cd 01-ai-applications/06-machine-learning-foundations/math-prerequisites/linear-algebra/vectors
 python3 playground/01_draw_vectors.py
 python3 playground/02_hit_the_target.py
 make -C ../../../../.. test-linalg</code></section>
-  <section class="deeper"><h2>参考资料</h2><p>知识正文：《向量与空间：三种视角、线性组合与基》《线性代数的起源与发展》（私有知识库，待核验）。公开来源：<a href="https://www.3blue1brown.com/lessons/vectors">3Blue1Brown：Vectors, what even are they?</a> · <a href="https://www.3blue1brown.com/lessons/span">Linear combinations, span, and basis vectors</a>。</p></section>
+  <section class="deeper"><h2>参考资料</h2><p>知识正文：《向量与空间：三种视角、线性组合与基》《线性代数的起源与发展》（私有知识库，待核验）。公开来源：<a href="https://www.3blue1brown.com/lessons/vectors">3Blue1Brown：Vectors, what even are they?</a> · <a href="https://www.3blue1brown.com/lessons/span">Linear combinations, span, and basis vectors</a> · <a href="https://www.3blue1brown.com/lessons/determinant">The determinant</a>。</p></section>
   <footer>Rubickx · ELI5 · <a href="../../index.html#06-machine-learning-foundations">回到能力地图</a></footer>
 </div>
 </body>

@@ -1,0 +1,573 @@
+<title>二维行列式图解</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 单列方格纸笔记本；顶部是可拖动的平行四边形，下面各节配一张图 */
+:root {
+  --paper: #f3f7fb;
+  --surface: #ffffff;
+  --ink: #16202b;
+  --muted: #566475;
+  --grid: #dfe7ef;
+  --grid-strong: #b4c3d3;
+  --v: #1d64c8;
+  --w: #c2410c;
+  --t: #7c3aed;
+  --open: #15803d;
+  --close: #b91c1c;
+  --code-bg: #e9eff6;
+  --f-display: "ZCOOL KuaiLe", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --f-body: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e141b; --surface: #151d26; --ink: #e5ecf3; --muted: #94a3b4;
+    --grid: #1f2b38; --grid-strong: #344457; --v: #6ea8ff; --w: #ff9b5e; --t: #b49bff;
+    --open: #4ade80; --close: #f87171; --code-bg: #1b2531; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e141b; --surface: #151d26; --ink: #e5ecf3; --muted: #94a3b4;
+  --grid: #1f2b38; --grid-strong: #344457; --v: #6ea8ff; --w: #ff9b5e; --t: #b49bff;
+  --open: #4ade80; --close: #f87171; --code-bg: #1b2531; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.75;
+}
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 40px 64px; display: grid; gap: 28px; }
+
+header { display: grid; gap: 8px; }
+.eyebrow { font-size: 13px; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+h1, h2 { font-family: var(--f-display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.3; }
+h1 { font-size: clamp(30px, 6vw, 44px); }
+h2 { font-size: clamp(22px, 4.2vw, 28px); }
+.lede { font-size: 18px; margin: 0; max-width: 34em; }
+.lede b { color: var(--open); }
+
+.sheet { background: var(--surface); border: 1px solid var(--grid-strong); border-radius: 14px; padding: 22px; display: grid; gap: 16px; }
+.sheet p { margin: 0; max-width: 40em; }
+
+code, .mono { font-family: var(--f-mono); font-size: .9em; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; }
+pre { margin: 0; background: var(--code-bg); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--f-mono); font-size: 14px; line-height: 1.6; }
+
+.cv { color: var(--v); font-weight: 600; }
+.cw { color: var(--w); font-weight: 600; }
+.ct { color: var(--t); font-weight: 600; }
+.co { color: var(--open); font-weight: 600; }
+.cc { color: var(--close); font-weight: 600; }
+
+/* playground */
+.play { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 640px) { .play { grid-template-columns: minmax(0, 1fr); } }
+svg.plane { width: 100%; height: auto; aspect-ratio: 1; display: block; background: var(--surface); border-radius: 10px; border: 1px solid var(--grid); }
+.controls { display: grid; gap: 14px; min-width: 0; }
+.vec { display: grid; gap: 6px; }
+.vec-title { font-weight: 800; }
+.slider { display: grid; grid-template-columns: 3.6em minmax(0, 1fr) 2.2em; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 14px; }
+.slider output { text-align: right; font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; }
+#v0, #v1 { accent-color: var(--v); }
+#w0, #w1 { accent-color: var(--w); }
+input[type="range"]:focus-visible, button:focus-visible { outline: 2px solid var(--v); outline-offset: 2px; }
+
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+button {
+  font: inherit; font-size: 14px; cursor: pointer;
+  background: var(--paper); color: var(--ink);
+  border: 1px solid var(--grid-strong); border-radius: 999px; padding: 4px 12px;
+}
+button:hover { border-color: var(--ink); }
+button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+button:disabled { opacity: .45; cursor: default; }
+button:disabled:hover { border-color: var(--grid-strong); }
+
+/* tug of war */
+.tug { display: grid; gap: 8px; }
+.row { display: grid; grid-template-columns: 6.2em minmax(0, 1fr) 3em; align-items: center; gap: 10px; font-size: 14px; }
+.row .num { font-family: var(--f-mono); text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.track { position: relative; height: 14px; background: var(--paper); border-radius: 7px; overflow: hidden; }
+.track::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--grid-strong); }
+.fill { position: absolute; top: 0; bottom: 0; border-radius: 7px; transition: left .2s, width .2s; }
+@media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+.row.result { border-top: 1px dashed var(--grid-strong); padding-top: 8px; font-weight: 800; }
+
+.formula { font-family: var(--f-mono); font-size: 14px; background: var(--code-bg); border-radius: 8px; padding: 8px 12px; overflow-x: auto; white-space: nowrap; }
+.status { display: flex; gap: 10px; align-items: baseline; font-size: 15px; }
+.pill { flex: none; font-size: 12px; font-weight: 800; letter-spacing: .06em; padding: 2px 10px; border-radius: 999px; color: var(--surface); }
+
+/* table */
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { font-size: 12.5px; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td.wrap-ok { white-space: normal; min-width: 12em; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: var(--paper); }
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 640px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.two > div { display: grid; gap: 12px; min-width: 0; }
+
+.recap { counter-reset: r; display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.recap li { counter-increment: r; display: grid; grid-template-columns: 2.2em minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 17px; }
+.recap li::before { content: counter(r); font-family: var(--f-display); font-size: 26px; color: var(--open); line-height: 1; }
+.caption { font-size: 13.5px; color: var(--muted); }
+
+/* step-by-step derivation */
+svg.plane.wide { aspect-ratio: 56 / 46; }
+.stepper { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.stepper .spacer { flex: 1; }
+.step-body { display: grid; gap: 10px; min-width: 0; }
+.step-body h3 { margin: 0; font-size: 17px; font-weight: 800; }
+.step-body p, .step-body ul { margin: 0; }
+.step-body ul { padding-left: 1.2em; }
+.step-body table td, .step-body table th { padding: 5px 8px; }
+.swatch { display: inline-block; width: .8em; height: .8em; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">线性代数 · 向量与空间 · ELI5</div>
+    <h1>d 是 v、w 围成的平行四边形面积</h1>
+    <p class="lede"><code>d = v[0]·w[1] − v[1]·w[0]</code> 是以 v、w 为两条边的平行四边形的<b>有向面积</b>：绝对值是面积，符号表示方向，0 表示共线。</p>
+  </header>
+
+  <section class="sheet" aria-labelledby="h-play">
+    <h2 id="h-play">自己拉一拉</h2>
+    <p>拖动滑块改变 <span class="cv">v</span> 和 <span class="cw">w</span>。它们围成的平行四边形面积就是 d；下面三根条显示 d 由哪两项相减得到。</p>
+    <div class="play">
+      <svg class="plane" id="plane" role="img" aria-label="v 与 w 围成的平行四边形"></svg>
+      <div class="controls">
+        <div class="vec">
+          <div class="vec-title cv">v = [<span id="vt0">3</span>, <span id="vt1">1</span>]</div>
+          <label class="slider"><span>v[0] 右</span><input type="range" id="v0" min="-6" max="6" step="1" value="3"><output id="ov0">3</output></label>
+          <label class="slider"><span>v[1] 上</span><input type="range" id="v1" min="-6" max="6" step="1" value="1"><output id="ov1">1</output></label>
+        </div>
+        <div class="vec">
+          <div class="vec-title cw">w = [<span id="wt0">1</span>, <span id="wt1">2</span>]</div>
+          <label class="slider"><span>w[0] 右</span><input type="range" id="w0" min="-6" max="6" step="1" value="1"><output id="ow0">1</output></label>
+          <label class="slider"><span>w[1] 上</span><input type="range" id="w1" min="-6" max="6" step="1" value="2"><output id="ow1">2</output></label>
+        </div>
+        <div class="presets" role="group" aria-label="示例">
+          <button type="button" data-v="3,0" data-w="0,2">一横一竖</button>
+          <button type="button" data-v="3,1" data-w="1,2">都有点斜</button>
+          <button type="button" data-v="3,1" data-w="6,2">共线</button>
+          <button type="button" data-v="1,2" data-w="3,1">交换 v、w</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tug" aria-live="polite">
+      <div class="row"><span class="co">v[0]·w[1]</span><div class="track"><div class="fill" id="fOpen" style="background: var(--open)"></div></div><span class="num" id="nOpen">6</span></div>
+      <div class="row"><span class="cc">v[1]·w[0]</span><div class="track"><div class="fill" id="fClose" style="background: var(--close)"></div></div><span class="num" id="nClose">1</span></div>
+      <div class="row result"><span>d = 两项之差</span><div class="track"><div class="fill" id="fD" style="background: var(--ink)"></div></div><span class="num" id="nD">5</span></div>
+    </div>
+    <div class="formula" id="formula">d = 3·2 − 1·1 = 6 − 1 = 5</div>
+    <div class="status"><span class="pill" id="pill">逆时针</span><span id="statusText"></span></div>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-tug">
+    <h2 id="h-tug">公式里的两项</h2>
+    <p><span class="co">第一项 <code>v[0]·w[1]</code></span>：v 的横向长度 × w 的纵向高度。v 沿 x 轴、w 沿 y 轴时（[3, 0] 与 [0, 2]），平行四边形就是矩形，面积只有这一项：3·2 = 6。</p>
+    <p><span class="cc">第二项 <code>v[1]·w[0]</code></span>：v 的纵向分量 × w 的横向分量。两个向量都倾斜时要减去这一项，原因见下一节"外框减空白"的推导。</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>v</th><th>w</th><th>v[0]·w[1]</th><th>v[1]·w[0]</th><th>d</th><th>图形</th></tr></thead>
+        <tbody>
+          <tr class="clickable" data-v="3,0" data-w="0,2"><td class="cv">[3, 0]</td><td class="cw">[0, 2]</td><td>6</td><td>0</td><td><b>6</b></td><td class="wrap-ok">矩形，面积 6</td></tr>
+          <tr class="clickable" data-v="3,1" data-w="1,2"><td class="cv">[3, 1]</td><td class="cw">[1, 2]</td><td>6</td><td>1</td><td><b>5</b></td><td class="wrap-ok">两个向量都倾斜，减去 1</td></tr>
+          <tr class="clickable" data-v="3,1" data-w="6,2"><td class="cv">[3, 1]</td><td class="cw">[6, 2]</td><td>6</td><td>6</td><td><b>0</b></td><td class="wrap-ok">两项相等，压成线段：共线</td></tr>
+          <tr class="clickable" data-v="1,2" data-w="3,1"><td class="cv">[1, 2]</td><td class="cw">[3, 1]</td><td>1</td><td>6</td><td><b>−5</b></td><td class="wrap-ok">交换 v、w：大小仍是 5，方向变为顺时针</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">点表格里的一行，上面的图会切换到那一组。负号表示从 v 转到 w 是顺时针方向，面积大小仍是 5。</p>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-derive">
+    <h2 id="h-derive">为什么 d 就是面积：外框减空白</h2>
+    <p>用 <span class="cv">v = [3, 1]</span>、<span class="cw">w = [1, 2]</span> 分 5 步推一遍。建议拿方格纸跟着画。</p>
+    <div class="stepper" role="group" aria-label="推导步骤">
+      <button type="button" class="dot" data-step="1">1 顶点</button>
+      <button type="button" class="dot" data-step="2">2 外框</button>
+      <button type="button" class="dot" data-step="3">3 切块</button>
+      <button type="button" class="dot" data-step="4">4 相减</button>
+      <button type="button" class="dot" data-step="5">5 换成字母</button>
+      <span class="spacer"></span>
+      <button type="button" id="prevStep">上一步</button>
+      <button type="button" id="nextStep">下一步</button>
+    </div>
+    <div class="two">
+      <div><svg class="plane wide" id="plane3" role="img" aria-label="外框减空白推导平行四边形面积"></svg></div>
+      <div class="step-body" id="stepBody" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-zero">
+    <h2 id="h-zero">d = 0：共线</h2>
+    <p>两项相等时 d = 0，平行四边形压成一条线段，v、w 在同一条直线上，即<b>共线</b>。例如 [3, 1] 与 [6, 2]：3·2 − 1·6 = 0。</p>
+    <p>所以 <code>is_collinear</code> 判断的就是这个面积是否为 0。n 维时要在每个坐标平面上（每一对 i、j）都检查一遍。</p>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-solve">
+    <h2 id="h-solve">在 solve_2x2 里：a、b 是面积之比</h2>
+    <div class="two">
+      <div>
+        <svg class="plane" id="plane2" role="img" aria-label="v、w 围成的平行四边形与 t、w 围成的平行四边形对比"></svg>
+        <div class="presets" role="group" aria-label="切换">
+          <button type="button" id="btnT" aria-pressed="true">t 和 w</button>
+          <button type="button" id="btn2v" aria-pressed="false">换成 2·v 和 w</button>
+        </div>
+      </div>
+      <div>
+        <p>要找 a、b，使 a·<span class="cv">v</span> + b·<span class="cw">w</span> = <span class="ct">t</span>。记 面积(x, y) = x[0]·y[1] − x[1]·y[0]，则 d = 面积(v, w)。</p>
+        <p><span class="co">绿色</span>：面积(<span class="cv">v</span>, <span class="cw">w</span>) = 3·2 − 1·1 = <b>5</b>。</p>
+        <p><span class="ct">紫色</span>：面积(<span class="ct">t</span>, <span class="cw">w</span>) = 7·2 − 4·1 = <b>10</b>。</p>
+        <p>a = 10 ÷ 5 = <b>2</b>。原因：代入 t = a·v + b·w，面积(t, w) = a·面积(v, w) + b·面积(w, w)，而 w 与自身的面积为 0，只剩 a·d。</p>
+        <p>求 b 时把 w 换成 t，v 留在第 1 格：面积(v, t) = 3·4 − 1·7 = 5，b = 5 ÷ 5 = <b>1</b>。顺序不能换：面积(t, v) = −5。</p>
+        <p id="explain2" class="caption">点"换成 2·v 和 w"：去掉 t 中的 1·w 后，平行四边形只是沿 w 方向平移变形，面积不变，仍为 10 = 2·d。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-recap">
+    <h2 id="h-recap">记住三句话</h2>
+    <ol class="recap">
+      <li><span>d 是 <span class="cv">v</span>、<span class="cw">w</span> 围成的平行四边形的有向面积，符号表示从 v 转到 w 的方向。</span></li>
+      <li><span><span class="co">v[0]·w[1]</span> − <span class="cc">v[1]·w[0]</span> 可由外框面积减去六块空白推出。</span></li>
+      <li><span>d = 0 表示共线；solve_2x2 中 a = 面积(t, w) / d，b = 面积(v, t) / d。</span></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(function () {
+  const NS = "http://www.w3.org/2000/svg";
+  const $ = (id) => document.getElementById(id);
+
+  function el(tag, attrs, style) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (style) for (const k in style) n.style[k] = style[k];
+    return n;
+  }
+
+  // Draw a coordinate plane that fits all points, with polygons, arrows and labels.
+  function drawPlane(svg, { points, polys = [], arrows = [], labels = [] }) {
+    const xs = [0, ...points.map((p) => p[0])];
+    const ys = [0, ...points.map((p) => p[1])];
+    let minX = Math.floor(Math.min(...xs)) - 1, maxX = Math.ceil(Math.max(...xs)) + 1;
+    let minY = Math.floor(Math.min(...ys)) - 1, maxY = Math.ceil(Math.max(...ys)) + 1;
+    let span = Math.max(maxX - minX, maxY - minY, 6);
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    minX = cx - span / 2; maxX = cx + span / 2; minY = cy - span / 2; maxY = cy + span / 2;
+    svg.setAttribute("viewBox", `${minX} ${-maxY} ${span} ${span}`);
+    svg.textContent = "";
+    const fs = span * 0.05;
+
+    const g = el("g", {});
+    for (let x = Math.ceil(minX); x <= Math.floor(maxX); x++) {
+      g.appendChild(el("line", { x1: x, y1: -maxY, x2: x, y2: -minY, "vector-effect": "non-scaling-stroke" },
+        { stroke: x === 0 ? "var(--grid-strong)" : "var(--grid)", strokeWidth: x === 0 ? "1.5px" : "1px" }));
+    }
+    for (let y = Math.ceil(minY); y <= Math.floor(maxY); y++) {
+      g.appendChild(el("line", { x1: minX, y1: -y, x2: maxX, y2: -y, "vector-effect": "non-scaling-stroke" },
+        { stroke: y === 0 ? "var(--grid-strong)" : "var(--grid)", strokeWidth: y === 0 ? "1.5px" : "1px" }));
+    }
+    svg.appendChild(g);
+
+    for (const p of polys) {
+      const pts = p.pts.map(([x, y]) => `${x},${-y}`).join(" ");
+      svg.appendChild(el("polygon", { points: pts, "vector-effect": "non-scaling-stroke" },
+        { fill: p.color, fillOpacity: p.opacity ?? 0.2, stroke: p.color, strokeWidth: "1.5px",
+          strokeDasharray: p.dashed ? "5 4" : "none" }));
+    }
+
+    for (const a of arrows) {
+      const [fx, fy] = a.from || [0, 0];
+      const [tx, ty] = a.to;
+      const dx = tx - fx, dy = ty - fy, len = Math.hypot(dx, dy);
+      if (len < 1e-9) {
+        svg.appendChild(el("circle", { cx: tx, cy: -ty, r: span * 0.012 }, { fill: a.color }));
+        continue;
+      }
+      const ux = dx / len, uy = dy / len, h = Math.min(span * 0.04, len * 0.45), wd = h * 0.55;
+      const bx = tx - ux * h, by = ty - uy * h;
+      svg.appendChild(el("line", { x1: fx, y1: -fy, x2: bx, y2: -by, "vector-effect": "non-scaling-stroke" },
+        { stroke: a.color, strokeWidth: "3px", strokeLinecap: "round", strokeDasharray: a.dashed ? "6 5" : "none" }));
+      const head = [[tx, ty], [bx - uy * wd, by + ux * wd], [bx + uy * wd, by - ux * wd]]
+        .map(([x, y]) => `${x},${-y}`).join(" ");
+      svg.appendChild(el("polygon", { points: head }, { fill: a.color }));
+    }
+
+    for (const l of labels) {
+      const t = el("text", { x: l.at[0], y: -l.at[1], "text-anchor": l.anchor || "middle", "dominant-baseline": "middle" },
+        { fill: l.color, fontSize: `${fs * (l.scale || 1)}px`, fontFamily: "var(--f-mono)", fontWeight: "600",
+          paintOrder: "stroke", stroke: "var(--surface)", strokeWidth: `${fs * 0.25}px`, strokeLinejoin: "round" });
+      t.textContent = l.text;
+      svg.appendChild(t);
+    }
+  }
+
+  // Label just beyond the tip of a vector.
+  function tipLabel(p, text, color, span) {
+    const len = Math.hypot(p[0], p[1]) || 1;
+    const off = 0.6;
+    return { at: [p[0] + (p[0] / len) * off, p[1] + (p[1] / len) * off], text, color };
+  }
+
+  const fmt = (n) => (n < 0 ? `(${n})` : `${n}`);
+  const show = (n) => (n < 0 ? `−${-n}` : `${n}`);
+
+  const ids = ["v0", "v1", "w0", "w1"];
+  const presetButtons = document.querySelectorAll(".play .presets button");
+
+  function setBar(fill, value, max) {
+    const frac = max ? Math.abs(value) / max : 0;
+    const w = frac * 50;
+    fill.style.width = `${w}%`;
+    fill.style.left = value >= 0 ? "50%" : `${50 - w}%`;
+  }
+
+  function render() {
+    const [v0, v1, w0, w1] = ids.map((id) => Number($(id).value));
+    ids.forEach((id) => { $("o" + id).textContent = $(id).value; });
+    $("vt0").textContent = v0; $("vt1").textContent = v1;
+    $("wt0").textContent = w0; $("wt1").textContent = w1;
+
+    const open = v0 * w1, close = v1 * w0, d = open - close;
+    const v = [v0, v1], w = [w0, w1], vw = [v0 + w0, v1 + w1];
+    const color = d > 0 ? "var(--open)" : d < 0 ? "var(--close)" : "var(--muted)";
+
+    drawPlane($("plane"), {
+      points: [v, w, vw],
+      polys: d !== 0 ? [{ pts: [[0, 0], v, vw, w], color }] : [],
+      arrows: [
+        { from: v, to: vw, color: "var(--w)", dashed: true },
+        { from: w, to: vw, color: "var(--v)", dashed: true },
+        { to: v, color: "var(--v)" },
+        { to: w, color: "var(--w)" },
+      ],
+      labels: [
+        tipLabel(v, "v", "var(--v)"),
+        tipLabel(w, "w", "var(--w)"),
+        ...(d !== 0 ? [{ at: [vw[0] / 2, vw[1] / 2], text: `d=${show(d)}`, color, scale: 1.15 }] : []),
+      ],
+    });
+
+    const max = Math.max(Math.abs(open), Math.abs(close), Math.abs(d), 1);
+    setBar($("fOpen"), open, max); setBar($("fClose"), close, max); setBar($("fD"), d, max);
+    $("nOpen").textContent = show(open); $("nClose").textContent = show(close); $("nD").textContent = show(d);
+    $("formula").textContent = `d = ${fmt(v0)}·${fmt(w1)} − ${fmt(v1)}·${fmt(w0)} = ${fmt(open)} − ${fmt(close)} = ${show(d)}`;
+
+    const pill = $("pill");
+    pill.style.background = color;
+    if (d > 0) {
+      pill.textContent = "逆时针";
+      $("statusText").textContent = `面积为 ${d}，从 v 转到 w 是逆时针方向，d 为正。`;
+    } else if (d < 0) {
+      pill.textContent = "顺时针";
+      $("statusText").textContent = `面积为 ${-d}，从 v 转到 w 是顺时针方向，d 为负。`;
+    } else {
+      pill.textContent = "共线";
+      $("statusText").textContent = "两项相等，平行四边形压成线段：v、w 共线，d = 0。";
+    }
+
+    presetButtons.forEach((b) => {
+      const pv = b.dataset.v.split(",").map(Number), pw = b.dataset.w.split(",").map(Number);
+      b.setAttribute("aria-pressed", String(pv[0] === v0 && pv[1] === v1 && pw[0] === w0 && pw[1] === w1));
+    });
+  }
+
+  function applyPreset(vs, ws) {
+    const [a, b] = vs.split(",").map(Number), [c, e] = ws.split(",").map(Number);
+    $("v0").value = a; $("v1").value = b; $("w0").value = c; $("w1").value = e;
+    render();
+  }
+
+  ids.forEach((id) => $(id).addEventListener("input", render));
+  presetButtons.forEach((b) => b.addEventListener("click", () => applyPreset(b.dataset.v, b.dataset.w)));
+  document.querySelectorAll("tr.clickable").forEach((tr) =>
+    tr.addEventListener("click", () => {
+      applyPreset(tr.dataset.v, tr.dataset.w);
+      $("h-play").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    }));
+
+  // solve_2x2 picture: v=[3,1], w=[1,2], t=[7,4]
+  let mode = "t";
+  function render2() {
+    const v = [3, 1], w = [1, 2], t = [7, 4], v2 = [6, 2];
+    const big = mode === "t" ? t : v2;
+    const bigName = mode === "t" ? "t" : "2v";
+    drawPlane($("plane2"), {
+      points: [[0, 0], v, w, t, [t[0] + w[0], t[1] + w[1]]],
+      polys: [
+        { pts: [[0, 0], big, [big[0] + w[0], big[1] + w[1]], w], color: "var(--t)", opacity: 0.16, dashed: mode !== "t" },
+        { pts: [[0, 0], v, [v[0] + w[0], v[1] + w[1]], w], color: "var(--open)", opacity: 0.3 },
+      ],
+      arrows: [
+        { to: big, color: "var(--t)" },
+        { to: v, color: "var(--v)" },
+        { to: w, color: "var(--w)" },
+      ],
+      labels: [
+        { at: [big[0] + 0.5, big[1] - 0.35], text: bigName, color: "var(--t)", anchor: "start" },
+        { at: [v[0] + 0.4, v[1] - 0.4], text: "v", color: "var(--v)" },
+        { at: [w[0] - 0.55, w[1] + 0.2], text: "w", color: "var(--w)" },
+        { at: [2, 1.5], text: "5", color: "var(--open)", scale: 1.1 },
+        { at: [(big[0] + w[0]) / 2 + 1.2, (big[1] + w[1]) / 2 + 0.6], text: "10", color: "var(--t)", scale: 1.1 },
+      ],
+    });
+    $("btnT").setAttribute("aria-pressed", String(mode === "t"));
+    $("btn2v").setAttribute("aria-pressed", String(mode !== "t"));
+  }
+  $("btnT").addEventListener("click", () => { mode = "t"; render2(); });
+  $("btn2v").addEventListener("click", () => { mode = "2v"; render2(); });
+
+  // Step-by-step derivation: box minus six blank pieces, v=[3,1], w=[1,2]
+  const sw = (c) => `<span class="swatch" style="background: ${c}"></span>`;
+  const PIECES = [
+    { id: "A", pts: [[0, 0], [3, 0], [3, 1]], at: [2.1, 0.32], area: "1.5", color: "var(--v)" },
+    { id: "B", pts: [[3, 0], [4, 0], [4, 1], [3, 1]], at: [3.5, 0.5], area: "1", color: "var(--t)" },
+    { id: "C", pts: [[3, 1], [4, 1], [4, 3]], at: [3.7, 1.6], area: "1", color: "var(--w)" },
+    { id: "D", pts: [[1, 2], [1, 3], [4, 3]], at: [1.9, 2.7], area: "1.5", color: "var(--v)" },
+    { id: "E", pts: [[0, 2], [1, 2], [1, 3], [0, 3]], at: [0.5, 2.5], area: "1", color: "var(--t)" },
+    { id: "F", pts: [[0, 0], [1, 2], [0, 2]], at: [0.3, 1.4], area: "1", color: "var(--w)" },
+  ];
+  const STEPS = [
+    `<h3>第 1 步：标出 4 个顶点</h3>
+     <p>平行四边形从原点出发，以 <span class="cv">v</span>、<span class="cw">w</span> 为两条边。</p>
+     <div class="tbl"><table>
+       <tr><td>O</td><td>原点</td><td class="mono">(0, 0)</td></tr>
+       <tr><td class="cv">P</td><td>沿 v 走</td><td class="mono">(3, 1)</td></tr>
+       <tr><td>Q</td><td>先走 v 再走 w</td><td class="mono">(4, 3)</td></tr>
+       <tr><td class="cw">R</td><td>沿 w 走</td><td class="mono">(1, 2)</td></tr>
+     </table></div>
+     <p>斜着的四边形没法直接用"宽 × 高"，所以换个办法。</p>`,
+    `<h3>第 2 步：画一个刚好包住它的外框</h3>
+     <p>最左 x = 0，最右 x = 4，最下 y = 0，最上 y = 3。</p>
+     <p class="mono">外框 = 4 × 3 = 12</p>
+     <p>宽 4 = <code>v[0] + w[0]</code>，高 3 = <code>v[1] + w[1]</code>。</p>
+     <p>平行四边形面积 = 外框 − 外框里的空白。接下来只要算出空白有多大。</p>`,
+    `<h3>第 3 步：画 4 条辅助线，把空白切成 6 块</h3>
+     <ul>
+       <li>从 P(3, 1) 竖直向下到 (3, 0)</li>
+       <li>从 P(3, 1) 水平向右到 (4, 1)</li>
+       <li>从 R(1, 2) 水平向左到 (0, 2)</li>
+       <li>从 R(1, 2) 竖直向上到 (1, 3)</li>
+     </ul>
+     <p>空白变成 6 块直角三角形或矩形，而且两两相同：</p>
+     <p>${sw("var(--v)")}A、D 是 v 形状的三角形<br>${sw("var(--w)")}C、F 是 w 形状的三角形<br>${sw("var(--t)")}B、E 是两个小矩形</p>`,
+    `<h3>第 4 步：外框减去空白</h3>
+     <div class="tbl"><table>
+       <tr><td>${sw("var(--v)")}A、D</td><td>½ × 3 × 1，各一块</td><td class="mono">1.5 + 1.5</td></tr>
+       <tr><td>${sw("var(--w)")}C、F</td><td>½ × 1 × 2，各一块</td><td class="mono">1 + 1</td></tr>
+       <tr><td>${sw("var(--t)")}B、E</td><td>1 × 1，各一块</td><td class="mono">1 + 1</td></tr>
+       <tr><td><b>空白合计</b></td><td></td><td class="mono"><b>7</b></td></tr>
+     </table></div>
+     <p class="mono">面积 = 12 − 7 = <b class="co">5</b></p>
+     <p>公式：d = 3·2 − 1·1 = 6 − 1 = <b class="co">5</b> ✓</p>`,
+    `<h3>第 5 步：把数字换成字母</h3>
+     <p>每一块的尺寸都来自 v、w 的分量：</p>
+     <p>${sw("var(--v)")}A、D：各 ½·v[0]·v[1]<br>${sw("var(--w)")}C、F：各 ½·w[0]·w[1]<br>${sw("var(--t)")}B、E：各 w[0]·v[1]</p>
+<pre>外框 = (v[0]+w[0])·(v[1]+w[1])
+     = v[0]v[1] + v[0]w[1]
+       + w[0]v[1] + w[0]w[1]
+
+空白 = v[0]v[1] + w[0]w[1]
+       + 2·w[0]v[1]
+
+外框 − 空白
+     = v[0]w[1] + w[0]v[1] − 2·w[0]v[1]
+     = v[0]w[1] − v[1]w[0]   ← 就是 d</pre>
+     <p>v 的两个三角形和 w 的两个三角形正好消掉，只剩 d。</p>`,
+  ];
+
+  let step = 1;
+  function drawDerivation() {
+    const svg = $("plane3");
+    svg.setAttribute("viewBox", "-0.8 -3.8 5.6 4.6");
+    svg.textContent = "";
+    const fs = 0.24;
+    const line = (x1, y1, x2, y2, stroke, width, dash) =>
+      svg.appendChild(el("line", { x1, y1: -y1, x2, y2: -y2, "vector-effect": "non-scaling-stroke" },
+        { stroke, strokeWidth: width, strokeDasharray: dash || "none", strokeLinecap: "round" }));
+    const text = (x, y, s, color, opts = {}) => {
+      const t = el("text", { x, y: -y, "text-anchor": opts.anchor || "middle", "dominant-baseline": "middle" },
+        { fill: color, fontSize: `${fs * (opts.scale || 1)}px`, fontFamily: "var(--f-mono)", fontWeight: "600",
+          paintOrder: "stroke", stroke: "var(--surface)", strokeWidth: `${fs * 0.22}px`, strokeLinejoin: "round" });
+      t.textContent = s;
+      svg.appendChild(t);
+    };
+    const poly = (pts, fill, opacity, stroke) =>
+      svg.appendChild(el("polygon", { points: pts.map(([x, y]) => `${x},${-y}`).join(" "), "vector-effect": "non-scaling-stroke" },
+        { fill, fillOpacity: opacity, stroke: stroke || "none", strokeWidth: "1.5px" }));
+
+    for (let x = 0; x <= 4; x++) line(x, -0.5, x, 3.5, x === 0 ? "var(--grid-strong)" : "var(--grid)", "1px");
+    for (let y = 0; y <= 3; y++) line(-0.5, y, 4.5, y, y === 0 ? "var(--grid-strong)" : "var(--grid)", "1px");
+    for (let x = 1; x <= 4; x++) text(x, -0.35, String(x), "var(--muted)", { scale: 0.75 });
+    for (let y = 1; y <= 3; y++) text(-0.3, y, String(y), "var(--muted)", { scale: 0.75 });
+
+    if (step >= 3) {
+      for (const p of PIECES) poly(p.pts, p.color, step >= 4 ? 0.3 : 0.18);
+    }
+    poly([[0, 0], [3, 1], [4, 3], [1, 2]], "var(--open)", step >= 4 ? 0.28 : 0.14);
+
+    if (step >= 2) {
+      svg.appendChild(el("rect", { x: 0, y: -3, width: 4, height: 3, "vector-effect": "non-scaling-stroke" },
+        { fill: "none", stroke: "var(--ink)", strokeWidth: "1.5px", strokeDasharray: "6 4" }));
+      text(2, 3.4, "外框 4 × 3 = 12", "var(--ink)", { scale: 0.9 });
+    }
+    if (step >= 3) {
+      const cut = "var(--muted)";
+      line(3, 1, 3, 0, cut, "1.5px", "3 3"); line(3, 1, 4, 1, cut, "1.5px", "3 3");
+      line(1, 2, 0, 2, cut, "1.5px", "3 3"); line(1, 2, 1, 3, cut, "1.5px", "3 3");
+    }
+
+    line(0, 0, 3, 1, "var(--v)", "3px"); line(1, 2, 4, 3, "var(--v)", "2px", "6 4");
+    line(0, 0, 1, 2, "var(--w)", "3px"); line(3, 1, 4, 3, "var(--w)", "2px", "6 4");
+    for (const [x, y] of [[0, 0], [3, 1], [4, 3], [1, 2]]) {
+      svg.appendChild(el("circle", { cx: x, cy: -y, r: 0.06 }, { fill: "var(--ink)" }));
+    }
+
+    if (step >= 3) {
+      for (const p of PIECES) text(p.at[0], p.at[1], step === 4 ? p.area : p.id, "var(--ink)", { scale: step === 4 ? 0.8 : 0.9 });
+    }
+    const center = step === 4 ? "12 − 7 = 5" : step === 5 ? "d" : "?";
+    text(2, 1.5, center, "var(--open)", { scale: step === 5 ? 1.3 : 1 });
+    text(-0.3, -0.3, "O", "var(--ink)", { scale: 0.85 });
+    if (step <= 2) {
+      text(3.3, 0.75, "P", "var(--v)", { scale: 0.85, anchor: "start" });
+      text(1.0, 2.35, "R", "var(--w)", { scale: 0.85 });
+    }
+    text(4.12, 3.0, "Q", "var(--ink)", { scale: 0.85, anchor: "start" });
+
+    $("stepBody").innerHTML = STEPS[step - 1];
+    document.querySelectorAll(".stepper .dot").forEach((b) =>
+      b.setAttribute("aria-pressed", String(Number(b.dataset.step) === step)));
+    $("prevStep").disabled = step === 1;
+    $("nextStep").disabled = step === STEPS.length;
+  }
+  document.querySelectorAll(".stepper .dot").forEach((b) =>
+    b.addEventListener("click", () => { step = Number(b.dataset.step); drawDerivation(); }));
+  $("prevStep").addEventListener("click", () => { if (step > 1) { step--; drawDerivation(); } });
+  $("nextStep").addEventListener("click", () => { if (step < STEPS.length) { step++; drawDerivation(); } });
+
+  render();
+  render2();
+  drawDerivation();
+})();
+</script>

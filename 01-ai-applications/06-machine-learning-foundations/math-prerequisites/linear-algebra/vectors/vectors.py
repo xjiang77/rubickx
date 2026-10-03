@@ -74,7 +74,10 @@ def linear_combination(coeffs: list[float], vectors: list[Vector]) -> Vector:
         >>> linear_combination([2, -3], [[1, 2], [3, -1]]) == [-7, 7]
         True
     """
-    raise NotImplementedError
+    result = [0] * len(vectors[0])
+    for c, v in zip(coeffs, vectors):
+        result = add(result, scale(c, v))
+    return result
 
 
 def is_collinear(v: Vector, w: Vector, tol: float = 1e-9) -> bool:
@@ -98,7 +101,12 @@ def is_collinear(v: Vector, w: Vector, tol: float = 1e-9) -> bool:
         >>> is_collinear([0, 0], [5, 7])      # 零向量
         True
     """
-    raise NotImplementedError
+    n = len(v)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if abs(v[i] * w[j] - v[j] * w[i]) > tol:
+                return False
+    return True
 
 
 def solve_2x2(v: Vector, w: Vector, t: Vector) -> tuple[float, float] | None:
@@ -120,8 +128,12 @@ def solve_2x2(v: Vector, w: Vector, t: Vector) -> tuple[float, float] | None:
         >>> print(solve_2x2([3, 1], [6, 2], [7, 4]))   # [6, 2] = 2·[3, 1]，共线
         None
     """
-    raise NotImplementedError
-
+    d = v[0] * w[1] - v[1] * w[0]
+    if abs(d) <= 1e-9:
+        return None
+    a = (t[0] * w[1] - t[1] * w[0]) / d
+    b = (v[0] * t[1] - v[1] * t[0]) / d
+    return a, b
 
 def coords_in_basis(t: Vector, b1: Vector, b2: Vector) -> tuple[float, float]:
     """t 在基 {b1, b2} 下的坐标 (a, b)，即 a·b1 + b·b2 = t。
@@ -146,7 +158,10 @@ def coords_in_basis(t: Vector, b1: Vector, b2: Vector) -> tuple[float, float]:
         Traceback (most recent call last):
         ValueError: b1 与 b2 共线，不构成基
     """
-    raise NotImplementedError
+    result = solve_2x2(b1, b2, t)
+    if result is None:
+        raise ValueError("b1 与 b2 共线，不构成基")
+    return result
 
 
 def in_span(t: Vector, v: Vector, w: Vector, tol: float = 1e-9) -> bool:

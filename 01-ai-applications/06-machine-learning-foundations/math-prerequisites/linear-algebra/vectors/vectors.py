@@ -39,7 +39,7 @@ def scale(c: float, v: Vector) -> Vector:
     """每个分量乘以标量 c。
 
     Args:
-        c: 标量。
+gei        c: 标量。
         v: 向量，维数任意。
 
     Returns:
@@ -186,7 +186,29 @@ def in_span(t: Vector, v: Vector, w: Vector, tol: float = 1e-9) -> bool:
         >>> in_span([3, 7, 1], [1, 2, 0], [2, 4, 1])
         False
     """
-    raise NotImplementedError
+    # 第1步：从 x, y, z 三个分量里面找两个(x,y) 或者 (x,z) 或者 （y, z），解二维方程组得到a,b
+    ab = None
+    for i, j in [(0, 1), (0, 2), (1, 2)]:
+        vv = [v[i], v[j]]
+        ww = [w[i], w[j]]
+        tt = [t[i], t[j]]
+        ab = solve_2x2(vv, ww, tt)
+        if ab is not None:
+            # 找到一组非线性的ab解
+            break
+
+    if ab is None:
+        raise ValueError("v 与 w 共线")
+
+    # 第2步： 用a,b在三维里算出线性组合 a * v + b * w
+    a, b = ab
+    candidate = linear_combination([a, b], [v, w])
+
+    # 第3步： candidate 和 t 做逐个对比，有不等，则false
+    for c, x in zip(candidate, t):
+        if abs(c - x) > tol:
+            return False
+    return True
 
 
 def is_independent_3(v1: Vector, v2: Vector, v3: Vector, tol: float = 1e-9) -> bool:
@@ -209,8 +231,13 @@ def is_independent_3(v1: Vector, v2: Vector, v3: Vector, tol: float = 1e-9) -> b
         >>> is_independent_3([1, 0, 0], [0, 1, 0], [0, 0, 1])   # 标准基
         True
     """
-    raise NotImplementedError
+    if is_collinear(v1, v2, tol):
+        return False
 
+    if in_span(v3, v1, v2, tol):
+        return False
+
+    return True
 
 def weighted_sum(weights: list[float], vectors: list[Vector]) -> Vector:
     """加权平均：权重合法时返回 linear_combination(weights, vectors)。
@@ -238,4 +265,11 @@ def weighted_sum(weights: list[float], vectors: list[Vector]) -> Vector:
         Traceback (most recent call last):
         ValueError: 权重不能为负
     """
-    raise NotImplementedError
+    for w in weights:
+        if w < 0:
+            raise ValueError("权重不能为负")
+
+    if abs(sum(weights) - 1) > 1e-9:
+        raise ValueError("权重和不为 1")
+
+    return linear_combination(weights, vectors)

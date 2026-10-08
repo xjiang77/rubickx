@@ -1,0 +1,634 @@
+<title>张成判定图解</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 与《二维行列式图解》同一套方格纸笔记本；顶部是可旋转的三维图，下面三步各一张卡，所有卡随同一组输入更新 */
+:root {
+  --paper: #f3f7fb;
+  --surface: #ffffff;
+  --ink: #16202b;
+  --muted: #566475;
+  --grid: #dfe7ef;
+  --grid-strong: #b4c3d3;
+  --v: #1d64c8;
+  --w: #c2410c;
+  --t: #7c3aed;
+  --open: #15803d;
+  --close: #b91c1c;
+  --chk: #a16207;
+  --solve-bg: #e3f4e8;
+  --chk-bg: #fbf1d9;
+  --code-bg: #e9eff6;
+  --f-display: "ZCOOL KuaiLe", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --f-body: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e141b; --surface: #151d26; --ink: #e5ecf3; --muted: #94a3b4;
+    --grid: #1f2b38; --grid-strong: #344457; --v: #6ea8ff; --w: #ff9b5e; --t: #b49bff;
+    --open: #4ade80; --close: #f87171; --chk: #fbbf24; --solve-bg: #14301f; --chk-bg: #33290f;
+    --code-bg: #1b2531; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e141b; --surface: #151d26; --ink: #e5ecf3; --muted: #94a3b4;
+  --grid: #1f2b38; --grid-strong: #344457; --v: #6ea8ff; --w: #ff9b5e; --t: #b49bff;
+  --open: #4ade80; --close: #f87171; --chk: #fbbf24; --solve-bg: #14301f; --chk-bg: #33290f;
+  --code-bg: #1b2531; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.75;
+}
+.wrap { max-width: 820px; margin: 0 auto; padding-inline: 16px; padding-block: 40px 64px; display: grid; gap: 28px; }
+
+header { display: grid; gap: 8px; }
+.eyebrow { font-size: 13px; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+h1, h2 { font-family: var(--f-display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.3; }
+h1 { font-size: clamp(30px, 6vw, 44px); }
+h2 { font-size: clamp(22px, 4.2vw, 28px); }
+h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.lede { font-size: 18px; margin: 0; max-width: 36em; }
+
+.sheet { background: var(--surface); border: 1px solid var(--grid-strong); border-radius: 14px; padding: 22px; display: grid; gap: 16px; min-width: 0; }
+.sheet p { margin: 0; max-width: 42em; }
+
+code, .mono { font-family: var(--f-mono); font-size: .9em; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; }
+pre { margin: 0; background: var(--code-bg); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--f-mono); font-size: 14px; line-height: 1.7; }
+
+.cv { color: var(--v); font-weight: 600; }
+.cw { color: var(--w); font-weight: 600; }
+.ct { color: var(--t); font-weight: 600; }
+.co { color: var(--open); font-weight: 600; }
+.cc { color: var(--close); font-weight: 600; }
+.ck { color: var(--chk); font-weight: 600; }
+.cm { color: var(--muted); }
+
+/* playground */
+.play { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 680px) { .play { grid-template-columns: minmax(0, 1fr); } }
+.space-box { display: grid; gap: 8px; min-width: 0; }
+svg.space { width: 100%; height: auto; aspect-ratio: 1; display: block; background: var(--surface); border-radius: 10px; border: 1px solid var(--grid); cursor: grab; touch-action: none; }
+svg.space:active { cursor: grabbing; }
+.controls { display: grid; gap: 14px; min-width: 0; }
+.vec { display: grid; gap: 4px; }
+.vec-title { font-weight: 800; font-family: var(--f-mono); }
+.slider { display: grid; grid-template-columns: 4.2em minmax(0, 1fr) 2.2em; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 13.5px; }
+.slider output { text-align: right; font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; }
+.vec.v input { accent-color: var(--v); }
+.vec.w input { accent-color: var(--w); }
+.vec.t input { accent-color: var(--t); }
+input[type="range"]:focus-visible, button:focus-visible { outline: 2px solid var(--v); outline-offset: 2px; }
+
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+button {
+  font: inherit; font-size: 14px; cursor: pointer;
+  background: var(--paper); color: var(--ink);
+  border: 1px solid var(--grid-strong); border-radius: 999px; padding: 4px 12px;
+}
+button:hover { border-color: var(--ink); }
+button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+.status { display: flex; gap: 10px; align-items: baseline; font-size: 15px; }
+.pill { flex: none; font-family: var(--f-mono); font-size: 13px; font-weight: 800; padding: 2px 12px; border-radius: 999px; color: var(--surface); }
+.caption { font-size: 13.5px; color: var(--muted); }
+
+/* step 1: equations by component */
+.grid3 { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; font-family: var(--f-mono); }
+th, td { text-align: center; padding: 7px 10px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { font-family: var(--f-body); font-size: 12.5px; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td.rowhead, th.rowhead { text-align: left; }
+.solve { background: var(--solve-bg); }
+.check { background: var(--chk-bg); }
+.eqs { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.eqs li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px; border-radius: 8px; font-family: var(--f-mono); font-size: 15px; background: var(--paper); }
+.eqs li.solve { background: var(--solve-bg); }
+.eqs li.check { background: var(--chk-bg); }
+.eqs .k { font-family: var(--f-body); font-weight: 600; min-width: 3.4em; }
+.tag { font-family: var(--f-body); font-size: 12px; font-weight: 800; letter-spacing: .04em; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; }
+.spacer { flex: 1; }
+
+/* step 2: projections */
+.minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 680px) { .minis { grid-template-columns: minmax(0, 1fr); } }
+.mini { display: grid; gap: 6px; align-content: start; min-width: 0; padding: 10px; border-radius: 10px; border: 1px solid var(--grid); }
+.mini.used { border-color: var(--open); background: var(--solve-bg); }
+.mini.skip { opacity: .55; }
+.mini svg { width: 100%; height: auto; aspect-ratio: 1; display: block; background: var(--surface); border-radius: 8px; border: 1px solid var(--grid); }
+.mini .formula { font-family: var(--f-mono); font-size: 13px; overflow-x: auto; white-space: nowrap; }
+.mini .note { font-size: 13.5px; font-weight: 600; }
+table.derive { font-size: 14px; }
+table.derive td { text-align: left; }
+table.derive td.step { font-family: var(--f-body); font-weight: 800; color: var(--muted); }
+table#derive tr:last-child td { background: var(--chk-bg); }
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 680px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.two > div { display: grid; gap: 10px; min-width: 0; }
+
+.recap { counter-reset: r; display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.recap li { counter-increment: r; display: grid; grid-template-columns: 2.2em minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 17px; }
+.recap li::before { content: counter(r); font-family: var(--f-display); font-size: 26px; color: var(--open); line-height: 1; }
+a { color: var(--v); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">线性代数 · 向量与空间 · in_span</div>
+    <h1>t 能否由 v、w 组合出来</h1>
+    <p class="lede"><code>in_span(t, v, w)</code> 判断是否存在 a、b，使 a·<span class="cv">v</span> + b·<span class="cw">w</span> = <span class="ct">t</span>。按分量写开是 <b>3 个方程、2 个未知数</b>：用两个方程解出 a、b，再用 a、b 检验全部分量。</p>
+  </header>
+
+  <section class="sheet" aria-labelledby="h-play">
+    <h2 id="h-play">自己改一改</h2>
+    <p>拖动滑块改变三个向量，或点下面的 doctest 示例。v、w 的全部组合 a·v + b·w 构成一个过原点的平面，图中绿色是其中一块；<span class="ct">t</span> 落在这个平面上，结果就是 True。</p>
+    <div class="play">
+      <div class="space-box">
+        <svg class="space" id="space" role="img" aria-label="三维坐标中的 v、w、t，以及 v、w 张成的平面"></svg>
+        <label class="slider"><span>旋转</span><input type="range" id="yaw" min="-180" max="180" step="1" value="34"><output id="oyaw">34°</output></label>
+        <p class="caption">在图上拖动可以旋转视角。虚线路径是先走 a 倍的 v，再走 b 倍的 w。<span class="cc">红色虚线</span>是 a·v + b·w 与 t 的差，它总是沿着<span class="ck">检验的那个分量</span>的坐标轴方向。</p>
+      </div>
+      <div class="controls">
+        <div id="sliders" class="controls"></div>
+        <div class="presets" role="group" aria-label="示例" id="presets">
+          <button type="button" data-v="1,0,1" data-w="0,1,1" data-t="1,2,3">doctest 1</button>
+          <button type="button" data-v="1,0,1" data-w="0,1,1" data-t="1,2,4">doctest 2</button>
+          <button type="button" data-v="1,2,0" data-w="2,4,1" data-t="3,6,1">doctest 3</button>
+          <button type="button" data-v="1,2,0" data-w="2,4,1" data-t="3,7,1">doctest 4</button>
+          <button type="button" data-v="1,2,3" data-w="2,4,6" data-t="3,6,9">v、w 共线</button>
+        </div>
+        <div class="status" aria-live="polite"><span class="pill" id="pill0">True</span><span id="status0"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-s1">
+    <h2 id="h-s1">第 1 步：把 a·v + b·w = t 展开成三个方程</h2>
+    <p>a、b 是未知数。按数乘和加法的定义把左边展开，就是你写的 <code>scale</code> 和 <code>add</code> 做的事。</p>
+    <div class="grid3"><table id="expand" class="derive" aria-label="把 a·v + b·w = t 按定义展开"></table></div>
+    <p>最后一行左右两边都是三维向量。<b>两个向量相等，就是第 0、1、2 个分量分别相等</b>，所以一个向量等式等价于三个普通方程：</p>
+    <ul class="eqs" id="eqs"></ul>
+    <p>未知数只有 a、b 两个，方程却有三个。两个方程就能确定 a、b，第三个方程不一定还成立，这就是 in_span 要判断的。</p>
+    <p class="caption"><span class="co">绿色</span>两行用来解 a、b，<span class="ck">黄色</span>一行用来检验。用哪两行由第 2 步决定。</p>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-s2">
+    <h2 id="h-s2">第 2 步：选一对分量，解出 a、b</h2>
+    <p>只看两个分量，就回到二维的 <code>solve_2x2</code>。图里是 v、w、t 在这两个分量上的投影 v′、w′、t′。投影共线时 d = 0，这一对解不出 a、b，要换下一对。按 (0, 1)、(0, 2)、(1, 2) 的顺序试，用<b>第一对</b> d ≠ 0 的分量。</p>
+    <div class="minis" id="minis"></div>
+    <h3>公式推导：两个方程消元</h3>
+    <p>取选中的两个分量 i、j 的方程，先消去 b 求 a，再消去 a 求 b。左列是一般形式，右列代入当前数值。</p>
+    <div class="grid3"><table id="derive" class="derive" aria-label="消元求 a、b 的推导"></table></div>
+    <p class="caption">v、w 在三维中不共线时，三对投影中至少有一对不共线，所以一定能解出来。三对都是 d = 0，说明 v、w 本身共线，可以点上面的"v、w 共线"示例。行列式 d 的含义见<a href="https://claude.ai/artifact/2YhrzYkZqoamvRtRbGnGeJ" target="_blank" rel="noopener">二维行列式图解</a>。</p>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-s3">
+    <h2 id="h-s3">第 3 步：用 a、b 检验全部分量</h2>
+    <p>用解出的 a、b 算出 a·v + b·w，三个分量逐个和 t 比较。用来求解的两个分量一定相等，所以真正起作用的是剩下那一个；但全部比较一遍，代码就不用记"剩下的是哪一个"。</p>
+    <div class="grid3"><table id="checkTable" aria-label="逐个分量比较 a·v + b·w 与 t"></table></div>
+    <div class="status" aria-live="polite"><span class="pill" id="pill3">True</span><span id="status3"></span></div>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-code">
+    <h2 id="h-code">代码思路</h2>
+    <div class="two">
+      <div>
+        <h3>步骤</h3>
+<pre>对每一对分量 (i, j)，依次是 (0,1)、(0,2)、(1,2)：
+  ① 取出 v、w、t 的第 i、j 个分量，
+     用 solve_2x2 解 a、b
+  ② 解不出（返回 None）→ 换下一对
+  ③ 解出了 → 用 linear_combination
+     算 a·v + b·w，逐个分量和 t 比较
+     全部相等 → True；有一个不等 → False
+三对都解不出 → False（v、w 共线，不符合前提）</pre>
+        <p class="caption">比较时用 <code>abs(差) &lt;= tol</code>，不用 <code>==</code>：a、b 由除法得到，可能带浮点误差。</p>
+      </div>
+      <div>
+        <h3>当前输入的执行过程</h3>
+        <pre id="trace" aria-live="polite"></pre>
+        <p class="caption">③ 一旦执行就直接返回，后面的分量对不再尝试。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-labelledby="h-recap">
+    <h2 id="h-recap">记住三句话</h2>
+    <ol class="recap">
+      <li><span>a·v + b·w = t 按分量写开是 3 个方程、2 个未知数。</span></li>
+      <li><span>用第一对 d ≠ 0 的分量，以 solve_2x2 解出 a、b；d = 0 时换下一对。</span></li>
+      <li><span>用 a、b 算出 a·v + b·w，三个分量都与 t 相等（容差内）才返回 True。</span></li>
+    </ol>
+    <p class="caption">下一个函数 <code>is_independent_3(v1, v2, v3)</code>：v3 在 span{v1, v2} 内，三者就线性相关。</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  const NS = "http://www.w3.org/2000/svg";
+  const $ = (id) => document.getElementById(id);
+  const NAMES = ["v", "w", "t"];
+  const PAIRS = [[0, 1], [0, 2], [1, 2]];
+  const S = { v: [1, 0, 1], w: [0, 1, 1], t: [1, 2, 3] };
+  const view = { th: 34 * Math.PI / 180, ph: 0.38 };
+
+  function el(tag, attrs, style) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (style) for (const k in style) n.style[k] = style[k];
+    return n;
+  }
+
+  // 数字显示：负号用 −，分数约分
+  const show = (n) => (n < 0 ? `−${-n}` : `${n}`);
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a || 1; }
+  function frac(n, d) {
+    if (d < 0) { n = -n; d = -d; }
+    const g = gcd(n, d); n /= g; d /= g;
+    return d === 1 ? show(n) : `${show(n)}/${d}`;
+  }
+  // 作为乘数时，负数和分数加括号
+  const par = (s) => (s.startsWith("−") || s.includes("/") ? `(${s})` : s);
+  const p = (n) => par(show(n));
+
+  // ---------- 计算：与代码思路一一对应 ----------
+  function compute() {
+    const { v, w, t } = S;
+    const trace = [];
+    let found = null;
+    for (const [i, j] of PAIRS) {
+      const d = v[i] * w[j] - v[j] * w[i];
+      const an = t[i] * w[j] - t[j] * w[i];
+      const bn = v[i] * t[j] - v[j] * t[i];
+      let status;
+      if (found) status = "skip";
+      else if (d === 0) status = "zero";
+      else { status = "used"; found = { i, j, k: 3 - i - j, d, an, bn }; }
+      trace.push({ i, j, d, an, bn, status });
+    }
+    const res = { trace, found, result: false };
+    if (found) {
+      const { d, an, bn } = found;
+      res.comboN = [0, 1, 2].map((k) => an * v[k] + bn * w[k]); // 分子，分母为 d
+      res.combo = res.comboN.map((n) => n / d);
+      res.eq = res.comboN.map((n, k) => n === t[k] * d);
+      res.result = res.eq.every(Boolean);
+      res.a = frac(an, d); res.b = frac(bn, d);
+    }
+    return res;
+  }
+
+  // ---------- 三维图 ----------
+  function proj([x, y, z]) {
+    const c = Math.cos(view.th), s = Math.sin(view.th), cp = Math.cos(view.ph), sp = Math.sin(view.ph);
+    const x1 = x * c - y * s, y1 = x * s + y * c;
+    return [x1, -(z * cp + y1 * sp)];
+  }
+  function line2(svg, a, b, color, width, dash) {
+    svg.appendChild(el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], "vector-effect": "non-scaling-stroke" },
+      { stroke: color, strokeWidth: `${width}px`, strokeLinecap: "round", strokeDasharray: dash || "none" }));
+  }
+  function arrow2(svg, a, b, color, R, dash) {
+    const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+    if (len < 1e-9) { svg.appendChild(el("circle", { cx: b[0], cy: b[1], r: R * 0.025 }, { fill: color })); return; }
+    const ux = dx / len, uy = dy / len, h = Math.min(R * 0.08, len * 0.45), wd = h * 0.5;
+    const bx = b[0] - ux * h, by = b[1] - uy * h;
+    line2(svg, a, [bx, by], color, 3, dash);
+    svg.appendChild(el("polygon", { points: `${b[0]},${b[1]} ${bx - uy * wd},${by + ux * wd} ${bx + uy * wd},${by - ux * wd}` }, { fill: color }));
+  }
+  function text2(svg, at, str, color, fs, anchor) {
+    const t = el("text", { x: at[0], y: at[1], "text-anchor": anchor || "middle", "dominant-baseline": "middle" },
+      { fill: color, fontSize: `${fs}px`, fontFamily: "var(--f-mono)", fontWeight: "600",
+        paintOrder: "stroke", stroke: "var(--surface)", strokeWidth: `${fs * 0.25}px`, strokeLinejoin: "round" });
+    t.textContent = str;
+    svg.appendChild(t);
+  }
+  // 箭头末端外侧的标签位置（屏幕坐标）
+  function beyond(sp, R) {
+    const len = Math.hypot(sp[0], sp[1]) || 1;
+    return [sp[0] + (sp[0] / len) * R * 0.1, sp[1] + (sp[1] / len) * R * 0.1];
+  }
+
+  function draw3d(res) {
+    const svg = $("space");
+    svg.textContent = "";
+    const { v, w, t } = S, f = res.found;
+    const extent = [v, w, t];
+    let P = null, a = 0, b = 0, s0, s1, u0, u1;
+    if (f) {
+      a = f.an / f.d; b = f.bn / f.d;
+      s0 = Math.min(0, a) - 0.6; s1 = Math.max(0, a) + 0.6;
+      u0 = Math.min(0, b) - 0.6; u1 = Math.max(0, b) + 0.6;
+      P = (s, u) => [0, 1, 2].map((k) => s * v[k] + u * w[k]);
+      extent.push(P(s0, u0), P(s0, u1), P(s1, u0), P(s1, u1));
+    }
+    const R = Math.max(2.5, ...extent.map((q) => Math.hypot(...q))) * 1.12;
+    svg.setAttribute("viewBox", `${-R} ${-R} ${2 * R} ${2 * R}`);
+    const fs = R * 0.075;
+
+    // 坐标轴；检验的那个分量用黄色
+    for (let k = 0; k < 3; k++) {
+      const e = [0, 0, 0], n = [0, 0, 0];
+      e[k] = R * 0.82; n[k] = -R * 0.82;
+      const isChk = f && k === f.k;
+      line2(svg, proj(n), proj(e), isChk ? "var(--chk)" : "var(--grid-strong)", isChk ? 2 : 1.3);
+      text2(svg, beyond(proj(e), R * 0.6), `分量${k}`, isChk ? "var(--chk)" : "var(--muted)", fs * 0.85);
+    }
+
+    if (f) {
+      // 平面的一块，以及 v、w 整数倍的网格线
+      const corners = [P(s0, u0), P(s1, u0), P(s1, u1), P(s0, u1)].map(proj).map((q) => q.join(",")).join(" ");
+      svg.appendChild(el("polygon", { points: corners, "vector-effect": "non-scaling-stroke" },
+        { fill: "var(--open)", fillOpacity: 0.13, stroke: "var(--open)", strokeOpacity: 0.5, strokeWidth: "1px" }));
+      for (let s = Math.ceil(s0); s <= Math.floor(s1); s++) line2(svg, proj(P(s, u0)), proj(P(s, u1)), "var(--open)", 0.8, "2 4");
+      for (let u = Math.ceil(u0); u <= Math.floor(u1); u++) line2(svg, proj(P(s0, u)), proj(P(s1, u)), "var(--open)", 0.8, "2 4");
+    } else {
+      // 共线：组合只能落在一条直线上
+      const dir = Math.hypot(...v) ? v : w;
+      const L = Math.hypot(...dir);
+      if (L) {
+        const q = dir.map((x) => (x / L) * R);
+        line2(svg, proj(q.map((x) => -x)), proj(q), "var(--muted)", 1.5, "6 5");
+      }
+    }
+
+    const O = proj([0, 0, 0]);
+    if (f) {
+      const av = v.map((x) => a * x);
+      line2(svg, O, proj(av), "var(--v)", 2, "6 5");
+      line2(svg, proj(av), proj(res.combo), "var(--w)", 2, "6 5");
+    }
+    arrow2(svg, O, proj(v), "var(--v)", R);
+    arrow2(svg, O, proj(w), "var(--w)", R);
+    arrow2(svg, O, proj(t), "var(--t)", R);
+    if (f) {
+      const c = proj(res.combo);
+      if (!res.result) {
+        line2(svg, c, proj(t), "var(--close)", 2.5, "4 4");
+        svg.appendChild(el("circle", { cx: c[0], cy: c[1], r: R * 0.03 }, { fill: "var(--ink)" }));
+        text2(svg, [c[0], c[1] + fs * 1.3], "a·v+b·w", "var(--ink)", fs * 0.85);
+      }
+    }
+    text2(svg, beyond(proj(v), R), "v", "var(--v)", fs);
+    text2(svg, beyond(proj(w), R), "w", "var(--w)", fs);
+    text2(svg, beyond(proj(t), R), "t", "var(--t)", fs);
+  }
+
+  // ---------- 二维投影小图 ----------
+  function drawPlane(svg, { points, polys = [], arrows = [], labels = [] }) {
+    const xs = [0, ...points.map((q) => q[0])], ys = [0, ...points.map((q) => q[1])];
+    let minX = Math.floor(Math.min(...xs)) - 1, maxX = Math.ceil(Math.max(...xs)) + 1;
+    let minY = Math.floor(Math.min(...ys)) - 1, maxY = Math.ceil(Math.max(...ys)) + 1;
+    const span = Math.max(maxX - minX, maxY - minY, 6);
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    minX = cx - span / 2; maxX = cx + span / 2; minY = cy - span / 2; maxY = cy + span / 2;
+    svg.setAttribute("viewBox", `${minX} ${-maxY} ${span} ${span}`);
+    svg.textContent = "";
+    const fs = span * 0.075;
+    for (let x = Math.ceil(minX); x <= Math.floor(maxX); x++)
+      svg.appendChild(el("line", { x1: x, y1: -maxY, x2: x, y2: -minY, "vector-effect": "non-scaling-stroke" },
+        { stroke: x === 0 ? "var(--grid-strong)" : "var(--grid)", strokeWidth: x === 0 ? "1.5px" : "1px" }));
+    for (let y = Math.ceil(minY); y <= Math.floor(maxY); y++)
+      svg.appendChild(el("line", { x1: minX, y1: -y, x2: maxX, y2: -y, "vector-effect": "non-scaling-stroke" },
+        { stroke: y === 0 ? "var(--grid-strong)" : "var(--grid)", strokeWidth: y === 0 ? "1.5px" : "1px" }));
+    for (const q of polys) {
+      svg.appendChild(el("polygon", { points: q.pts.map(([x, y]) => `${x},${-y}`).join(" "), "vector-effect": "non-scaling-stroke" },
+        { fill: q.color, fillOpacity: 0.2, stroke: q.color, strokeWidth: "1.5px" }));
+    }
+    for (const a of arrows) {
+      const [tx, ty] = a.to, len = Math.hypot(tx, ty);
+      if (len < 1e-9) { svg.appendChild(el("circle", { cx: 0, cy: 0, r: span * 0.02 }, { fill: a.color })); continue; }
+      const ux = tx / len, uy = ty / len, h = Math.min(span * 0.06, len * 0.45), wd = h * 0.5;
+      const bx = tx - ux * h, by = ty - uy * h;
+      svg.appendChild(el("line", { x1: 0, y1: 0, x2: bx, y2: -by, "vector-effect": "non-scaling-stroke" },
+        { stroke: a.color, strokeWidth: "2.5px", strokeLinecap: "round" }));
+      svg.appendChild(el("polygon", { points: [[tx, ty], [bx - uy * wd, by + ux * wd], [bx + uy * wd, by - ux * wd]].map(([x, y]) => `${x},${-y}`).join(" ") }, { fill: a.color }));
+    }
+    for (const l of labels) {
+      const len = Math.hypot(...l.at) || 1;
+      const t = el("text", { x: l.at[0] + (l.at[0] / len) * 0.7, y: -(l.at[1] + (l.at[1] / len) * 0.7), "text-anchor": "middle", "dominant-baseline": "middle" },
+        { fill: l.color, fontSize: `${fs}px`, fontFamily: "var(--f-mono)", fontWeight: "600",
+          paintOrder: "stroke", stroke: "var(--surface)", strokeWidth: `${fs * 0.25}px`, strokeLinejoin: "round" });
+      t.textContent = l.text;
+      svg.appendChild(t);
+    }
+  }
+
+  function renderMinis(res) {
+    const box = $("minis");
+    const { v, w, t } = S;
+    box.textContent = "";
+    for (const tr of res.trace) {
+      const { i, j, d, status } = tr;
+      const card = document.createElement("div");
+      card.className = "mini" + (status === "used" ? " used" : status === "skip" ? " skip" : "");
+      const vp = [v[i], v[j]], wp = [w[i], w[j]], tp = [t[i], t[j]];
+      const note = status === "used" ? `<span class="co">d ≠ 0，用这一对</span>`
+        : status === "zero" ? `<span class="cm">d = 0，投影共线，跳过</span>`
+        : `<span class="cm">前面已解出，不再尝试</span>`;
+      card.innerHTML = `<h3>分量 (${i}, ${j})</h3>
+        <svg role="img" aria-label="v、w、t 在分量 ${i}、${j} 上的投影"></svg>
+        <div class="caption">横轴 分量${i}，纵轴 分量${j}</div>
+        <div class="formula">d = ${p(v[i])}·${p(w[j])} − ${p(v[j])}·${p(w[i])} = ${show(d)}</div>
+        <div class="note">${note}</div>`;
+      box.appendChild(card);
+      const color = status === "used" ? "var(--open)" : "var(--muted)";
+      drawPlane(card.querySelector("svg"), {
+        points: [vp, wp, tp, [vp[0] + wp[0], vp[1] + wp[1]]],
+        polys: d !== 0 ? [{ pts: [[0, 0], vp, [vp[0] + wp[0], vp[1] + wp[1]], wp], color }] : [],
+        arrows: [{ to: tp, color: "var(--t)" }, { to: vp, color: "var(--v)" }, { to: wp, color: "var(--w)" }],
+        labels: [{ at: vp, text: "v′", color: "var(--v)" }, { at: wp, text: "w′", color: "var(--w)" }, { at: tp, text: "t′", color: "var(--t)" }],
+      });
+    }
+    renderDerive(res);
+  }
+
+  // ---------- 第 2 步的推导：消元 ----------
+  function renderDerive(res) {
+    const { v, w, t } = S, f = res.found;
+    const row = (step, sym, num) => `<tr><td class="step">${step}</td><td>${sym}</td><td>${num}</td></tr>`;
+    let html = `<thead><tr><th class="rowhead">步骤</th><th class="rowhead">一般形式</th><th class="rowhead">本例数值</th></tr></thead><tbody>`;
+    // 先列出 d = 0 被跳过的分量对：消去 b 后 a 的系数为 0
+    for (const tr of res.trace) {
+      if (tr.status !== "zero") continue;
+      html += row(`(${tr.i}, ${tr.j})`, `消去 b：a·(v[${tr.i}]·w[${tr.j}] − v[${tr.j}]·w[${tr.i}]) = t[${tr.i}]·w[${tr.j}] − t[${tr.j}]·w[${tr.i}]`,
+        `a·0 = ${show(tr.an)}：${tr.an === 0 ? "任何 a 都满足" : "没有 a 满足"}，a 不能唯一确定，换下一对`);
+    }
+    if (!f) {
+      $("derive").innerHTML = html + row("结论", "三对的 d 都是 0", "v、w 共线，返回 False") + "</tbody>";
+      return;
+    }
+    const { i, j, k, d, an, bn } = f;
+    html += row("①", `a·v[${i}] + b·w[${i}] = t[${i}]`, `a·${p(v[i])} + b·${p(w[i])} = ${show(t[i])}`);
+    html += row("②", `a·v[${j}] + b·w[${j}] = t[${j}]`, `a·${p(v[j])} + b·${p(w[j])} = ${show(t[j])}`);
+    html += row("消去 b", `① × w[${j}] − ② × w[${i}]`, `① × ${p(w[j])} − ② × ${p(w[i])}`);
+    html += row("", `a·(v[${i}]·w[${j}] − v[${j}]·w[${i}]) = t[${i}]·w[${j}] − t[${j}]·w[${i}]`,
+      `a·(${p(v[i])}·${p(w[j])} − ${p(v[j])}·${p(w[i])}) = ${p(t[i])}·${p(w[j])} − ${p(t[j])}·${p(w[i])}`);
+    html += row("", `a·d = …，d = v[${i}]·w[${j}] − v[${j}]·w[${i}]`, `a·${p(d)} = ${show(an)}，<b>a = ${res.a}</b>`);
+    html += row("消去 a", `② × v[${i}] − ① × v[${j}]`, `② × ${p(v[i])} − ① × ${p(v[j])}`);
+    html += row("", `b·(v[${i}]·w[${j}] − v[${j}]·w[${i}]) = v[${i}]·t[${j}] − v[${j}]·t[${i}]`,
+      `b·${p(d)} = ${p(v[i])}·${p(t[j])} − ${p(v[j])}·${p(t[i])} = ${show(bn)}，<b>b = ${res.b}</b>`);
+    html += row("③ 代入", `a·v[${k}] + b·w[${k}] 是否等于 t[${k}]`,
+      `${par(res.a)}·${p(v[k])} + ${par(res.b)}·${p(w[k])} = ${frac(res.comboN[k], d)}，t[${k}] = ${show(t[k])}，${res.eq[k] ? "相等" : "不等"}`);
+    $("derive").innerHTML = html + "</tbody>";
+  }
+
+  // ---------- 第 1 步：对齐表与方程 ----------
+  function renderStep1(res) {
+    const { v, w, t } = S, f = res.found;
+    const role = (k) => (!f ? "" : k === f.k ? "check" : "solve");
+    // 按定义逐步展开：数乘 → 相加 → 令其等于 t
+    const vec = (items) => `[${items.join(", ")}]`;
+    const K = [0, 1, 2];
+    const row = (step, sym, num) => `<tr><td class="step">${step}</td><td>${sym}</td><td>${num}</td></tr>`;
+    const sumSym = vec(K.map((k) => `a·v[${k}] + b·w[${k}]`));
+    const sumNum = vec(K.map((k) => `a·${p(v[k])} + b·${p(w[k])}`));
+    let html = `<thead><tr><th class="rowhead">步骤</th><th class="rowhead">一般形式</th><th class="rowhead">本例数值</th></tr></thead><tbody>`;
+    html += row("要求", "a·v + b·w = t", `a·${vec(v.map(show))} + b·${vec(w.map(show))} = ${vec(t.map(show))}`);
+    html += row("数乘", `a·v = ${vec(K.map((k) => `a·v[${k}]`))}`, `a·v = ${vec(v.map((x) => `a·${p(x)}`))}`);
+    html += row("数乘", `b·w = ${vec(K.map((k) => `b·w[${k}]`))}`, `b·w = ${vec(w.map((x) => `b·${p(x)}`))}`);
+    html += row("相加", `a·v + b·w = ${sumSym}`, `a·v + b·w = ${sumNum}`);
+    html += row("等于 t", `${sumSym} = ${vec(K.map((k) => `t[${k}]`))}`, `${sumNum} = ${vec(t.map(show))}`);
+    $("expand").innerHTML = html + "</tbody>";
+    $("eqs").innerHTML = [0, 1, 2].map((k) => {
+      const r = role(k);
+      const tag = r === "solve" ? `<span class="tag co">解 a、b</span>` : r === "check" ? `<span class="tag ck">检验</span>` : "";
+      return `<li class="${r}"><span class="k">分量${k}</span><span>a·<span class="cv">${p(v[k])}</span> + b·<span class="cw">${p(w[k])}</span> = <span class="ct">${show(t[k])}</span></span><span class="spacer"></span>${tag}</li>`;
+    }).join("");
+  }
+
+  // ---------- 第 3 步：检验表 ----------
+  function renderStep3(res) {
+    const { v, w, t } = S, f = res.found;
+    if (!f) {
+      $("checkTable").innerHTML = `<tbody><tr><td class="rowhead cm">没有解出 a、b，不进行检验</td></tr></tbody>`;
+    } else {
+      let html = `<thead><tr><th class="rowhead">分量</th><th>a·v[k] + b·w[k]</th><th>t[k]</th><th>结果</th></tr></thead><tbody>`;
+      for (let k = 0; k < 3; k++) {
+        const r = k === f.k ? "check" : "solve";
+        const val = frac(res.comboN[k], f.d);
+        const diff = frac(t[k] * f.d - res.comboN[k], f.d);
+        const ok = res.eq[k];
+        html += `<tr><td class="rowhead ${r}">分量${k}</td>
+          <td class="${r}">${par(res.a)}·${p(v[k])} + ${par(res.b)}·${p(w[k])} = ${val}</td>
+          <td class="${r} ct">${show(t[k])}</td>
+          <td class="${r} ${ok ? "co" : "cc"}">${ok ? "相等" : `不等，差 ${diff}`}</td></tr>`;
+      }
+      $("checkTable").innerHTML = html + "</tbody>";
+    }
+  }
+
+  // ---------- 结论与执行过程 ----------
+  function verdict(res) {
+    const f = res.found;
+    if (!f) return "三对分量都解不出 a、b：v、w 共线，不符合 w 与 v 不共线的前提。";
+    if (res.result) return `a = ${res.a}，b = ${res.b} 时 a·v + b·w = t，t 在 span{v, w} 内。`;
+    const bad = res.eq.map((ok, k) => (ok ? null : k)).filter((k) => k !== null);
+    return `用分量 (${f.i}, ${f.j}) 解出 a = ${res.a}，b = ${res.b}，但分量${bad.join("、")}对不上，t 不在 span{v, w} 内。`;
+  }
+
+  function renderTrace(res) {
+    const lines = [];
+    for (const tr of res.trace) {
+      if (tr.status === "skip") continue;
+      if (tr.status === "zero") { lines.push(`(${tr.i},${tr.j})：d = 0 → 解不出，换下一对`); continue; }
+      lines.push(`(${tr.i},${tr.j})：d = ${show(tr.d)} → a = ${res.a}，b = ${res.b}`);
+      const combo = res.comboN.map((n) => frac(n, tr.d)).join(", ");
+      lines.push(`   a·v + b·w = [${combo}]`);
+      lines.push(`   t         = [${S.t.map(show).join(", ")}]`);
+      lines.push(res.result ? "   逐个分量全部相等 → 返回 True"
+        : `   分量${res.eq.map((ok, k) => (ok ? null : k)).filter((k) => k !== null).join("、")}不等 → 返回 False`);
+    }
+    if (!res.found) lines.push("三对都解不出 → 返回 False");
+    $("trace").textContent = lines.join("\n");
+  }
+
+  function setPill(pill, text, res) {
+    pill.textContent = res.result ? "True" : "False";
+    pill.style.background = res.result ? "var(--open)" : res.found ? "var(--close)" : "var(--muted)";
+    text.textContent = verdict(res);
+  }
+
+  // ---------- 控件 ----------
+  const sliders = $("sliders");
+  for (const name of NAMES) {
+    const g = document.createElement("div");
+    g.className = `vec ${name}`;
+    g.innerHTML = `<div class="vec-title c${name}">${name} = [<span id="${name}t">${S[name].join(", ")}</span>]</div>` +
+      [0, 1, 2].map((k) => `<label class="slider"><span>${name}[${k}]</span><input type="range" id="${name}${k}" min="-5" max="5" step="1" value="${S[name][k]}"><output id="o${name}${k}">${S[name][k]}</output></label>`).join("");
+    sliders.appendChild(g);
+  }
+
+  function readInputs() {
+    for (const name of NAMES) {
+      S[name] = [0, 1, 2].map((k) => Number($(`${name}${k}`).value));
+      [0, 1, 2].forEach((k) => { $(`o${name}${k}`).textContent = S[name][k]; });
+      $(`${name}t`).textContent = S[name].map(show).join(", ");
+    }
+  }
+
+  function render() {
+    readInputs();
+    const res = compute();
+    draw3d(res);
+    renderStep1(res);
+    renderMinis(res);
+    renderStep3(res);
+    renderTrace(res);
+    setPill($("pill0"), $("status0"), res);
+    setPill($("pill3"), $("status3"), res);
+    document.querySelectorAll("#presets button").forEach((btn) => {
+      const same = NAMES.every((n) => btn.dataset[n] === S[n].join(","));
+      btn.setAttribute("aria-pressed", String(same));
+    });
+  }
+
+  sliders.addEventListener("input", render);
+  $("presets").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    for (const name of NAMES) btn.dataset[name].split(",").forEach((x, k) => { $(`${name}${k}`).value = x; });
+    render();
+  });
+
+  // 旋转：滑块控制水平角度，拖动同时控制水平与俯仰
+  function setYaw(deg) {
+    deg = ((deg + 540) % 360) - 180;
+    view.th = deg * Math.PI / 180;
+    $("yaw").value = Math.round(deg);
+    $("oyaw").textContent = `${Math.round(deg)}°`;
+  }
+  $("yaw").addEventListener("input", () => { setYaw(Number($("yaw").value)); draw3d(compute()); });
+  const space = $("space");
+  let drag = null;
+  space.addEventListener("pointerdown", (e) => {
+    drag = { x: e.clientX, y: e.clientY, th: view.th, ph: view.ph };
+    space.setPointerCapture(e.pointerId);
+  });
+  space.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    setYaw((drag.th + (e.clientX - drag.x) * 0.01) * 180 / Math.PI);
+    view.ph = Math.max(-1.45, Math.min(1.45, drag.ph + (e.clientY - drag.y) * 0.01));
+    draw3d(compute());
+  });
+  const end = () => { drag = null; };
+  space.addEventListener("pointerup", end);
+  space.addEventListener("pointercancel", end);
+
+  render();
+})();
+</script>

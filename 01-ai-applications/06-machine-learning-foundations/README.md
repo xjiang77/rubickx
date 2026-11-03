@@ -25,7 +25,8 @@
 从仓库根目录执行（Nanochat 命令在具体系统目录执行）：
 
 - `make test-math`
-- `make test-linalg`（骨架状态下预期失败；不计入 `make test`）
+- `make test-linalg`（A 组 vectors；不计入 `make test`）
+- `make test-linalg-matrices`（B 组 matrices；骨架状态下预期失败；不计入 `make test`）
 - `各系统目录 pytest test_impl.py；实现后 python parity.py`（TODO / skip 不证明实现完成。）
 
 ## 下一步

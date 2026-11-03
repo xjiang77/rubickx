@@ -12,5 +12,8 @@
 | 目录 | 对应正文 | 学 | 验证入口 |
 |---|---|---|---|
 | [vectors](vectors) | 02 - AI - 向量与空间：三种视角、线性组合与基 | [ELI5 页](../../../../web/learn/06-machine-learning-foundations/linear-algebra.html) | `make test-linalg` |
+| [matrices](matrices) | B 组：变换与矩阵（3Blue1Brown 第 3–5 集；正文 03 在 dragon-vault，本仓无笔记） | 随练习补（本轮不建 ELI5） | `make test-linalg-matrices` |
 
 四段合在一个 notebook 里按顺序走（`vectors.ipynb`，JupyterLab 打开）。`demo.py` 用 numpy 复现正文中的示例，只供闭卷实现之后对照。notebook 提交前清除输出，交付前 Restart Kernel and Run All Cells 一次跑通。
+
+B 组 `matrices/` 目前是手写骨架和验证器。`matrices.ipynb` 只有一句占位，不铺 playground，也不建 ELI5 页。`make test-linalg` 仍只跑 A 组；B 组用 `make test-linalg-matrices`（骨架状态下预期失败，不得改为 skip）。

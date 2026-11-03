@@ -127,7 +127,7 @@ svg text{font-family:"Avenir Next","Segoe UI","PingFang SC",sans-serif}
     <div class="ctx origin"><h2>起源与发展</h2><p>17 世纪后期，牛顿与莱布尼茨分别建立 calculus（微积分）；dy/dx 记法源自莱布尼茨，chain rule 在该记法下表达最为直接。1847 年，Cauchy 提出沿负 gradient 方向逐步逼近极值的方法，即 gradient descent（梯度下降）的早期形式。1970 年起，reverse-mode automatic differentiation（反向模式自动微分）将 chain rule 实现为可自动执行的算法，即后来用于训练神经网络的 backpropagation。</p><ol class="timeline" aria-label="时间线"><li><span class="y">17 世纪后期</span><span class="e">Calculus</span><span class="w">牛顿、莱布尼茨</span></li><li><span class="y">1847</span><span class="e">Gradient descent 的早期形式</span><span class="w">Cauchy</span></li><li><span class="y">1970</span><span class="e">Reverse-mode AD</span><span class="w">Linnainmaa</span></li></ol></div>
   </section>
   <p class="part">逐步推演</p>
-  <div class="intro"><p>示例只用一个样本 (x, y) = (2, 10)，即面积 200 平方米、成交价 1000 万元；parameter 初值为 w = 3、b = 0。第 1 屏介绍 derivative，第 2、3 屏介绍 partial derivative、gradient 与 gradient descent，第 4 屏介绍 chain rule。</p><p>本例说明以下要点：</p><ol><li>Derivative 是局部变化率：输入改变一个小量时，输出的改变量约为 derivative 与该小量之积。</li><li>Gradient 由各 parameter 的 partial derivative 组成，指向 loss 增大最快的方向；沿反方向移动，loss 下降。</li><li>复合运算的 derivative 等于各步 derivative 之积；存在多条路径时，各路径的结果相加。</li></ol></div>
+  <div class="intro"><p>示例只用一个样本 (x, y) = (2, 10)，即面积 200 平方米、成交价 1000 万元；parameter 初值为 w = 3、b = 0。步骤 1 介绍 derivative，步骤 2 与步骤 3 介绍 partial derivative、gradient 与 gradient descent，步骤 4 介绍 chain rule。</p><p>本例说明以下要点：</p><ol><li>Derivative 是局部变化率：输入改变一个小量时，输出的改变量约为 derivative 与该小量之积。</li><li>Gradient 由各 parameter 的 partial derivative 组成，指向 loss 增大最快的方向；沿反方向移动，loss 下降。</li><li>复合运算的 derivative 等于各步 derivative 之积；存在多条路径时，各路径的结果相加。</li></ol></div>
   <main>
     <section class="screen" id="derivative">
       <span class="step">1 · Derivative</span>

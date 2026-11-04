@@ -805,10 +805,11 @@
         "kind": "code",
         "state": "partial",
         "paths": [
-          "01-ai-applications/06-machine-learning-foundations/math-prerequisites/linear-algebra/vectors"
+          "01-ai-applications/06-machine-learning-foundations/math-prerequisites/linear-algebra/vectors",
+          "01-ai-applications/06-machine-learning-foundations/math-prerequisites/linear-algebra/properties"
         ],
         "verify": "make test-linalg",
-        "plan": "每篇正文对应四段：学（ELI5 页）→ 玩（playground）→ 做（手写实现，C5）→ 测（验证器 + 题库）；后续各组随知识正文逐篇增加"
+        "plan": "每篇正文对应四段：学（ELI5 页）→ 玩（playground）→ 做（手写实现，C5）→ 测（验证器 + 题库）。A 组 vectors 用 make test-linalg。C 组 properties 仍是骨架，用 make test-linalg-properties，实现前预期失败。B 组 matrices 在 draft PR #10，入口 make test-linalg-matrices。变换的性质这一篇本仓无笔记；ELI5 另轮。"
       },
       "eli5": {
         "path": "web/learn/06-machine-learning-foundations/linear-algebra.html",

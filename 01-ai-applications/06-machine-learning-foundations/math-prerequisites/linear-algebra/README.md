@@ -12,5 +12,17 @@
 | 目录 | 对应正文 | 学 | 验证入口 |
 |---|---|---|---|
 | [vectors](vectors) | 02 - AI - 向量与空间：三种视角、线性组合与基 | [ELI5 页](../../../../web/learn/06-machine-learning-foundations/linear-algebra.html) | `make test-linalg` |
+| [dimensions](dimensions) | D 组：维度之间（3Blue1Brown 第 8–11 集：非方阵、点积与对偶、一维投影、叉积；本仓无对应笔记） | 随练习补（本轮不建 ELI5） | `make test-linalg-dimensions` |
 
 四段合在一个 notebook 里按顺序走（`vectors.ipynb`，JupyterLab 打开）。`demo.py` 用 numpy 复现正文中的示例，只供闭卷实现之后对照。notebook 提交前清除输出，交付前 Restart Kernel and Run All Cells 一次跑通。
+
+D 组 `dimensions/` 目前是手写骨架和验证器，与 `vectors/` 并列。`dimensions.ipynb` 只有一句占位，不铺 playground，也不建 ELI5 页。
+
+本分支上的两个入口，另外两组在别的 draft：
+
+- `make test-linalg`：A 组 `vectors/`。这个目标保持只跑 A 组。
+- `make test-linalg-dimensions`：D 组 `dimensions/`。骨架状态下预期失败，不得改为 skip。
+- `make test-linalg-matrices`：B 组 `matrices/`，在 draft PR #10。本分支没有该目录，也不改那组文件。
+- `make test-linalg-properties`：C 组 `properties/`，在 draft PR #11。本分支没有该目录，也不改那组文件。
+
+这些目标都不并入默认 `make test`。

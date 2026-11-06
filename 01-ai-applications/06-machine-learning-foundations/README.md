@@ -25,8 +25,11 @@
 从仓库根目录执行（Nanochat 命令在具体系统目录执行）：
 
 - `make test-math`
-- `make test-linalg`（骨架状态下预期失败；不计入 `make test`）
+- `make test-linalg`（A 组 vectors；不计入 `make test`）
+- `make test-linalg-eigen`（E 组「坐标系变换」；骨架状态下预期失败；不计入 `make test`）
 - `各系统目录 pytest test_impl.py；实现后 python parity.py`（TODO / skip 不证明实现完成。）
+
+B 组「变换与矩阵」的入口是 `make test-linalg-matrices`（draft PR #10 的 `matrices/`）。C 组「变换的性质」的入口是 `make test-linalg-properties`（draft PR #11 的 `properties/`）。D 组「维度之间」的入口是 `make test-linalg-dimensions`（draft PR #12 的 `dimensions/`）。本分支不改那三组文件。上述线性代数目标都不计入 `make test`。
 
 ## 下一步
 

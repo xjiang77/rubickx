@@ -544,10 +544,10 @@
         "kind": "code",
         "state": "partial",
         "paths": [
-          "01-ai-applications/06-machine-learning-foundations/nanochat/systems/06-engine"
+          "01-ai-applications/05-operating-in-production/kv-cache-lab"
         ],
-        "verify": "cd 01-ai-applications/06-machine-learning-foundations/nanochat/systems/06-engine && pytest test_impl.py",
-        "plan": "练习骨架：实现须由本人手写（nanochat C5 约束），verifier 在实现前预期失败"
+        "verify": "make test-kvcache",
+        "plan": "概念练习骨架：形状、token-forward、字节、KVCache.append/get 与前缀复用由本人手写。make test-kvcache 在实现前预期失败，不计入 make test / CI，不得用 skip 或 xfail 换成退出码 0。nanochat systems/06-engine 是后续全量 Inference Engine 重写，不在本练习里。"
       },
       "eli5": null
     },

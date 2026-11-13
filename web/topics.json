@@ -564,10 +564,12 @@
       },
       "practice": {
         "kind": "code",
-        "state": "missing",
-        "paths": [],
-        "verify": null,
-        "plan": "连续批处理调度模拟器"
+        "state": "partial",
+        "paths": [
+          "01-ai-applications/05-operating-in-production/serving-scheduler-lab"
+        ],
+        "verify": "make test-serving",
+        "plan": "连续批处理调度模拟器的概念练习骨架：实现由本人手写。make test-serving 在实现前预期失败，不计入 make test / CI，不得用 skip/xfail 换成退出码 0。不是 vLLM，也不是 nanochat 06-engine。"
       },
       "eli5": null
     },

@@ -123,7 +123,7 @@
       "zh": "AI 生产运维",
       "origin": "andrew",
       "source": "https://x.com/AndrewYNg/status/2090840747738374568",
-      "status": "planned",
+      "status": "scaffold",
       "description": "持续观察 AI 应用的质量、成本、延迟与行为变化。",
       "boundary": "当前没有 AI 线上运维实践；通用 CI 不证明漂移检测、模型质量或成本控制。",
       "next": "选择真实 AI 服务后，定义观测指标、回归样本与响应流程。",
